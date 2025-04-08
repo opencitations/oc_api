@@ -1,0 +1,70 @@
+$def with (active, sp_title, sparql_endpoint, current_subdomain, render)
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenCitations - API</title>
+  <!-- Bootstrap CSS -->
+  <link href="/static/bootstrap-533/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Custom HEADER CSS -->
+  <link rel="stylesheet" href="/static/css/custom.css" class="css" />
+</head>
+
+<body>
+
+  $:render.common.header(sp_title, current_subdomain)
+
+  <main>
+    <div class="container">
+      <div class="text-center my-5 animate__animated animate__fadeIn">
+        <img src="../static/img/oc-medium.png" alt="Logo" class="img-fluid mb-4" style="max-height: 120px" />
+        <h1 class="display-4 mb-5">Choose API</h1>
+      </div>
+
+      <div class="container">
+        <div class="row justify-content-center g-4">
+          <div class="col-md-5">
+            <a href="/meta" class="endpoint-card">
+              <div class="card h-100 shadow-sm hover-effect">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center p-4">
+                  <i class="fa fa-database mb-3 fa-3x text-primary"></i>
+                  <h2 class="card-title h3">Meta</h2>
+                  <p class="card-text text-muted">
+                    Stores and delivers bibliographic metadata for all
+                    publications involved in the OC Index DB.
+                  </p>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div class="col-md-5">
+            <a href="/index" class="endpoint-card">
+              <div class="card h-100 shadow-sm hover-effect">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center p-4">
+                  <i class="fa fa-list-alt mb-3 fa-3x text-primary"></i>
+                  <h2 class="card-title h3">Index</h2>
+                  <p class="card-text text-muted">
+                    Contain citation data, treating citations as primary data
+                    entities rather than simple links
+                  </p>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer class="position-fixed bottom-0 end-0 p-3 footer-container">
+    <a href="https://opencitations.net" class="back-home-link">
+      Back to OC Home Page
+    </a>
+  </footer>
+  <!-- Bootstrap JS -->
+  <script src="/static/bootstrap-533/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

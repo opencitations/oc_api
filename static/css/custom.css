@@ -1,0 +1,119 @@
+/* Header w/ OC colors */
+.navbar {
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+.dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,.1);
+}
+
+.nav-link {
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #2D22DE !important; /* OpenCitations blue */
+}
+
+.dropdown-item {
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-item:hover {
+    color: #9931FC !important; /* OpenCitations purple */
+    background-color: rgba(153, 49, 252, 0.05); /* Light purple background */
+}
+
+/* Sparql selector */
+.hover-effect {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: white;
+    border: none;
+}
+
+.hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.endpoint-card {
+    text-decoration: none;
+    color: inherit;
+}
+
+.endpoint-card:hover {
+    color: inherit;
+}
+
+.card {
+    border-radius: 15px;
+    border: 1px solid rgba(0,0,0,0.08);
+}
+
+.display-4 {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.card-text {
+    font-size: 0.95rem;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate__fadeIn {
+    animation: fadeIn 1s ease-out;
+}
+
+
+/* FOOTER */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap');
+
+.footer-container {
+  z-index: 1000;
+}
+
+.back-home-link {
+  font-family: 'Lato', sans-serif;
+  font-weight: 300;
+  font-size: 0.9rem;
+  color: #9931FC; /* OpenCitations purple */
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.back-home-link:hover {
+  color: #2D22DE; /* OpenCitations blue */
+  background-color: rgba(45, 34, 222, 0.05); /* Light blue background */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Aggiunge margine al contenuto principale */
+main {
+  margin-bottom: 60px;
+}
+
+/* Media query per tablet e smartphone */
+@media (max-width: 992px) {
+  .footer-container {
+    left: 0;
+    right: 0;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.95);
+  }
+}

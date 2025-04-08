@@ -1,0 +1,212 @@
+
+/* Colori OpenCitations */
+:root {
+    --oc-purple: #9931FC;
+    --oc-blue: #2D22DE;
+    --oc-light-purple: rgba(153, 49, 252, 0.03);
+    --oc-hover-blue: rgba(45, 34, 222, 0.05);
+  }
+  
+  /* Container principale centrato */
+  .search.container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  /* Wrapper responsive per tabella */
+  #search_results .table-responsive {
+    margin: 0 auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Miglioramenti tabella risultati */
+  #search_results .table.results-tab {
+    width: 100%;
+    margin: 0 auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Intestazioni tabella */
+  #search_results .results-tab th {
+    background-color: var(--oc-purple) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 12px 15px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: none !important;
+  }
+  
+  /* Righe alternate */
+  #search_results .results-tab tbody tr:nth-child(even) {
+    background-color: var(--oc-light-purple);
+  }
+  
+  /* Effetto hover sulle righe */
+  #search_results .results-tab tbody tr:hover {
+    background-color: var(--oc-hover-blue);
+  }
+  
+  /* Link nelle celle */
+  #search_results .results-tab a.res-val-link {
+    color: var(--oc-blue);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  
+  #search_results .results-tab a.res-val-link:hover {
+    color: var(--oc-purple);
+    text-decoration: underline;
+  }
+  
+  /* Miglioramenti footer tabella */
+  #search_results .table.tab-footer {
+    background: transparent;
+    border: none;
+    margin-top: 1rem;
+  }
+  
+  /* Paginazione */
+  #search_results .pagination {
+    justify-content: center;
+    margin: 1rem 0;
+  }
+  
+  #search_results .pagination .page-item .page-link {
+    color: var(--oc-blue);
+    border-color: rgba(153, 49, 252, 0.2);
+    margin: 0 2px;
+    border-radius: 4px;
+  }
+  
+  #search_results .pagination .page-item.active .page-link {
+    background-color: var(--oc-purple);
+    border-color: var(--oc-purple);
+    color: white;
+  }
+  
+  #search_results .pagination .page-item .page-link:hover {
+    background-color: rgba(153, 49, 252, 0.1);
+    color: var(--oc-purple);
+  }
+  
+  /* Layout responsive header */
+  .search-header .row {
+    align-items: center;
+  }
+  
+  /* Layout filtri e risultati */
+  @media (min-width: 992px) {
+    .search-filters {
+      padding-right: 2rem;
+    }
+    
+    .search-results {
+      padding-left: 1rem;
+    }
+  }
+  
+  /* Miglioramenti filtri */
+  .search-filters .filter-values-tab {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  
+  .search-filters .filter-values-tab th {
+    background-color: var(--oc-purple);
+    color: white;
+  }
+  
+  /* Checkbox più grandi */
+  .search-filters .form-check-input {
+    width: 1.2em;
+    height: 1.2em;
+  }
+  
+  .search-filters .form-check {
+    padding: 0.5rem 0;
+  }
+  
+  /* Bottoni filtro */
+  .filters-btns .btn-primary {
+    background-color: #ffffff;
+    color: var(--oc-purple);
+    border-color: var(--oc-purple);
+    transition: all 0.3s;
+  }
+  
+  .filters-btns .btn-primary:hover,
+  .filters-btns .btn-primary:focus {
+    background-color: var(--oc-purple);
+    color: #ffffff;
+    border-color: var(--oc-purple);
+  }
+  
+  /* Slider filtro */
+  .search-filters .form-range::-webkit-slider-thumb {
+    background-color: var(--oc-purple);
+  }
+  
+  .search-filters .form-range::-moz-range-thumb {
+    background-color: var(--oc-purple);
+  }
+  
+  /* Miglioramenti testo di aiuto */
+  .tot-results #tot_val {
+    color: var(--oc-purple);
+    font-weight: bold;
+  }
+  
+  /* Tabella nessun risultato */
+  .table.tab-footer.noresults {
+    text-align: center;
+    padding: 2rem 0;
+  }
+  
+  /* Media query per dispositivi mobili */
+  @media (max-width: 768px) {
+    #search_results .results-tab td,
+    #search_results .results-tab th {
+      padding: 8px 10px;
+      font-size: 14px;
+    }
+    
+    .search-results {
+      margin-top: 1.5rem;
+    }
+    
+    .pagination .page-link {
+      padding: 6px 10px;
+    }
+    
+    .filters-btns .btn {
+      margin-bottom: 0.5rem;
+    }
+  }
+  
+  /* Spaziatura e margini generali */
+  .search-body {
+    margin-top: 1.5rem;
+  }
+  
+  .limit-results-value {
+    color: var(--oc-purple);
+    font-weight: bold;
+  }
+  
+  /* Loader migliorato */
+  .searchloader.spinner-border {
+    color: var(--oc-purple);
+  }
+
+  #search_header{
+    height: 100%!important;
+  } 
