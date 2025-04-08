@@ -28,7 +28,7 @@ from dateutil.parser import parse
 from collections import defaultdict
 
 # Load the configuration file
-with open("../../conf.json") as f:
+with open("conf.json") as f:
     c = json.load(f)
     
 

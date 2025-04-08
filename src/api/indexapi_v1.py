@@ -27,7 +27,7 @@ from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse
 
 # Load the configuration file
-with open("../../conf.json") as f:
+with open("conf.json") as f:
     c = json.load(f)
     
 
