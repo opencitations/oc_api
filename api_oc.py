@@ -50,8 +50,8 @@ urls = (
     '/favicon.ico', 'Favicon',
     "/sparql/index", "SparqlIndex",
     "/sparql/meta", "SparqlMeta",
-    "/index", "RedirectIndex",
-    "/meta", "RedirectMeta",
+    "/index/?", "RedirectIndex",
+    "/meta/?", "RedirectMeta",
     "/(index)(/v[0-9].*)", "Api",
     "/(meta)(/v[0-9].*)", "Api"
     
