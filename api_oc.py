@@ -52,6 +52,11 @@ urls = (
     "/(index)(/v[0-9]).*", "Api",
     # META API
     "/(meta)(/v[0-9].*)", "Api"
+    # INDEX Sparql
+    "/sparql/index", "SparqlIndex",
+    # Meta Sparql
+    "/sparql/meta", "SparqlMeta",
+    
 )
 
 # Set the web logger

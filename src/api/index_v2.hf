@@ -1,6 +1,6 @@
 #url /api/v2
 #type api
-#base https://opencitations.net/index
+#base https://api.opencitations.net/index
 #title The REST API for OpenCitations Index
 #description This document describe the REST API for accessing the data stored in the [OpenCitations Index](https://w3id.org/oc/index) hosted by [OpenCitations](http://opencitations.net). This API implements operations to retrieve the citation data for all the references to other works appearing in a particular bibliographic entity, or the citation data for all the references appearing in other works to a particular bibliographic entity, given the identifier of a bibliographic entity, or to retrieve citation data about a particular citation identified by means of its [Open Citation Identifier (OCI)](https://opencitations.wordpress.com/2018/03/12/citations-as-first-class-data-entities-open-citation-identifiers/).
 
@@ -20,7 +20,7 @@ get(API_CALL, headers=HTTP_HEADERS)
 #version Version 2.1.0 (2024-07-01)
 #contacts [contact@opencitations.net](mailto:contact@opencitations.net)
 #license This document is licensed with a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/legalcode), while the REST API itself has been created using [RAMOSE](https://github.com/opencitations/ramose), the *Restful API Manager Over SPARQL Endpoints* created by [Silvio Peroni](https://orcid.org/0000-0003-0530-4305), which is licensed with an [ISC license](https://opensource.org/licenses/ISC).
-#endpoint http://127.0.0.1/index/sparql
+#endpoint http://api.opencitations.net/index/sparql
 #method post
 #addon indexapi_v2
 

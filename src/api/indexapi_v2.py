@@ -27,19 +27,6 @@ from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse
 from collections import defaultdict
 
-# Load the configuration file
-with open("conf.json") as f:
-    c = json.load(f)
-    
-
-# Docker ENV variables
-api_config = {
-    "api_base_url": os.getenv("API_BASE_URL", c["api_base_url"]),
-    "sparql_endpoint_index": os.getenv("SPARQL_ENDPOINT_INDEX", c["sparql_endpoint_index"]),
-    "sparql_endpoint_meta": os.getenv("SPARQL_ENDPOINT_META", c["sparql_endpoint_meta"]),
-    "sync_enabled": os.getenv("SYNC_ENABLED", "false").lower() == "true"
-}
-
 def lower(s):
     return s.lower(),
 
