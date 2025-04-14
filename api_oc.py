@@ -53,7 +53,7 @@ urls = (
     # Meta Sparql
     "/sparql/meta", "SparqlMeta",
     # INDEX API
-    "/(index)(/v[0-9]).*", "Api",
+    "/(index)(/v[0-9].*)", "Api",
     # META API
     "/(meta)(/v[0-9].*)", "Api"
     
