@@ -75,7 +75,7 @@ class HashFormatHandler(object):
             cur_field_name = None
             cur_field_content = None
             for line in f.readlines():
-                cur_matching = search("^#([^\s]+)\s(.+)$", line, DOTALL)
+                cur_matching = search(r"^#([^\s]+)\s(.+)$", line, DOTALL)
                 if cur_matching is not None:
                     cur_field_name = cur_matching.group(1)
                     cur_field_content = cur_matching.group(2)
@@ -246,7 +246,7 @@ The operations that this API implements are:
 <p class="ex attr"><strong>Exemplar output (in JSON)</strong></p>
 <pre><code>%s</code></pre></div>""" % (op["url"], op["url"], markdown(op["description"]),
                                        ", ".join(
-                                           split("\s+", op["method"].strip())), "</li><li>".join(params),
+                                           split(r"\s+", op["method"].strip())), "</li><li>".join(params),
                                        ", ".join(["%s <em>(%s)</em>" % (f, t) for t, f in
                                                   findall(FIELD_TYPE_RE, op["field_type"])]),
                                        conf["website"] + conf["base_url"] + op["call"], op["call"], op["output_json"])
@@ -1110,9 +1110,9 @@ class Operation(object):
 
         if "preprocess" in op_item:
 
-            for pre in [sub("\s+", "", i) for i in op_item["preprocess"].split(" --> ")]:
-                func_name = sub("^([^\(\)]+)\(.+$", "\\1", pre).strip()
-                params_name = sub("^.+\(([^\(\)]+)\).*", "\\1", pre).split(",")
+            for pre in [sub(r"\s+", "", i) for i in op_item["preprocess"].split(" --> ")]:
+                func_name = sub(r"^([^\(\)]+)\(.+$", r"\1", pre).strip()
+                params_name = sub(r"^.+\(([^\(\)]+)\).*", r"\1", pre).split(",")
 
                 param_list = ()
                 for param_name in params_name:
@@ -1151,8 +1151,8 @@ class Operation(object):
 
         if "postprocess" in op_item:
             for post in [i.strip() for i in op_item["postprocess"].split(" --> ")]:
-                func_name = sub("^([^\(\)]+)\(.+$", "\\1", post).strip()
-                param_str = sub("^.+\(([^\(\)]*)\).*", "\\1", post)
+                func_name = sub(r"^([^\(\)]+)\(.+$", r"\1", post).strip()
+                param_str = sub(r"^.+\(([^\(\)]*)\).*", r"\1", post)
                 if param_str == "":
                     params_values = ()
                 else:

@@ -48,13 +48,11 @@ active = {
 urls = (
     "/", "Main",
     '/favicon.ico', 'Favicon',
-    # INDEX Sparql
     "/sparql/index", "SparqlIndex",
-    # Meta Sparql
     "/sparql/meta", "SparqlMeta",
-    # INDEX API
+    "/index", "RedirectIndex",
+    "/meta", "RedirectMeta",
     "/(index)(/v[0-9].*)", "Api",
-    # META API
     "/(meta)(/v[0-9].*)", "Api"
     
 )
@@ -125,6 +123,22 @@ def validateAccessToken():
 class Favicon:
     def GET(self): 
         raise web.seeother("/static/favicon.ico")
+    
+class RedirectIndex:
+    def GET(self):
+        # Redirect from /index to /index/v2
+        raise web.seeother('/index/v2')
+    
+    def POST(self):
+        raise web.seeother('/index/v2')
+    
+class RedirectMeta:
+    def GET(self):
+        # Redirect from /index to /index/v2
+        raise web.seeother('/meta/v1')
+    
+    def POST(self):
+        raise web.seeother('/meta/v1')
 
 class Header:
     def GET(self):
