@@ -213,16 +213,13 @@ class Sparql:
 
     def __run_query_string(self, active, query_string, is_post=False,
                           content_type="application/x-www-form-urlencoded"):
+        # Add redirect if no query string is provided
+        if query_string is None or query_string.strip() == "":
+            raise web.seeother('/')
+        
         parsed_query = urlparse.parse_qs(query_string)
         current_subdomain = web.ctx.host.split('.')[0].lower()
-        if query_string is None or query_string.strip() == "":
-            web_logger.mes()
-            return getattr(render, self.sparql_endpoint_title)(
-                active=active, 
-                sp_title=self.sparql_endpoint_title, 
-                sparql_endpoint=self.yasqe_sparql_endpoint, 
-                render=render,
-                current_subdomain=current_subdomain)
+
         for k in self.collparam:
             if k in parsed_query:
                 query = parsed_query[k][0]
