@@ -20,7 +20,7 @@ get(API_CALL, headers=HTTP_HEADERS)
 #version Version 2.1.0 (2024-07-01)
 #contacts [contact@opencitations.net](mailto:contact@opencitations.net)
 #license This document is licensed with a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/legalcode), while the REST API itself has been created using [RAMOSE](https://github.com/opencitations/ramose), the *Restful API Manager Over SPARQL Endpoints* created by [Silvio Peroni](https://orcid.org/0000-0003-0530-4305), which is licensed with an [ISC license](https://opensource.org/licenses/ISC).
-#endpoint http://api.opencitations.net/index/sparql
+#endpoint http://qlever-service.default.svc.cluster.local:7011
 #method post
 #addon indexapi_v2
 
