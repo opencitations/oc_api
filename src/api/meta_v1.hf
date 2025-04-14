@@ -1,4 +1,4 @@
-#url /api/v1
+#url /v1
 #type api
 #base https://api.opencitations.net/meta
 #title REST API for OpenCitations Meta

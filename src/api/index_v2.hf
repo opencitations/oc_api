@@ -1,4 +1,4 @@
-#url /api/v2
+#url /v2
 #type api
 #base https://api.opencitations.net/index
 #title The REST API for OpenCitations Index

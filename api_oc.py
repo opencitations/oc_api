@@ -48,14 +48,14 @@ active = {
 urls = (
     "/", "Main",
     '/favicon.ico', 'Favicon',
-    # INDEX API
-    "/(index)(/v[0-9]).*", "Api",
-    # META API
-    "/(meta)(/v[0-9].*)", "Api"
     # INDEX Sparql
     "/sparql/index", "SparqlIndex",
     # Meta Sparql
     "/sparql/meta", "SparqlMeta",
+    # INDEX API
+    "/(index)(/v[0-9]).*", "Api",
+    # META API
+    "/(meta)(/v[0-9].*)", "Api"
     
 )
 
