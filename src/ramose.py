@@ -45,8 +45,9 @@ from os import sep, getcwd
 from itertools import product
 
 
-FIELD_TYPE_RE = "([^\(\s]+)\(([^\)]+)\)"
-PARAM_NAME = "{([^{}\(\)]+)}"
+# Costanti per regex
+FIELD_TYPE_RE = r"([^\(\s]+)\(([^\)]+)\)"
+PARAM_NAME = r"{([^{}\(\)]+)}"
 
 
 class HashFormatHandler(object):
@@ -227,7 +228,7 @@ The operations that this API implements are:
                 p_shape = ".+"
                 if p in op:
                     p_type, p_shape = findall(
-                        "^\s*([^\(]+)\((.+)\)\s*$", op[p])[0]
+                        r"^\s*([^\(]+)\((.+)\)\s*$", op[p])[0]
 
                 params.append(
                     "<em>%s</em>: type <em>%s</em>, regular expression shape <code>%s</code>" % (p, p_type, p_shape))
@@ -1058,7 +1059,7 @@ class Operation(object):
         if "json" in params:
             fields = params["json"]
             for field in fields:
-                ops = findall('([a-z]+)\(("[^"]+"),([^\)]+)\)', field)
+                ops = findall(r'([a-z]+)\(("[^"]+"),([^\)]+)\)', field)
                 for op_type, s, es in ops:
                     separator = sub('"(.+)"', "\\1", s)
                     entries = [i.strip() for i in es.split(",")]
@@ -1233,7 +1234,7 @@ class Operation(object):
             field_names = []
             order = []
             for field in fields:
-                order_names = findall("^(desc|asc)\(([^\(\)]+)\)$", field)
+                order_names = findall(r"^(desc|asc)\(([^\(\)]+)\)$", field)
                 if order_names:
                     order.append(order_names[0][0])
                     field_names.append(order_names[0][1])
@@ -1510,7 +1511,7 @@ class APIManager(object):
                 t = i[term]
             except KeyError:
                 t = "str(.+)"
-            result = result.replace("{%s}" % term, "%s" % sub("^[^\(]+(\(.+\))$", "\\1", t))
+            result = result.replace("{%s}" % term, "%s" % sub(r"^[^\(]+(\(.+\))$", r"\1", t))
 
         return "%s%s" % (b, result)
 
@@ -1518,7 +1519,7 @@ class APIManager(object):
         """This method takes an URL of an API call in input and find the API operation URL and the related
         configuration that best match with the API call, if any."""
         #u = u.decode('UTF8') if isinstance(u, (bytes, bytearray)) else u
-        cur_u = sub("\?.*$", "", u)
+        cur_u = sub(r"\?.*$", "", u)
         result = None, None
         for base_url in self.all_conf:
             if u.startswith(base_url):
