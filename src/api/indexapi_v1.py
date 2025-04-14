@@ -26,6 +26,20 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse
 
+# Load the configuration file
+with open("conf.json") as f:
+    c = json.load(f)
+    
+
+# Docker ENV variables
+api_config = {
+    "api_base_url": os.getenv("API_BASE_URL", c["api_base_url"]),
+    "sparql_endpoint_index": os.getenv("SPARQL_ENDPOINT_INDEX", c["sparql_endpoint_index"]),
+    "sparql_endpoint_meta": os.getenv("SPARQL_ENDPOINT_META", c["sparql_endpoint_meta"]),
+    "sync_enabled": os.getenv("SYNC_ENABLED", "false").lower() == "true"
+}
+
+
 def lower(s):
     return s.lower(),
 
@@ -554,7 +568,7 @@ def __br_meta_metadata(values):
         return None
 
 def __ocmeta_parser(ids, pre="doi"):
-    api = "http://127.0.0.1/meta/api/v1/metadata/"
+    api = "https://api.opencitations.net/meta/v1/metadata/"
 
     r = get(api + "__".join(ids), headers={"User-Agent": "INDEX REST API (via OpenCitations - http://opencitations.net; mailto:contact@opencitations.net)"}, timeout=60)
 

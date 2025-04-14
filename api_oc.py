@@ -242,12 +242,12 @@ class Main:
 class SparqlIndex(Sparql):
     def __init__(self):
         Sparql.__init__(self, api_config["sparql_endpoint_index"],
-                       "index", "/index")
+                       "index", "/sparql/index")
 
 class SparqlMeta(Sparql):
     def __init__(self):
         Sparql.__init__(self, api_config["sparql_endpoint_meta"],
-                       "meta", "/meta")
+                       "meta", "/sparql/meta")
 
        
 class Api:
@@ -282,10 +282,13 @@ class Api:
             man = meta_api_manager
             doc = meta_doc_manager
 
+        print(call)
+
         if man is None:
             raise web.notfound()
         else:
             if re.match("^/v[1-9]*/?$", call):
+                print('sono dentro', call)
                 # remember to remove the slash at the end
                 org_ref = web.ctx.env.get('HTTP_REFERER')
                 if org_ref is not None:
@@ -301,6 +304,7 @@ class Api:
                 web_logger.mes()
                 return doc.get_documentation()[1]
             else:
+                print('sono dentro l else', call)
                 content_type = web.ctx.env.get('HTTP_ACCEPT')
                 if content_type is not None and "text/csv" in content_type:
                     content_type = "text/csv"
@@ -309,6 +313,8 @@ class Api:
 
                 operation_url = call + unquote(web.ctx.query)
                 op = man.get_op(operation_url)
+                print("operation_url", operation_url)
+                print("op", op)
                 if type(op) is Operation:
                     status_code, res, c_type = op.exec(
                         content_type=content_type)
