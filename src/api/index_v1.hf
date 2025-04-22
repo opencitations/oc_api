@@ -73,7 +73,8 @@ LIMIT 50000
 #url /citation-count/{doi}
 #type operation
 #doi str(10\..+)
-#preprocess lower(doi) --> doi2omids(doi)
+#preprocess lower(doi) --> id2omids(doi)
+#postprocess count_unique_cits(oci,citing,cited)
 #method get
 #description This operation retrieves the number of incoming citations to the bibliographic entity identified by the input DOI.
 
@@ -88,17 +89,19 @@ The field returned by this operation is:
     }
 ]
 #sparql PREFIX cito: <http://purl.org/spar/cito/>
-SELECT (count(?citing) as ?count)
+SELECT ?oci ?citing ?cited
 WHERE {
-    VALUES ?val {[[doi]]} .
-    ?oci cito:hasCitedEntity ?val .
+    VALUES ?cited {[[doi]]}
+    ?oci cito:hasCitedEntity ?cited .
     ?oci cito:hasCitingEntity ?citing .
 }
+LIMIT 200000
 
 #url /reference-count/{doi}
 #type operation
 #doi str(10\..+)
-#preprocess lower(doi) --> doi2omids(doi)
+#preprocess lower(doi) --> id2omids(doi)
+#postprocess count_unique_cits(oci,citing,cited)
 #method get
 #description This operation retrieves the number of outgoing citations from the bibliographic entity identified by the input DOI.
 
@@ -113,12 +116,13 @@ The field returned by this operation is:
     }
 ]
 #sparql PREFIX cito: <http://purl.org/spar/cito/>
-SELECT (count(?cited) as ?count)
+SELECT ?oci ?citing ?cited
 WHERE {
-    VALUES ?val {[[doi]]} .
-    ?oci cito:hasCitingEntity ?val .
+    VALUES ?citing {[[doi]]}
+    ?oci cito:hasCitingEntity ?citing .
     ?oci cito:hasCitedEntity ?cited .
 }
+LIMIT 200000
 
 #url /metadata/{dois}
 #type operation
@@ -183,7 +187,7 @@ SELECT ?val (GROUP_CONCAT(?citing; separator="; ") as ?citation) (GROUP_CONCAT(?
 #url /citations/{doi}
 #type operation
 #doi str(10\..+)
-#preprocess lower(doi) --> doi2omid(doi)
+#preprocess lower(doi) --> id2omids(doi)
 #postprocess citations_info(oci,citing,cited)
 #method get
 #description This operation retrieves the citation data for all the references appearing in the reference lists of other citing works to the bibliographic entity identified by the input DOI, that constitute the incoming citations of that identified bibliographic entity.
@@ -234,16 +238,16 @@ The values of all the fields are prefixed with `[index name] => `, so as to clea
 #sparql PREFIX cito: <http://purl.org/spar/cito/>
 SELECT ?oci ?citing ?cited
 WHERE {
-      ?oci cito:hasCitedEntity <https://w3id.org/oc/meta/br/[[doi]]> .
-      ?oci cito:hasCitingEntity ?citing .
-      BIND(<https://w3id.org/oc/meta/br/[[doi]]> as ?cited) .
+    VALUES ?cited {[[doi]]}
+    ?oci cito:hasCitedEntity ?cited .
+    ?oci cito:hasCitingEntity ?citing .
 }
-LIMIT 50000
+LIMIT 200000
 
 #url /references/{doi}
 #type operation
 #doi str(10\..+)
-#preprocess lower(doi) --> doi2omid(doi)
+#preprocess lower(doi) --> id2omids(doi)
 #postprocess citations_info(oci,citing,cited)
 #method get
 #description This operation retrieves the citation data for all the outgoing references to other cited works appearing in the reference list of the bibliographic entity identified by the input DOI.
@@ -294,8 +298,8 @@ The values of all the fields are prefixed with `[index name] => `, so as to clea
 #sparql PREFIX cito: <http://purl.org/spar/cito/>
 SELECT ?oci ?citing ?cited
 WHERE {
-      ?oci cito:hasCitingEntity <https://w3id.org/oc/meta/br/[[doi]]> .
-      ?oci cito:hasCitedEntity ?cited .
-      BIND(<https://w3id.org/oc/meta/br/[[doi]]> as ?citing) .
+    VALUES ?citing {[[doi]]}
+    ?oci cito:hasCitingEntity ?citing .
+    ?oci cito:hasCitedEntity ?cited .
 }
-LIMIT 50000
+LIMIT 200000

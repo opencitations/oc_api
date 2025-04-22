@@ -14,7 +14,7 @@
 # ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 # SOFTWARE.
 
-__author__ = 'essepuntato'
+__author__ = 'Arcangelo Massari & Ivan Heibi'
 import json
 import os
 from urllib.parse import quote, unquote
@@ -25,6 +25,7 @@ from json import loads
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse
+from collections import defaultdict
 
 # Load the configuration file
 with open("conf.json") as f:
@@ -39,163 +40,23 @@ api_config = {
     "sync_enabled": os.getenv("SYNC_ENABLED", "false").lower() == "true"
 }
 
-
 def lower(s):
     return s.lower(),
-
 
 def encode(s):
     return quote(s),
 
-
-def decode_doi(res, *args):
-    header = res[0]
-    field_idx = []
-
-    for field in args:
-        field_idx.append(header.index(field))
-
-    for row in res[1:]:
-        for idx in field_idx:
-            t, v = row[idx]
-            row[idx] = t, unquote(v)
-
-    return res, True
-
-
-def decode_pmid(res, *args):
-    header = res[0]
-    field_idx = []
-
-    for field in args:
-        field_idx.append(header.index(field))
-
-    for row in res[1:]:
-        for idx in field_idx:
-            t, v = row[idx]
-            row[idx] = t, unquote(v)
-
-    return res, True
-
-
-def merge(res, *args):
-    final_result = []
-    header = res[0]
-    final_result.append(header)
-    prefix_idx = header.index(args[0])
-    citing_idx = header.index(args[1])
-    cited_idx = header.index(args[2])
-
-    citations = {}
-    row_idx = 0
-    for row in res[1:]:
-        source = row[prefix_idx][1]
-        citation = row[citing_idx][1], row[cited_idx][1]
-
-        for idx in range(len(header)):
-            t, v = row[idx]
-            row[idx] = t, source.replace("/", " => ") + v
-        if citation in citations:
-            processed_row = citations[citation]
-            for idx in range(len(header)):
-                t, v = final_result[processed_row][idx]
-                final_result[processed_row][idx] = t, v + "; " + row[idx][1]
-        else:
-            row_idx += 1
-            citations[citation] = row_idx
-            final_result.append(list(row))
-
-    for row in final_result:
-        row.pop(prefix_idx)
-
-    return final_result, False
-
-
-def split_dois(s):
-    return "\"%s\"" % "\" \"".join(s.split("__")),
-
 def split_dois2omids(s):
-    #return "\"%s\"" % "\" \"".join([__get_omid_of(d) for d in s.split("__")]),
-    return " ".join(["<https://w3id.org/oc/meta/br/"+str(__get_omid_of("doi:"+d))+">" for d in s.split("__")]),
+    l_omids = []
+    for d in s.split("__"):
+        print("omid of :",d)
+        l_omids.extend( __get_omid_of(d, multi = True) )
+    return " ".join(l_omids),
 
-
-
-def doi2omid(s):
-    return __get_omid_of("doi:"+s),
-
-def pmid2omid(s):
-    return __get_omid_of("pmid:"+s),
-
-def doi2omids(s):
-    return __get_omid_of("doi:"+s, multi = True),
-
-def __get_omid_of(s, multi = False):
-    sparql_endpoint = api_config["sparql_endpoint_meta"]
-
-    # SPARQL query
-    br_pre_l = ["doi","issn","isbn","pmid","pmcid","url","wikidata","wikipedia","jid","arxiv"]
-    for br_pre in br_pre_l:
-        if s.startswith(br_pre+":"):
-            s = s.replace(br_pre+":","")
-            break
-
-    sparql_query = """
-        PREFIX datacite: <http://purl.org/spar/datacite/>
-        PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
-        SELECT ?br {
-            ?identifier literal:hasLiteralValue '"""+s+"""'.
-            ?br datacite:hasIdentifier ?identifier
-        }
-    """
-    headers={"Accept": "application/sparql-results+json", "Content-Type": "application/sparql-query"}
-    data = {"query": sparql_query}
-    omid_l = []
-    try:
-        response = post(sparql_endpoint, headers=headers, data=sparql_query, timeout=45)
-        if response.status_code == 200:
-            r = loads(response.text)
-            results = r["results"]["bindings"]
-            if len(results) > 0:
-                for elem in results:
-                    omid_val = elem["br"]["value"].split("meta/br/")[1]
-                    omid_l.append(omid_val)
-    except:
-        return ""
-
-    if multi:
-        return " ".join(["<https://w3id.org/oc/meta/br/"+e+">" for e in omid_l])
-
-    if len(omid_l) == 0:
-        return ""
-    elif len(omid_l) == 1:
-        return omid_l[0]
-    else:
-        # Check the OMID which has more citations/references
-        sparql_values = " ".join(["<https://w3id.org/oc/meta/br/"+e+">" for e in omid_l])
-        sparql_endpoint = api_config["sparql_endpoint_index"]
-        sparql_query = """
-        PREFIX cito:<http://purl.org/spar/cito/>
-        SELECT ?cited (COUNT(?citation) as ?citation_count) WHERE {
-          	VALUES ?cited {"""+sparql_values+"""} .
-        	?citation cito:hasCitedEntity ?cited .
-        } GROUP BY ?cited
-        """
-        try:
-            response = post(sparql_endpoint, headers=headers, data=sparql_query, timeout=45)
-            if response.status_code == 200:
-                r = loads(response.text)
-                results = r["results"]["bindings"]
-                max_cits = -1
-                res_omid = omid_l[0]
-                if len(results) > 0:
-                    for elem in results:
-                        cits_num = elem["citation_count"]["value"]
-                        if int(cits_num) > max_cits:
-                            res_omid = elem["cited"]["value"].split("meta/br/")[1]
-                            max_cits = int(cits_num)
-                return res_omid
-        except:
-            return omid_l[0]
+def id2omids(s):
+    if "omid" in s:
+        return s.replace("omid:br/","<https://w3id.org/oc/meta/br/") +">",
+    return __get_omid_of(s, multi = True),
 
 def metadata(res, *args):
     header = res[0]
@@ -225,25 +86,25 @@ def metadata(res, *args):
         omid_uri = res_entities[idx]["omid"]
         citation = res_entities[idx]["citation"]
         reference = res_entities[idx]["reference"]
-
         entities = citation.split("; ") + reference.split("; ") + [omid_uri]
         r = __br_meta_metadata(["<"+e+">" for e in entities])
         if r is None or all([i in ("", None) for i in r]):
             row.extend(["","",""])
         else:
+            k_omids_uris = r[0]
 
             citation_ids = []
             for e in citation.split("; "):
-                if e in r:
-                    citation_ids.append(__get_identifier(r[e]))
+                if e in k_omids_uris:
+                    citation_ids.append(__get_doi(k_omids_uris[e],True))
 
             reference_ids = []
             for e in reference.split("; "):
-                if e in r:
-                    reference_ids.append(__get_identifier(r[e]))
+                if e in k_omids_uris:
+                    reference_ids.append(__get_doi(k_omids_uris[e],True))
 
             row.extend([
-                __get_identifier(r[omid_uri],["doi"]),
+                __get_doi(k_omids_uris[omid_uri],True),
                 str(len(citation_ids)),
                 "; ".join(citation_ids),
                 "; ".join(reference_ids)
@@ -271,301 +132,111 @@ def metadata(res, *args):
 
     return res, True
 
-# args must contain the [[citing]] and [[cited]]
+def count_unique_cits(res, *args):
+    header = res[0]
+    oci_idx = header.index(args[0])
+    citing_idx = header.index(args[1])
+    cited_idx = header.index(args[2])
+    set_oci = set()
+
+    # build
+    if len(res) > 1:
+        citing_to_dedup = []
+        cited_to_dedup = []
+        for idx, row in enumerate(res[1:]):
+            citing_val = row[citing_idx]
+            cited_val = row[cited_idx]
+            if isinstance(citing_val, tuple):
+                citing_to_dedup.extend(citing_val)
+                cited_to_dedup.extend(cited_val)
+            else:
+                citing_to_dedup.append(citing_val)
+                cited_to_dedup.append(cited_val)
+
+        citing_to_dedup_meta = __get_unique_brs_metadata( list(set(citing_to_dedup)) )
+        cited_to_dedup_meta = __get_unique_brs_metadata( list(set(cited_to_dedup)) )
+        for _k_citing in citing_to_dedup_meta.keys():
+            for _k_cited in cited_to_dedup_meta.keys():
+                set_oci.add( (_k_citing,_k_cited) )
+    return [["count"],[ len( set_oci ) ]], True
+
+# args must contain the <citing> and <cited>
 def citations_info(res, *args):
 
     header = res[0]
-    oci_idx = header.index(args[0]);
+    oci_idx = header.index(args[0])
     citing_idx = header.index(args[1])
     cited_idx = header.index(args[2])
-    # ids managed – ordered by relevance
-    all_ids = ["doi","pmid"]
-    if len(args) > 3:
-        all_ids = args[3].split("__")
 
-    index_meta = {}
+    # build
+    f_res = [
+        ["oci", "citing", "cited", "creation", "timespan", "journal_sc", "author_sc"]
+    ]
 
-    #all_entities = ["omid:br/06101068294","omid:br/0610123167","omid:br/06101494166"]
-    res_entities = {}
-    all_entities = []
     if len(res) > 1:
+        citing_to_dedup = []
+        cited_to_dedup = []
         for idx, row in enumerate(res[1:]):
-            res_entities[idx] = []
-            res_entities[idx] += [__get_omid_str(row[citing_idx][1]), __get_omid_str(row[cited_idx][1])]
-            all_entities += [__get_omid_str(row[citing_idx][1]), __get_omid_str(row[cited_idx][1])]
-
-    # delete the item + citing + cited columns
-    res = [[elem for idx, elem in enumerate(row) if idx != oci_idx and idx != citing_idx and idx != cited_idx] for row in res]
-
-    additional_fields = ["oci", "citing", "cited", "creation", "timespan", "journal_sc","author_sc"]
-    header = res[0]
-    header.extend(additional_fields)
-
-    # call __ocmeta_parser for each STEP entities each time
-    r = {}
-    STEP = 8
-    all_entities = list(set(all_entities))
-    all_entities = ["<"+e+">" for e in all_entities]
-    r = __br_meta_metadata(all_entities)
-
-    # process and elaborate additional fields
-    #creation = entities_data["citing"][1]
-    if len(res) > 1:
-        for idx, row in enumerate(res[1:]):
-
-            citing_entity = res_entities[idx][0]
-            cited_entity = res_entities[idx][1]
-
-            oci_val = __get_omid_str(citing_entity,True)+"-"+__get_omid_str(cited_entity,True)
-
-            citing_id = ""
-            citing_pubdate = ""
-            if citing_entity in r:
-                citing_id = __get_identifier(r[citing_entity], all_ids)
-                citing_pubdate = __get_pub_date(r[citing_entity])
-
-            cited_id = ""
-            duration = ""
-            journal_sc = ""
-            author_sc = ""
-            if citing_entity in r and cited_entity in r:
-                cited_id = __get_identifier(r[cited_entity], all_ids)
-                duration = __cit_duration(__get_pub_date(r[citing_entity]),__get_pub_date(r[cited_entity]))
-                journal_sc = __cit_journal_sc(__get_source(r[citing_entity]),__get_source(r[cited_entity]))
-                author_sc = __cit_author_sc(__get_author(r[citing_entity]),__get_author(r[cited_entity]))
-
-            # in case its the API of POCI add the prefix
-            if len(all_ids) == 1 and "pmid" in all_ids:
-                if oci_val != "":
-                    oci_val = "oci:"+oci_val
-                if citing_id != "":
-                    citing_id = "pmid:"+citing_id
-                if cited_id != "":
-                    cited_id = "pmid:"+cited_id
-
-            # pre_source = ""
-            # if len(all_ids) > 1:
-            #     if citing_id.startswith("10."):
-            #         pre_source = "coci => "
-            #     else:
-            #         pre_source = "poci => "
-
-            row.extend([
-                # oci value
-                oci_val,
-                # citing
-                citing_id,
-                # cited
-                cited_id,
-                # creation = citing[pub_date]
-                citing_pubdate,
-                # timespan = citing[pub_date] - cited[pub_date]
-                duration,
-                # journal_sc = compare citing[source_id] and cited[source_id]
-                journal_sc,
-                # author_sc = compare citing[source_id] and cited[source_id]
-                author_sc
-            ])
-
-
-    return res, True
-
-def __get_omid_str(val, reverse = False):
-    if not reverse:
-        return "https://w3id.org/oc/meta/"+val.split("oc/meta/")[1]
-    return val.replace("https://w3id.org/oc/meta/br/","")
-
-def __get_identifier(elem, ids = ["doi","pmid"]):
-    if "ids" in elem:
-        for pre in ids:
-            for id in elem["ids"]["value"].split(" __ "):
-                if id.startswith(pre+":"):
-                    return id.replace(pre+":","")
-    return ""
-
-def __get_pub_date(elem):
-    if "pubDate" in elem:
-        return elem["pubDate"]["value"]
-    return ""
-
-def __get_source(elem):
-    if "source" in elem:
-        return elem["source"]["value"].split("; ")
-    return ""
-
-def __get_author(elem):
-    if "author" in elem:
-        return elem["author"]["value"].split("; ")
-    return ""
-
-def __cit_journal_sc(citing_source_ids, cited_source_ids):
-    if len(set(citing_source_ids).intersection(set(cited_source_ids))) > 0:
-        return "yes"
-    return "no"
-
-def __cit_author_sc(citing_authors, cited_authors):
-    if len(set(citing_authors).intersection(set(cited_authors))) > 0:
-        return "yes"
-    return "no"
-
-def __cit_duration(citing_complete_pub_date, cited_complete_pub_date):
-
-    def ___contains_years(date):
-        return date is not None and len(date) >= 4
-
-    def ___contains_months(date):
-        return date is not None and len(date) >= 7
-
-    def ___contains_days(date):
-        return date is not None and len(date) >= 10
-
-    DEFAULT_DATE = datetime(1970, 1, 1, 0, 0)
-    consider_months = ___contains_months(citing_complete_pub_date) and ___contains_months(cited_complete_pub_date)
-    consider_days = ___contains_days(citing_complete_pub_date) and ___contains_days(cited_complete_pub_date)
-
-    try:
-        if citing_complete_pub_date == "" or citing_complete_pub_date == None:
-            return ""
-        citing_pub_datetime = parse(
-            citing_complete_pub_date, default=DEFAULT_DATE
-        )
-    except ValueError:  # It is not a leap year
-        citing_pub_datetime = parse(
-            citing_complete_pub_date[:7] + "-28", default=DEFAULT_DATE
-        )
-    try:
-        if cited_complete_pub_date == "" or cited_complete_pub_date == None:
-            return ""
-        cited_pub_datetime = parse(
-            cited_complete_pub_date, default=DEFAULT_DATE
-        )
-    except ValueError:  # It is not a leap year
-        cited_pub_datetime = parse(
-            cited_complete_pub_date[:7] + "-28", default=DEFAULT_DATE
-        )
-
-    delta = relativedelta(citing_pub_datetime, cited_pub_datetime)
-
-    result = ""
-    if (
-        delta.years < 0
-        or (delta.years == 0 and delta.months < 0 and consider_months)
-        or (
-            delta.years == 0
-            and delta.months == 0
-            and delta.days < 0
-            and consider_days
-        )
-    ):
-        result += "-"
-    result += "P%sY" % abs(delta.years)
-
-    if consider_months:
-        result += "%sM" % abs(delta.months)
-
-    if consider_days:
-        result += "%sD" % abs(delta.days)
-
-    return result
-
-def __get_issn(body):
-    cur_id = ""
-    if "ISSN" in body and len(body["ISSN"]):
-        cur_id = "; ".join("issn:" + cur_issn for cur_issn in body["ISSN"])
-    return __normalise(cur_id)
-
-def __get_isbn(body):
-    cur_id = ""
-    if "ISBN" in body and len(body["ISBN"]):
-        cur_id = "; ".join("isbn:" + cur_issn for cur_issn in body["ISBN"])
-    return __normalise(cur_id)
-
-def __get_id(body, f_list):
-    cur_id = ""
-    for f in f_list:
-        if cur_id == "":
-            cur_id = f(body)
-    return __normalise(cur_id)
-
-def __create_title_from_list(title_list):
-    cur_title = ""
-
-    for title in title_list:
-        strip_title = title.strip()
-        if strip_title != "":
-            if cur_title == "":
-                cur_title = strip_title
+            citing_val = row[citing_idx]
+            cited_val = row[cited_idx]
+            if isinstance(citing_val, tuple):
+                citing_to_dedup.extend(citing_val)
+                cited_to_dedup.extend(cited_val)
             else:
-                cur_title += " - " + strip_title
+                citing_to_dedup.append(citing_val)
+                cited_to_dedup.append(cited_val)
 
-    return __create_title(cur_title)
+        citing_to_dedup_meta = __get_unique_brs_metadata( list(set(citing_to_dedup)) )
+        cited_to_dedup_meta = __get_unique_brs_metadata( list(set(cited_to_dedup)) )
 
+        for citing_entity in citing_to_dedup_meta:
+            for cited_entity in cited_to_dedup_meta:
 
-def __create_title(cur_title):
-    return __normalise(cur_title.title())
+                _citing = citing_to_dedup_meta[citing_entity]
+                _cited = cited_to_dedup_meta[cited_entity]
 
+                res_row = [
+                    # oci value
+                    __get_id_val(citing_entity,True)+"-"+__get_id_val(cited_entity,True),
+                    # citing
+                    __get_doi(_citing),
+                    # cited
+                    __get_doi(_cited),
+                    # creation = citing[pub_date]
+                    __get_pub_date(_citing),
+                    # timespan = citing[pub_date] - cited[pub_date]
+                    __cit_duration(__get_pub_date(_citing),__get_pub_date(_cited)),
+                    # journal_sc = compare citing[source_id] and cited[source_id]
+                    __cit_journal_sc(__get_source(_citing),__get_source(_cited)),
+                    # author_sc = compare citing[source_id] and cited[source_id]
+                    __cit_author_sc(__get_author(_citing),__get_author(_cited))
+                ]
+                f_res.append(res_row)
 
-def __normalise(o):
-    if o is None:
-        s = ""
-    else:
-        s = str(o)
-    return sub(r"\s+", " ", s).strip()
+    return f_res, True
 
-def __br_meta_metadata(values):
-    sparql_endpoint = api_config["sparql_endpoint_meta"]
+# args must contain the <count>
+def sum_all(res, *args):
 
-    # SPARQL query
-    sparql_query = """
-    PREFIX pro: <http://purl.org/spar/pro/>
-    PREFIX frbr: <http://purl.org/vocab/frbr/core#>
-    PREFIX fabio: <http://purl.org/spar/fabio/>
-    PREFIX datacite: <http://purl.org/spar/datacite/>
-    PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
-    PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
-    SELECT DISTINCT ?val ?pubDate (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=' __ ') AS ?ids) (GROUP_CONCAT(?venue; separator="; ") as ?source) (GROUP_CONCAT(?raAuthor; separator="; ") as ?author)
-    WHERE {
-    	  VALUES ?val { """+" ".join(values)+""" }
-          OPTIONAL { ?val prism:publicationDate ?pubDate. }
-          OPTIONAL {
-              ?val datacite:hasIdentifier ?identifier.
-              ?identifier datacite:usesIdentifierScheme ?scheme;
-                  literal:hasLiteralValue ?literalValue.
-              BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literalValue) AS ?id)
-          }
-          OPTIONAL {
-              {
-                ?val a fabio:JournalArticle;
-                      frbr:partOf+ ?venue.
-                ?venue a fabio:Journal.
-              } UNION {
-                ?val frbr:partOf ?venue.
-              }
-          }
-          OPTIONAL {
-              ?val pro:isDocumentContextFor ?arAuthor.
-                  ?arAuthor pro:withRole pro:author;
-                            pro:isHeldBy ?raAuthor.
-          }
-     } GROUP BY ?val ?pubDate
-    """
-
-    headers={"Accept": "application/sparql-results+json", "Content-Type": "application/sparql-query"}
-    data = {"query": sparql_query}
-
+    header = res[0]
     try:
-        response = post(sparql_endpoint, headers=headers, data=sparql_query)
-        if response.status_code == 200:
-            r = loads(response.text)
-            results = r["results"]["bindings"]
-            res_json = {}
-            if len(results) > 0:
-                for elem in results:
-                    res_json[elem["val"]["value"]] = elem
-            return res_json
+        count_idx = header.index(args[0])
+
+        tot_count = 0
+        for idx, row in enumerate(res[1:]):
+            tot_count += int(row[count_idx][1])
+
+        # delete the item + citing + cited columns
+        res = [header,[str(tot_count)]]
+        return res, True
 
     except:
-        return None
+        return [], True
+
+
+# ---
+# Local methods
+# ---
 
 def __ocmeta_parser(ids, pre="doi"):
     api = "https://api.opencitations.net/meta/v1/metadata/"
@@ -668,180 +339,268 @@ def __ocmeta_parser(ids, pre="doi"):
 
     return f_res
 
-def __crossref_parser(doi):
-    api = "https://api.crossref.org/works/%s"
+def __convert_cit_v1(l_cits):
+    if len(l_cits) > 0:
+        for cit in l_cits:
+            for k_att in ["citing","cited"]:
+                if k_att in cit:
+                    doi = ""
+                    for anyid in cit[k_att].split():
+                        if anyid.startswith("doi:"):
+                            doi = anyid.split("doi:")[1]
+                    cit[k_att] = doi
+    return l_cits
+
+
+def __get_omid_of(s, multi = False):
+    MULTI_VAL_MAX = 9000
+    sparql_endpoint = api_config["sparql_endpoint_meta"]
+
+    sparql_query = """
+        PREFIX datacite: <http://purl.org/spar/datacite/>
+        PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+        SELECT ?br {
+            ?identifier literal:hasLiteralValue '"""+s+"""'.
+            ?br datacite:hasIdentifier ?identifier
+        }
+    """
+
+    headers={"Accept": "application/sparql-results+json", "Content-Type": "application/sparql-query"}
+    data = {"query": sparql_query}
+    omid_l = []
+    try:
+        response = post(sparql_endpoint, headers=headers, data=sparql_query, timeout=45)
+        if response.status_code == 200:
+            r = loads(response.text)
+            results = r["results"]["bindings"]
+            if len(results) > 0:
+                for elem in results:
+                    omid_val = elem["br"]["value"].split("meta/br/")[1]
+                    omid_l.append(omid_val)
+    except:
+        return ""
+
+    if len(omid_l) == 0:
+        return ""
+
+    if multi:
+        sparql_values = []
+        for i in range(0, len(omid_l), MULTI_VAL_MAX):
+            sparql_values.append( " ".join(["<https://w3id.org/oc/meta/br/"+e+">" for e in omid_l[i:i + MULTI_VAL_MAX]]) )
+        return sparql_values
+
+    # in case multi OMIDs is not handled
+    # return the only omid given as result
+    return omid_l[0]
+
+def __get_unique_brs_metadata(l_url_brs):
+
+    res = []
+    l_brs = ["<"+_url_br+">" for _url_br in l_url_brs]
+
+    i = 0
+    chunk_size = 3000
+    brs_meta = {}
+    while i < len(l_brs):
+        chunk = l_brs[i:i + chunk_size]
+        m_br = __br_meta_metadata(chunk)
+        brs_meta.update( m_br[0] )
+        if i == 0:
+            res.append(m_br[1])
+        i += chunk_size
+
+    unique_brs_anyid = []
+    unique_brs = []
+    for k_br,k_val in brs_meta.items():
+        br_ids = k_val["ids"]["value"]
+        if br_ids:
+            s = set( [id for id in br_ids.split(" __ ")] )
+            # check the unique br anyids
+            _c_intersection = 0
+            for __unique in unique_brs_anyid:
+                _c_intersection += len(__unique.intersection(s))
+            # if there is no common anyids with the other br entities
+            if _c_intersection == 0:
+                unique_brs_anyid.append(s)
+                br_values = [k_val[k]['value'] if k in k_val else "" for k in res[0]]
+                res.append( br_values )
+                #unique_brs.append( br_values )
+
+    f_res = {}
+    for row in res[1:]:
+        f_res[row[0]] = {k_val: row[i] for i, k_val in enumerate(res[0])}
+
+    return f_res
+
+def __br_meta_metadata(values):
+    sparql_endpoint = api_config["sparql_endpoint_meta"]
+
+    # SPARQL query
+    sparql_query = """
+    PREFIX pro: <http://purl.org/spar/pro/>
+    PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+    PREFIX fabio: <http://purl.org/spar/fabio/>
+    PREFIX datacite: <http://purl.org/spar/datacite/>
+    PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+    PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
+    SELECT DISTINCT ?val ?pubDate (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=' __ ') AS ?ids) (GROUP_CONCAT(?venue; separator="; ") as ?source) (GROUP_CONCAT(?raAuthor; separator="; ") as ?author)
+    WHERE {
+    	  VALUES ?val { """+" ".join(values)+""" }
+          OPTIONAL { ?val prism:publicationDate ?pubDate. }
+          OPTIONAL {
+              ?val datacite:hasIdentifier ?identifier.
+              ?identifier datacite:usesIdentifierScheme ?scheme;
+                  literal:hasLiteralValue ?literalValue.
+              BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literalValue) AS ?id)
+          }
+          OPTIONAL {
+              {
+                ?val a fabio:JournalArticle;
+                      frbr:partOf+ ?venue.
+                ?venue a fabio:Journal.
+              } UNION {
+                ?val frbr:partOf ?venue.
+              }
+          }
+          OPTIONAL {
+              ?val pro:isDocumentContextFor ?arAuthor.
+                  ?arAuthor pro:withRole pro:author;
+                            pro:isHeldBy ?raAuthor.
+          }
+     } GROUP BY ?val ?pubDate
+    """
+
+    headers={"Accept": "application/sparql-results+json", "Content-Type": "application/sparql-query"}
+    data = {"query": sparql_query}
 
     try:
-        r = get(api % doi,
-                headers={"User-Agent": "COCI REST API (via OpenCitations - http://opencitations.net; mailto:contact@opencitations.net)"}, timeout=30)
-        if r.status_code == 200:
-            json_res = loads(r.text)
-            if "message" in json_res:
-                body = json_res["message"]
+        response = post(sparql_endpoint, headers=headers, data=sparql_query)
+        if response.status_code == 200:
+            r = loads(response.text)
+            results = r["results"]["bindings"]
+            res_json = {}
+            if len(results) > 0:
+                for elem in results:
+                    res_json[elem["val"]["value"]] = elem
+            return res_json,["val","pubDate","ids","source","author"]
 
-                authors = []
-                if "author" in body:
-                    for author in body["author"]:
-                        author_string = None
-                        if "family" in author:
-                            author_string = author["family"].title()
-                            if "given" in author:
-                                author_string += ", " + author["given"].title()
-                                if "ORCID" in author:
-                                    author_string += ", " + \
-                                        author["ORCID"].replace(
-                                            "http://orcid.org/", "")
-                        if author_string is not None:
-                            authors.append(__normalise(author_string))
+    except:
+        return None,None
 
-                year = ""
-                if "issued" in body and "date-parts" in body["issued"] and len(body["issued"]["date-parts"]) and \
-                        len(body["issued"]["date-parts"][0]):
-                    year = __normalise(body["issued"]["date-parts"][0][0])
+def __normalise(o):
+    if o is None:
+        s = ""
+    else:
+        s = str(o)
+    return sub("\s+", " ", s).strip()
 
-                title = ""
-                if "title" in body:
-                    title = __create_title_from_list(body["title"])
+def __get_id_val(val, reverse = False):
+    if not reverse:
+        return "https://w3id.org/oc/meta/"+val.split("oc/meta/")[1]
+    return val.replace("https://w3id.org/oc/meta/br/","")
 
-                source_title = ""
-                if "container-title" in body:
-                    source_title = __create_title_from_list(
-                        body["container-title"])
+def __get_omid(elem):
+    str_ids = []
+    if "ids" in elem:
+        for id in elem["ids"].split(" __ "):
+            if id.startswith("omid:"):
+                str_ids.append(id.split("omid:")[1])
 
-                volume = ""
-                if "volume" in body:
-                    volume = __normalise(body["volume"])
+    return " ".join(str_ids)
 
-                issue = ""
-                if "issue" in body:
-                    issue = __normalise(body["issue"])
+def __get_doi(elem, value_key = False):
+    str_ids = []
+    if "ids" in elem:
+        ids = elem["ids"]
+        if value_key:
+            ids = ids["value"]
+        for id in ids.split(" __ "):
+            if id.startswith("doi:"):
+                str_ids.append(id.split("doi:")[1])
 
-                page = ""
-                if "page" in body:
-                    page = __normalise(body["page"])
+    return " ".join(str_ids)
 
-                source_id = ""
-                if "type" in body:
-                    if body["type"] == "book-chapter":
-                        source_id = __get_isbn(body)
-                    else:
-                        source_id = __get_issn(body)
-                else:
-                    source_id = __get_id(body, [__get_issn, __get_isbn])
+def __get_pub_date(elem):
+    if "pubDate" in elem:
+        return elem["pubDate"]
+    return ""
 
-                return ["; ".join(authors), year, title, source_title, volume, issue, page, source_id]
+def __get_source(elem):
+    if "source" in elem:
+        return elem["source"].split("; ")
+    return ""
 
-    except Exception as e:
-        return ["", "", "", "", "", "", "", ""]
+def __get_author(elem):
+    if "author" in elem:
+        return elem["author"].split("; ")
+    return ""
 
+def __cit_journal_sc(citing_source_ids, cited_source_ids):
+    if len(set(citing_source_ids).intersection(set(cited_source_ids))) > 0:
+        return "yes"
+    return "no"
 
-def __datacite_parser(doi):
-    api = "https://api.datacite.org/works/%s"
+def __cit_author_sc(citing_authors, cited_authors):
+    if len(set(citing_authors).intersection(set(cited_authors))) > 0:
+        return "yes"
+    return "no"
+
+def __cit_duration(citing_complete_pub_date, cited_complete_pub_date):
+
+    def ___contains_years(date):
+        return date is not None and len(date) >= 4
+
+    def ___contains_months(date):
+        return date is not None and len(date) >= 7
+
+    def ___contains_days(date):
+        return date is not None and len(date) >= 10
+
+    DEFAULT_DATE = datetime(1970, 1, 1, 0, 0)
+    consider_months = ___contains_months(citing_complete_pub_date) and ___contains_months(cited_complete_pub_date)
+    consider_days = ___contains_days(citing_complete_pub_date) and ___contains_days(cited_complete_pub_date)
 
     try:
-        r = get(api % doi,
-                headers={"User-Agent": "COCI REST API (via OpenCitations - "
-                                       "http://opencitations.net; mailto:contact@opencitations.net)"}, timeout=30)
-        if r.status_code == 200:
-            json_res = loads(r.text)
-            if "data" in json_res and "attributes" in json_res["data"]:
-                body = json_res["data"]["attributes"]
+        if citing_complete_pub_date == "" or citing_complete_pub_date == None:
+            return ""
+        citing_pub_datetime = parse(
+            citing_complete_pub_date, default=DEFAULT_DATE
+        )
+    except ValueError:  # It is not a leap year
+        citing_pub_datetime = parse(
+            citing_complete_pub_date[:7] + "-28", default=DEFAULT_DATE
+        )
+    try:
+        if cited_complete_pub_date == "" or cited_complete_pub_date == None:
+            return ""
+        cited_pub_datetime = parse(
+            cited_complete_pub_date, default=DEFAULT_DATE
+        )
+    except ValueError:  # It is not a leap year
+        cited_pub_datetime = parse(
+            cited_complete_pub_date[:7] + "-28", default=DEFAULT_DATE
+        )
 
-                authors = []
-                if "author" in body:
-                    for author in body["author"]:
-                        author_string = None
-                        if "family" in author:
-                            author_string = author["family"].title()
-                            if "given" in author:
-                                author_string += ", " + author["given"].title()
-                                if "ORCID" in author:
-                                    author_string += ", " + \
-                                        author["ORCID"].replace(
-                                            "http://orcid.org/", "")
-                        if author_string is not None:
-                            authors.append(__normalise(author_string))
+    delta = relativedelta(citing_pub_datetime, cited_pub_datetime)
 
-                year = ""
-                if "published" in body:
-                    year = __normalise(body["published"])
+    result = ""
+    if (
+        delta.years < 0
+        or (delta.years == 0 and delta.months < 0 and consider_months)
+        or (
+            delta.years == 0
+            and delta.months == 0
+            and delta.days < 0
+            and consider_days
+        )
+    ):
+        result += "-"
+    result += "P%sY" % abs(delta.years)
 
-                title = ""
-                if "title" in body:
-                    title = __create_title(body["title"])
+    if consider_months:
+        result += "%sM" % abs(delta.months)
 
-                source_title = ""
-                if "container-title" in body:
-                    source_title = __create_title(body["container-title"])
+    if consider_days:
+        result += "%sD" % abs(delta.days)
 
-                volume = ""
-                issue = ""
-                page = ""
-                source_id = ""
-                return ["; ".join(authors), year, title, source_title, volume, issue, page, source_id]
-
-    except Exception as e:
-        return ["", "", "", "", "", "", "", ""]
-
-
-def oalink(res, *args):
-    base_api_url = "https://api.unpaywall.org/v2/%s?email=contact@opencitations.net"
-
-    # doi, reference, citation_count
-    header = res[0]
-    doi_field = header.index("doi")
-    additional_fields = ["oa_link"]
-
-    header.extend(additional_fields)
-
-    for row in res[1:]:
-        row.append("")  # empty element
-        # citing_doi = row[doi_field][1]
-        #
-        # try:
-        #     r = get(base_api_url % citing_doi,
-        #             headers={"User-Agent": "COCI REST API (via OpenCitations - "
-        #                                    "http://opencitations.net; mailto:contact@opencitations.net)"}, timeout=30)
-        #     if r.status_code == 200:
-        #         res_json = loads(r.text)
-        #         if "best_oa_location" in res_json and res_json["best_oa_location"] is not None and \
-        #                 "url" in res_json["best_oa_location"]:
-        #             row.append(res_json["best_oa_location"]["url"])
-        #         else:
-        #             row.append("")  # empty element
-        #     else:
-        #         row.append("")  # empty element
-        # except Exception as e:
-        #     row.append("")  # empty element
-
-    return res, True
-
-def oc_coci_references(res, *args):
-    api = "http://127.0.0.1/index/coci/api/v1/references/%s"
-
-    header = res[0]
-    doi_field = header.index("doi")
-    additional_fields = ["reference"]
-
-    header.extend(additional_fields)
-
-    for row in res[1:]:
-        citing_doi = row[doi_field][1]
-
-        try:
-            r = get(api % citing_doi, headers={"User-Agent": "COCI REST API (via OpenCitations - http://opencitations.net; mailto:contact@opencitations.net)"}, timeout=30)
-            if r.status_code == 200:
-                cited_dois = []
-                res_json = loads(r.text)
-                if len(res_json) > 0:
-                    for item in res_json:
-                        cited_dois.append(item["cited"])
-                    row.append("; ".join(cited_dois))  # list of dois
-                else:
-                    row.append("")  # empty element
-            else:
-                row.append("")  # empty element
-        except Exception as e:
-            row.append("")  # empty element
-
-    return res, True
+    return result

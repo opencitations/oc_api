@@ -17,7 +17,7 @@ HTTP_HEADERS = {"authorization": "YOUR-OPENCITATIONS-ACCESS-TOKEN"}
 get(API_CALL, headers=HTTP_HEADERS)
 </code></pre>
 
-#version Version 2.1.0 (2024-07-01)
+#version Version 2.2.0 (2025-04-15)
 #contacts [contact@opencitations.net](mailto:contact@opencitations.net)
 #license This document is licensed with a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/legalcode), while the REST API itself has been created using [RAMOSE](https://github.com/opencitations/ramose), the *Restful API Manager Over SPARQL Endpoints* created by [Silvio Peroni](https://orcid.org/0000-0003-0530-4305), which is licensed with an [ISC license](https://opensource.org/licenses/ISC).
 #endpoint http://qlever-service.default.svc.cluster.local:7011
@@ -72,7 +72,7 @@ LIMIT 50000
 #type operation
 #id str((omid|doi|pmid):(.+))
 #preprocess lower(id) --> id2omids(id)
-#postprocess count_unique_brs(citing)
+#postprocess count_unique_cits(oci,citing,cited)
 #method get
 #description This operation retrieves the number of incoming citations to the bibliographic entity identified by the input PID (DOI, PMID, OMID)..
 
@@ -87,12 +87,13 @@ The field returned by this operation is:
     }
 ]
 #sparql PREFIX cito: <http://purl.org/spar/cito/>
-SELECT ?citing
+SELECT ?oci ?citing ?cited
 WHERE {
-    VALUES ?val {[[id]]} .
-    ?oci cito:hasCitedEntity ?val .
+    VALUES ?cited {[[id]]}
+    ?oci cito:hasCitedEntity ?cited .
     ?oci cito:hasCitingEntity ?citing .
 }
+LIMIT 200000
 
 #url /venue-citation-count/{id}
 #type operation
@@ -115,8 +116,8 @@ The field returned by this operation is:
 #sparql PREFIX cito: <http://purl.org/spar/cito/>
 SELECT (count(DISTINCT(?citing)) as ?count)
 WHERE {
-    VALUES ?val {[[id]]} .
-    ?oci cito:hasCitedEntity ?val .
+    VALUES ?cited {[[id]]}
+    ?oci cito:hasCitedEntity ?cited .
     ?oci cito:hasCitingEntity ?citing .
 }
 
@@ -124,7 +125,7 @@ WHERE {
 #type operation
 #id str((omid|doi|pmid|issn):(.+))
 #preprocess lower(id) --> id2omids(id)
-#postprocess count_unique_brs(cited)
+#postprocess count_unique_cits(oci,citing,cited)
 #method get
 #description This operation retrieves the number of outgoing citations from the bibliographic entity identified by the input PID (DOI, PMID, OMID).
 
@@ -139,17 +140,18 @@ The field returned by this operation is:
     }
 ]
 #sparql PREFIX cito: <http://purl.org/spar/cito/>
-SELECT ?cited
+SELECT ?oci ?citing ?cited
 WHERE {
-    VALUES ?val {[[id]]} .
-    ?oci cito:hasCitingEntity ?val .
+    VALUES ?citing {[[id]]}
+    ?oci cito:hasCitingEntity ?citing .
     ?oci cito:hasCitedEntity ?cited .
 }
+LIMIT 200000
 
 #url /citations/{id}
 #type operation
 #id str((omid|doi|pmid):(.+))
-#preprocess lower(id) --> id2omid(id)
+#preprocess lower(id) --> id2omids(id)
 #postprocess citations_info(oci,citing,cited)
 #method get
 #description This operation retrieves the citation data for all the references appearing in the reference lists of other citing works to the bibliographic entity identified by the input PID (DOI, PMID, OMID), that constitute the incoming citations of that identified bibliographic entity.
@@ -200,16 +202,16 @@ The values of all the fields are prefixed with `[index name] => `, so as to clea
 #sparql PREFIX cito: <http://purl.org/spar/cito/>
 SELECT ?oci ?citing ?cited
 WHERE {
-      ?oci cito:hasCitedEntity <https://w3id.org/oc/meta/br/[[id]]> .
-      ?oci cito:hasCitingEntity ?citing .
-      BIND(<https://w3id.org/oc/meta/br/[[id]]> as ?cited) .
+    VALUES ?cited {[[id]]}
+    ?oci cito:hasCitedEntity ?cited .
+    ?oci cito:hasCitingEntity ?citing .
 }
-LIMIT 50000
+LIMIT 200000
 
 #url /references/{id}
 #type operation
 #id str((omid|doi|pmid):(.+))
-#preprocess lower(id) --> id2omid(id)
+#preprocess lower(id) --> id2omids(id)
 #postprocess citations_info(oci,citing,cited)
 #method get
 #description This operation retrieves the citation data for all the outgoing references to other cited works appearing in the reference list of the bibliographic entity identified by the input PID (DOI, PMID, OMID)..
@@ -261,8 +263,8 @@ The values of all the fields are prefixed with `[index name] => `, so as to clea
 #sparql PREFIX cito: <http://purl.org/spar/cito/>
 SELECT ?oci ?citing ?cited
 WHERE {
-      ?oci cito:hasCitingEntity <https://w3id.org/oc/meta/br/[[id]]> .
+      VALUES ?citing {[[id]]}
+      ?oci cito:hasCitingEntity ?citing .
       ?oci cito:hasCitedEntity ?cited .
-      BIND(<https://w3id.org/oc/meta/br/[[id]]> as ?citing) .
 }
-LIMIT 50000
+LIMIT 200000

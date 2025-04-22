@@ -40,22 +40,123 @@ api_config = {
     "sync_enabled": os.getenv("SYNC_ENABLED", "false").lower() == "true"
 }
 
-
 def lower(s):
     return s.lower(),
 
 def encode(s):
     return quote(s),
 
-def id2omid(s):
-    if "omid" in s:
-        return s.replace("omid:br/",""),
-    return __get_omid_of(s),
-
 def id2omids(s):
     if "omid" in s:
         return s.replace("omid:br/","<https://w3id.org/oc/meta/br/") +">",
     return __get_omid_of(s, multi = True),
+
+def count_unique_cits(res, *args):
+    header = res[0]
+    oci_idx = header.index(args[0])
+    citing_idx = header.index(args[1])
+    cited_idx = header.index(args[2])
+    set_oci = set()
+
+    # build
+    if len(res) > 1:
+        citing_to_dedup = []
+        cited_to_dedup = []
+        for idx, row in enumerate(res[1:]):
+            citing_val = row[citing_idx]
+            cited_val = row[cited_idx]
+            if isinstance(citing_val, tuple):
+                citing_to_dedup.extend(citing_val)
+                cited_to_dedup.extend(cited_val)
+            else:
+                citing_to_dedup.append(citing_val)
+                cited_to_dedup.append(cited_val)
+
+        citing_to_dedup_meta = __get_unique_brs_metadata( list(set(citing_to_dedup)) )
+        cited_to_dedup_meta = __get_unique_brs_metadata( list(set(cited_to_dedup)) )
+        for _k_citing in citing_to_dedup_meta.keys():
+            for _k_cited in cited_to_dedup_meta.keys():
+                set_oci.add( (_k_citing,_k_cited) )
+
+    return [["count"],[ len( set_oci ) ]], True
+
+# args must contain the <citing> and <cited>
+def citations_info(res, *args):
+
+    header = res[0]
+    oci_idx = header.index(args[0])
+    citing_idx = header.index(args[1])
+    cited_idx = header.index(args[2])
+
+    # build
+    f_res = [
+        ["oci", "citing", "cited", "creation", "timespan", "journal_sc", "author_sc"]
+    ]
+
+    if len(res) > 1:
+        citing_to_dedup = []
+        cited_to_dedup = []
+        for idx, row in enumerate(res[1:]):
+            citing_val = row[citing_idx]
+            cited_val = row[cited_idx]
+            if isinstance(citing_val, tuple):
+                citing_to_dedup.extend(citing_val)
+                cited_to_dedup.extend(cited_val)
+            else:
+                citing_to_dedup.append(citing_val)
+                cited_to_dedup.append(cited_val)
+
+        citing_to_dedup_meta = __get_unique_brs_metadata( list(set(citing_to_dedup)) )
+        cited_to_dedup_meta = __get_unique_brs_metadata( list(set(cited_to_dedup)) )
+
+        for citing_entity in citing_to_dedup_meta:
+            for cited_entity in cited_to_dedup_meta:
+
+                _citing = citing_to_dedup_meta[citing_entity]
+                _cited = cited_to_dedup_meta[cited_entity]
+
+                res_row = [
+                    # oci value
+                    __get_id_val(citing_entity,True)+"-"+__get_id_val(cited_entity,True),
+                    # citing
+                    __get_all_pids(_citing,citing_entity),
+                    # cited
+                    __get_all_pids(_cited,cited_entity),
+                    # creation = citing[pub_date]
+                    __get_pub_date(_citing),
+                    # timespan = citing[pub_date] - cited[pub_date]
+                    __cit_duration(__get_pub_date(_citing),__get_pub_date(_cited)),
+                    # journal_sc = compare citing[source_id] and cited[source_id]
+                    __cit_journal_sc(__get_source(_citing),__get_source(_cited)),
+                    # author_sc = compare citing[source_id] and cited[source_id]
+                    __cit_author_sc(__get_author(_citing),__get_author(_cited))
+                ]
+                f_res.append(res_row)
+
+    return f_res, True
+
+# args must contain the <count>
+def sum_all(res, *args):
+
+    header = res[0]
+    try:
+        count_idx = header.index(args[0])
+
+        tot_count = 0
+        for idx, row in enumerate(res[1:]):
+            tot_count += int(row[count_idx][1])
+
+        # delete the item + citing + cited columns
+        res = [header,[str(tot_count)]]
+        return res, True
+
+    except:
+        return [], True
+
+
+# ---
+# Local methods
+# ---
 
 def __get_omid_of(s, multi = False):
     MULTI_VAL_MAX = 9000
@@ -66,8 +167,9 @@ def __get_omid_of(s, multi = False):
     br_pre_l = ["doi","issn","isbn","pmid","pmcid","url","wikidata","wikipedia","jid","arxiv"]
     for br_pre in br_pre_l:
         if s.startswith(br_pre+":"):
-            is_journal = br_pre in ["issn"]
             s = s.replace(br_pre+":","")
+            # check if is journal
+            is_journal = br_pre in ["issn"]
             break
 
     sparql_query = """
@@ -87,7 +189,7 @@ def __get_omid_of(s, multi = False):
             PREFIX ns1: <http://purl.org/vocab/frbr/core#>
             PREFIX fabio: <http://purl.org/spar/fabio/>
             SELECT ?br {
-            	?identifier literal:hasLiteralValue '"""+s+"""' .
+            	?identifier literal:hasLiteralValue '"""+s+"""'^^<http://www.w3.org/2001/XMLSchema#string>.
             	?venue datacite:hasIdentifier ?identifier .
               	{?br ns1:partOf ?venue .}
               	UNION { ?br ns1:partOf/ns1:partOf ?venue . }
@@ -112,94 +214,41 @@ def __get_omid_of(s, multi = False):
     except:
         return ""
 
-    if multi:
-        if len(omid_l) == 0:
-            return ""
-        else:
-            sparql_values = []
-            for i in range(0, len(omid_l), MULTI_VAL_MAX):
-                sparql_values.append( " ".join(["<https://w3id.org/oc/meta/br/"+e+">" for e in omid_l[i:i + MULTI_VAL_MAX]]) )
-            return sparql_values
-
     if len(omid_l) == 0:
         return ""
-    elif len(omid_l) == 1:
-        return omid_l[0]
-    else:
-        # return the citation/reference count of all OMIDs
-        return __call_tp_for_citations(omid_l)
 
-def __call_tp_for_citations(omid_l):
-    MAX_VALUES = 9900
+    if multi:
+        sparql_values = []
+        for i in range(0, len(omid_l), MULTI_VAL_MAX):
+            sparql_values.append( " ".join(["<https://w3id.org/oc/meta/br/"+e+">" for e in omid_l[i:i + MULTI_VAL_MAX]]) )
+        return sparql_values
 
-    part_omid_l = omid_l[:MAX_VALUES]
-    rest_omid_l = omid_l[MAX_VALUES:]
+    # in case multi OMIDs is not handled
+    # return the only omid given as result
+    return omid_l[0]
 
-    # Check the OMID which has more citations/references
-    sparql_values = " ".join(["<https://w3id.org/oc/meta/br/"+e+">" for e in part_omid_l])
-    sparql_endpoint = api_config["sparql_endpoint_index"]
-    sparql_query = """
-    PREFIX cito:<http://purl.org/spar/cito/>
-    SELECT ?cited (COUNT(?citation) as ?citation_count) WHERE {
-        VALUES ?cited {"""+sparql_values+"""} .
-        ?citation cito:hasCitedEntity ?cited .
-    } GROUP BY ?cited
-    """
-    try:
-        headers={"Accept": "application/sparql-results+json", "Content-Type": "application/sparql-query"}
-        response = post(sparql_endpoint, headers=headers, data=sparql_query, timeout=45)
-        if response.status_code == 200:
-            r = loads(response.text)
-            results = r["results"]["bindings"]
-            max_cits = -1
-            res_omid = part_omid_l[0]
-            if len(results) > 0:
-                for elem in results:
-                    cits_num = elem["citation_count"]["value"]
-                    if int(cits_num) > max_cits:
-                        res_omid = elem["cited"]["value"].split("meta/br/")[1]
-                        max_cits = int(cits_num)
+def __get_unique_brs_metadata(l_url_brs):
 
-            if len(rest_omid_l) == 0:
-                return res_omid
-            else:
-                return res_omid + __call_tp_for_citations(rest_omid_l)
-    except:
-        return omid_l[0]
+    res = []
+    l_brs = ["<"+_url_br+">" for _url_br in l_url_brs]
 
-# args must contain the <count>
-def sum_all(res, *args):
+    i = 0
+    chunk_size = 3000
+    brs_meta = {}
+    while i < len(l_brs):
+        chunk = l_brs[i:i + chunk_size]
+        m_br = __br_meta_metadata(chunk)
+        brs_meta.update( m_br[0] )
+        if i == 0:
+            res.append(m_br[1])
+        i += chunk_size
 
-    header = res[0]
-    try:
-        count_idx = header.index(args[0])
-
-        tot_count = 0
-        for idx, row in enumerate(res[1:]):
-            tot_count += int(row[count_idx][1])
-
-        # delete the item + citing + cited columns
-        res = [header,[str(tot_count)]]
-        return res, True
-
-    except:
-        return [], True
-
-
-def count_unique_brs(res, *args):
-    header = res[0]
-    idx_omid_br_uri = header.index(args[0])
-
-    count_brs = 0
-    if len(res) > 1:
-        l_brs = []
-        for idx, row in enumerate(res[1:]):
-            l_brs.append(row[idx_omid_br_uri][1])
-        l_brs = ["<"+_c+">" for _c in l_brs]
-        l_brs_anyids = __get_ids_from_meta(l_brs)
-        unique_brs_anyid = []
-        for _l in l_brs_anyids:
-            s = set(_l)
+    unique_brs_anyid = []
+    unique_brs = []
+    for k_br,k_val in brs_meta.items():
+        br_ids = k_val["ids"]["value"]
+        if br_ids:
+            s = set( [id for id in br_ids.split(" __ ")] )
             # check the unique br anyids
             _c_intersection = 0
             for __unique in unique_brs_anyid:
@@ -207,138 +256,98 @@ def count_unique_brs(res, *args):
             # if there is no common anyids with the other br entities
             if _c_intersection == 0:
                 unique_brs_anyid.append(s)
+                br_values = [k_val[k]['value'] if k in k_val else "" for k in res[0]]
+                res.append( br_values )
+                #unique_brs.append( br_values )
 
-        count_brs = len(unique_brs_anyid)
+    f_res = {}
+    for row in res[1:]:
+        f_res[row[0]] = {k_val: row[i] for i, k_val in enumerate(res[0])}
 
-    res = [["count"],[count_brs]]
-    return res, True
+    return f_res
 
-# args must contain the <citing> and <cited>
-def citations_info(res, *args):
+def __br_meta_metadata(values):
+    sparql_endpoint = api_config["sparql_endpoint_meta"]
 
-    header = res[0]
-    oci_idx = header.index(args[0])
-    citing_idx = header.index(args[1])
-    cited_idx = header.index(args[2])
-    # ids managed – ordered by relevance
-    all_ids = ["doi","pmid"]
-    if len(args) > 3:
-        all_ids = args[3].split("__")
+    # SPARQL query
+    sparql_query = """
+    PREFIX pro: <http://purl.org/spar/pro/>
+    PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+    PREFIX fabio: <http://purl.org/spar/fabio/>
+    PREFIX datacite: <http://purl.org/spar/datacite/>
+    PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+    PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
+    SELECT DISTINCT ?val ?pubDate (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=' __ ') AS ?ids) (GROUP_CONCAT(?venue; separator="; ") as ?source) (GROUP_CONCAT(?raAuthor; separator="; ") as ?author)
+    WHERE {
+    	  VALUES ?val { """+" ".join(values)+""" }
+          OPTIONAL { ?val prism:publicationDate ?pubDate. }
+          OPTIONAL {
+              ?val datacite:hasIdentifier ?identifier.
+              ?identifier datacite:usesIdentifierScheme ?scheme;
+                  literal:hasLiteralValue ?literalValue.
+              BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literalValue) AS ?id)
+          }
+          OPTIONAL {
+              {
+                ?val a fabio:JournalArticle;
+                      frbr:partOf+ ?venue.
+                ?venue a fabio:Journal.
+              } UNION {
+                ?val frbr:partOf ?venue.
+              }
+          }
+          OPTIONAL {
+              ?val pro:isDocumentContextFor ?arAuthor.
+                  ?arAuthor pro:withRole pro:author;
+                            pro:isHeldBy ?raAuthor.
+          }
+     } GROUP BY ?val ?pubDate
+    """
 
-    index_meta = {}
+    headers={"Accept": "application/sparql-results+json", "Content-Type": "application/sparql-query"}
+    data = {"query": sparql_query}
 
-    #all_entities = ["omid:br/06101068294","omid:br/0610123167","omid:br/06101494166"]
-    res_entities = {}
-    all_entities = []
-    if len(res) > 1:
-        for idx, row in enumerate(res[1:]):
-            res_entities[idx] = []
-            res_entities[idx] += [__get_omid_str(row[citing_idx][1]), __get_omid_str(row[cited_idx][1])]
-            all_entities += [__get_omid_str(row[citing_idx][1]), __get_omid_str(row[cited_idx][1])]
+    try:
+        response = post(sparql_endpoint, headers=headers, data=sparql_query)
+        if response.status_code == 200:
+            r = loads(response.text)
+            results = r["results"]["bindings"]
+            res_json = {}
+            if len(results) > 0:
+                for elem in results:
+                    res_json[elem["val"]["value"]] = elem
+            return res_json,["val","pubDate","ids","source","author"]
 
-    # delete the item + citing + cited columns
-    res = [[elem for idx, elem in enumerate(row) if idx != oci_idx and idx != citing_idx and idx != cited_idx] for row in res]
+    except:
+        return None,None
 
-    additional_fields = ["oci", "citing", "cited", "creation", "timespan", "journal_sc","author_sc"]
-    header = res[0]
-    header.extend(additional_fields)
-
-    # call __ocmeta_parser for each STEP entities each time
-    r = {}
-    STEP = 8
-    all_entities = list(set(all_entities))
-    all_entities = ["<"+e+">" for e in all_entities]
-    r = __br_meta_metadata(all_entities)
-
-    # process and elaborate additional fields
-    #creation = entities_data["citing"][1]
-    if len(res) > 1:
-        for idx, row in enumerate(res[1:]):
-
-            citing_entity = res_entities[idx][0]
-            cited_entity = res_entities[idx][1]
-
-            oci_val = __get_omid_str(citing_entity,True)+"-"+__get_omid_str(cited_entity,True)
-
-            citing_id = ""
-            citing_pubdate = ""
-            if citing_entity in r:
-                citing_id = __get_all_pids(r[citing_entity], citing_entity)
-                citing_pubdate = __get_pub_date(r[citing_entity])
-
-            cited_id = ""
-            duration = ""
-            journal_sc = ""
-            author_sc = ""
-            if citing_entity in r and cited_entity in r:
-                cited_id = __get_all_pids(r[cited_entity], cited_entity)
-                duration = __cit_duration(__get_pub_date(r[citing_entity]),__get_pub_date(r[cited_entity]))
-                journal_sc = __cit_journal_sc(__get_source(r[citing_entity]),__get_source(r[cited_entity]))
-                author_sc = __cit_author_sc(__get_author(r[citing_entity]),__get_author(r[cited_entity]))
-
-            # in case its the API of POCI add the prefix
-            if len(all_ids) == 1 and "pmid" in all_ids:
-                if oci_val != "":
-                    oci_val = "oci:"+oci_val
-                if citing_id != "":
-                    citing_id = "pmid:"+citing_id
-                if cited_id != "":
-                    cited_id = "pmid:"+cited_id
-
-            # pre_source = ""
-            # if len(all_ids) > 1:
-            #     if citing_id.startswith("10."):
-            #         pre_source = "coci => "
-            #     else:
-            #         pre_source = "poci => "
-
-            row.extend([
-                # oci value
-                oci_val,
-                # citing
-                citing_id,
-                # cited
-                cited_id,
-                # creation = citing[pub_date]
-                citing_pubdate,
-                # timespan = citing[pub_date] - cited[pub_date]
-                duration,
-                # journal_sc = compare citing[source_id] and cited[source_id]
-                journal_sc,
-                # author_sc = compare citing[source_id] and cited[source_id]
-                author_sc
-            ])
-
-
-    return res, True
-
-def __get_omid_str(val, reverse = False):
+def __get_id_val(val, reverse = False):
     if not reverse:
         return "https://w3id.org/oc/meta/"+val.split("oc/meta/")[1]
     return val.replace("https://w3id.org/oc/meta/br/","")
 
 def __get_all_pids(elem, uri_omid):
-    str_omid = "omid:br/"+__get_omid_str(uri_omid,True)
+    str_omid = "omid:br/"+__get_id_val(uri_omid,True)
     str_ids = [str_omid]
     if "ids" in elem:
-        for id in elem["ids"]["value"].split(" __ "):
+        for id in elem["ids"].split(" __ "):
             str_ids.append(id)
 
     return " ".join(str_ids)
 
 def __get_pub_date(elem):
     if "pubDate" in elem:
-        return elem["pubDate"]["value"]
+        return elem["pubDate"]
     return ""
 
 def __get_source(elem):
     if "source" in elem:
-        return elem["source"]["value"].split("; ")
+        return elem["source"].split("; ")
     return ""
 
 def __get_author(elem):
     if "author" in elem:
-        return elem["author"]["value"].split("; ")
+        return elem["author"].split("; ")
     return ""
 
 def __cit_journal_sc(citing_source_ids, cited_source_ids):
@@ -410,109 +419,3 @@ def __cit_duration(citing_complete_pub_date, cited_complete_pub_date):
         result += "%sD" % abs(delta.days)
 
     return result
-
-def __get_ids_from_meta(values, finalres = None):
-
-    if finalres == None:
-        finalres = []
-
-    MAX_VALUES = 2000
-
-    values_part = values[:MAX_VALUES]
-    values_rest = values[MAX_VALUES:]
-
-    sparql_endpoint = api_config["sparql_endpoint_meta"]
-    sparql_query = """
-    PREFIX datacite: <http://purl.org/spar/datacite/>
-    PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
-    SELECT ?br_omid ?identifier_val ?scheme {
-      	VALUES ?br_omid { """+" ".join(values_part)+""" }
-      	?br_omid datacite:hasIdentifier ?identifier .
-        ?identifier literal:hasLiteralValue ?identifier_val .
-      	?identifier datacite:usesIdentifierScheme ?scheme .
-    }
-    """
-    headers={"Accept": "application/sparql-results+json", "Content-Type": "application/sparql-query"}
-    data = {"query": sparql_query}
-
-    res = dict()
-
-    try:
-        response = post(sparql_endpoint, headers=headers, data=sparql_query)
-        if response.status_code == 200:
-            r = loads(response.text)
-            results = r["results"]["bindings"]
-            if len(results) > 0:
-                for elem in results:
-                    omid_br = elem["br_omid"]["value"]
-                    anyid_pref = elem["scheme"]["value"].split("datacite/")[1]
-                    anyid_val = elem["identifier_val"]["value"]
-
-                    if omid_br not in res:
-                        res[omid_br] = []
-                    res[omid_br].append(anyid_pref+":"+anyid_val)
-    except:
-        pass
-
-    finalres += [res[k] for k in res]
-    res = None
-    if len(values_rest) > 0:
-        return __get_ids_from_meta(values_rest, finalres)
-    else:
-        return finalres
-
-
-def __br_meta_metadata(values):
-    sparql_endpoint = api_config["sparql_endpoint_meta"]
-
-    # SPARQL query
-    sparql_query = """
-    PREFIX pro: <http://purl.org/spar/pro/>
-    PREFIX frbr: <http://purl.org/vocab/frbr/core#>
-    PREFIX fabio: <http://purl.org/spar/fabio/>
-    PREFIX datacite: <http://purl.org/spar/datacite/>
-    PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
-    PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
-    SELECT DISTINCT ?val ?pubDate (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=' __ ') AS ?ids) (GROUP_CONCAT(?venue; separator="; ") as ?source) (GROUP_CONCAT(?raAuthor; separator="; ") as ?author)
-    WHERE {
-    	  VALUES ?val { """+" ".join(values)+""" }
-          OPTIONAL { ?val prism:publicationDate ?pubDate. }
-          OPTIONAL {
-              ?val datacite:hasIdentifier ?identifier.
-              ?identifier datacite:usesIdentifierScheme ?scheme;
-                  literal:hasLiteralValue ?literalValue.
-              BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literalValue) AS ?id)
-          }
-          OPTIONAL {
-              {
-                ?val a fabio:JournalArticle;
-                      frbr:partOf+ ?venue.
-                ?venue a fabio:Journal.
-              } UNION {
-                ?val frbr:partOf ?venue.
-              }
-          }
-          OPTIONAL {
-              ?val pro:isDocumentContextFor ?arAuthor.
-                  ?arAuthor pro:withRole pro:author;
-                            pro:isHeldBy ?raAuthor.
-          }
-     } GROUP BY ?val ?pubDate
-    """
-
-    headers={"Accept": "application/sparql-results+json", "Content-Type": "application/sparql-query"}
-    data = {"query": sparql_query}
-
-    try:
-        response = post(sparql_endpoint, headers=headers, data=sparql_query)
-        if response.status_code == 200:
-            r = loads(response.text)
-            results = r["results"]["bindings"]
-            res_json = {}
-            if len(results) > 0:
-                for elem in results:
-                    res_json[elem["val"]["value"]] = elem
-            return res_json
-
-    except:
-        return None
