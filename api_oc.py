@@ -20,8 +20,9 @@ with open("conf.json") as f:
     
 
 # Docker ENV variables
-api_config = {
-    "api_base_url": os.getenv("API_BASE_URL", c["api_base_url"]),
+env_config = {
+    "base_url": os.getenv("BASE_URL", c["base_url"]),
+    "log_dir": os.getenv("LOG_DIR", c["log_dir"]),
     "sparql_endpoint_index": os.getenv("SPARQL_ENDPOINT_INDEX", c["sparql_endpoint_index"]),
     "sparql_endpoint_meta": os.getenv("SPARQL_ENDPOINT_META", c["sparql_endpoint_meta"]),
     "sync_enabled": os.getenv("SYNC_ENABLED", "false").lower() == "true"
@@ -58,14 +59,15 @@ urls = (
 )
 
 # Set the web logger
-web_logger = WebLogger("api.opencitations.net", c["log_dir"], [
-    "REMOTE_ADDR",        # The IP address of the visitor
-    "HTTP_USER_AGENT",    # The browser type of the visitor
-    "HTTP_REFERER",       # The URL of the page that called your program
-    "HTTP_HOST",          # The hostname of the page being attempted
-    "REQUEST_URI",        # The interpreted pathname of the requested document
-                          # or CGI (relative to the document root)
-    "HTTP_AUTHORIZATION",  # Access token
+web_logger = WebLogger(env_config["base_url"], env_config["log_dir"], [
+    "HTTP_X_FORWARDED_FOR", # The IP address of the client
+    "REMOTE_ADDR",          # The IP address of internal balancer
+    "HTTP_USER_AGENT",      # The browser type of the visitor
+    "HTTP_REFERER",         # The URL of the page that called your program
+    "HTTP_HOST",            # The hostname of the page being attempted
+    "REQUEST_URI",          # The interpreted pathname of the requested document
+                            # or CGI (relative to the document root)
+    "HTTP_AUTHORIZATION",   # Access token
     ],
     # comment this line only for test purposes
      {"REMOTE_ADDR": ["130.136.130.1", "130.136.2.47", "127.0.0.1"]}
@@ -252,12 +254,12 @@ class Main:
 
 class SparqlIndex(Sparql):
     def __init__(self):
-        Sparql.__init__(self, api_config["sparql_endpoint_index"],
+        Sparql.__init__(self, env_config["sparql_endpoint_index"],
                        "index", "/sparql/index")
 
 class SparqlMeta(Sparql):
     def __init__(self):
-        Sparql.__init__(self, api_config["sparql_endpoint_meta"],
+        Sparql.__init__(self, env_config["sparql_endpoint_meta"],
                        "meta", "/sparql/meta")
 
        
@@ -364,8 +366,8 @@ class Api:
 if __name__ == "__main__":
     # Add startup log
     print("Starting API OpenCitations web application...")
-    print(f"Configuration: Base URL={api_config['api_base_url']}")
-    print(f"Sync enabled: {api_config['sync_enabled']}")
+    print(f"Configuration: Base URL={env_config['base_url']}")
+    print(f"Sync enabled: {env_config['sync_enabled']}")
     
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='API OpenCitations web application')
@@ -384,7 +386,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(f"Starting on port: {args.port}")
     
-    if args.sync_static or api_config["sync_enabled"]:
+    if args.sync_static or env_config["sync_enabled"]:
         # Run sync if either --sync-static is provided (local testing) 
         # or SYNC_ENABLED=true (Docker environment)
         print("Static sync is enabled")

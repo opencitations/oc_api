@@ -33,8 +33,8 @@ with open("conf.json") as f:
     
 
 # Docker ENV variables
-api_config = {
-    "api_base_url": os.getenv("API_BASE_URL", c["api_base_url"]),
+env_config = {
+    "base_url": os.getenv("BASE_URL", c["base_url"]),
     "sparql_endpoint_index": os.getenv("SPARQL_ENDPOINT_INDEX", c["sparql_endpoint_index"]),
     "sparql_endpoint_meta": os.getenv("SPARQL_ENDPOINT_META", c["sparql_endpoint_meta"]),
     "sync_enabled": os.getenv("SYNC_ENABLED", "false").lower() == "true"
@@ -160,7 +160,7 @@ def sum_all(res, *args):
 
 def __get_omid_of(s, multi = False):
     MULTI_VAL_MAX = 9000
-    sparql_endpoint = api_config["sparql_endpoint_meta"]
+    sparql_endpoint = env_config["sparql_endpoint_meta"]
 
     # SPARQL query
     is_journal = False
@@ -267,7 +267,7 @@ def __get_unique_brs_metadata(l_url_brs):
     return f_res
 
 def __br_meta_metadata(values):
-    sparql_endpoint = api_config["sparql_endpoint_meta"]
+    sparql_endpoint = env_config["sparql_endpoint_meta"]
 
     # SPARQL query
     sparql_query = """

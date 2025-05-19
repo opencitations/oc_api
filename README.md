@@ -1,21 +1,13 @@
-# OpenCitations SPARQL Service
+# OpenCitations API Service
 
-This repository contains the SPARQL service for OpenCitations, allowing users to query the OpenCitations datasets using SPARQL.
+This repository contains the API service for OpenCitations, allowing users to interact with the OpenCitations datasets through RESTful endpoints.
 
 ## Overview
 
-The service provides two main SPARQL endpoints:
+The service provides two main API endpoints:
 
-- **Index endpoint** (`/index`): For querying the OpenCitations Index database
-- **Meta endpoint** (`/meta`): For querying the OpenCitations Meta database
-
-## Features
-
-- SPARQL query interface powered by YASQE/YASR
-- Support for both GET and POST SPARQL queries 
-- SPARQL Update queries are not permitted
-- Request logging
-- Docker deployment ready
+- **Index endpoint** (`/index/v2`): For querying the OpenCitations Index database
+- **Meta endpoint** (`/meta/v1`): For querying the OpenCitations Meta database
 
 ## Configuration
 
@@ -23,15 +15,17 @@ The service provides two main SPARQL endpoints:
 
 The service requires the following environment variables. These values take precedence over the ones defined in `conf.json`:
 
-- `SPARQL_BASE_URL`: Base URL for the SPARQL endpoint
-- `SPARQL_ENDPOINT_INDEX`: URL for the index SPARQL endpoint
-- `SPARQL_ENDPOINT_META`: URL for the meta SPARQL endpoint
+- `BASE_URL`: Base URL for the API service
+- `SPARQL_ENDPOINT_INDEX`: URL for the internal Index SPARQL endpoint (used by the API)
+- `SPARQL_ENDPOINT_META`: URL for the internal Meta SPARQL endpoint (used by the API)
+- `LOG_DIR`: Directory path where log files will be stored
 - `SYNC_ENABLED`: Enable/disable static files synchronization (default: false)
 
 For instance:
 
 ```env
-SPARQL_BASE_URL=sparql.opencitations.net
+BASE_URL=api.opencitations.net
+LOG_DIR=/home/dir/log/
 SPARQL_ENDPOINT_INDEX=http://qlever-service.default.svc.cluster.local:7011  
 SPARQL_ENDPOINT_META=http://virtuoso-service.default.svc.cluster.local:8890/sparql
 SYNC_ENABLED=true
@@ -79,16 +73,16 @@ The application supports the following command line arguments:
 Examples:
 ```bash
 # Run with default settings
-python3 sparql_oc.py
+python3 api_oc.py
 
 # Run with static sync enabled
-python3 sparql_oc.py --sync-static
+python3 api_oc.py --sync-static
 
 # Run on custom port
-python3 sparql_oc.py --port 8085
+python3 api_oc.py --port 8085
 
 # Run with both options
-python3 sparql_oc.py --sync-static --port 8085
+python3 api_oc.py --sync-static --port 8085
 ```
 
 The Docker container is configured to run with `--sync-static` enabled by default.
@@ -103,7 +97,8 @@ FROM python:3.11-slim
 
 # Define environment variables with default values
 # These can be overridden during container runtime
-ENV SPARQL_BASE_URL="sparql.opencitations.net" \
+ENV BASE_URL="api.opencitations.net" \
+    LOG_DIR="/mnt/log_dir/oc_api"  \
     SPARQL_ENDPOINT_INDEX="http://qlever-service.default.svc.cluster.local:7011" \
     SPARQL_ENDPOINT_META="http://virtuoso-service.default.svc.cluster.local:8890/sparql" \
     SYNC_ENABLED="true"
@@ -115,15 +110,14 @@ RUN apt-get update && \
     git \
     python3-dev \
     build-essential && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get clean
 
 # Set the working directory for our application
 WORKDIR /website
 
-# Clone the specific branch (sparql) from the repository
+# Clone the specific branch (api) from the repository
 # The dot at the end means clone into current directory
-RUN git clone --single-branch --branch main https://github.com/opencitations/oc_sparql .
+RUN git clone --single-branch --branch main https://github.com/opencitations/oc_api .
 
 # Install Python dependencies from requirements.txt
 RUN pip install -r requirements.txt
@@ -132,5 +126,6 @@ RUN pip install -r requirements.txt
 EXPOSE 8080
 
 # Start the application
-# The Python script will now read environment variables for SPARQL configurations
-CMD ["python3", "sparql_oc.py"]
+# The Python script will now read environment variables for API configurations
+CMD ["python3", "api_oc.py"]
+```
