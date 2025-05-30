@@ -30,7 +30,7 @@ env_config = {
     "sync_enabled": os.getenv("SYNC_ENABLED", "false").lower() == "true",
 
     "redis": {
-        "enabled": os.getenv("REDIS_ENABLED", c["redis"]["enabled"]).lower() == "false",
+        "enabled": os.getenv("REDIS_ENABLED", c["redis"]["enabled"]).lower() == "true",
         "host": os.getenv("REDIS_HOST", c["redis"]["host"]),
         "port": int(os.getenv("REDIS_PORT", c["redis"]["port"])),
         "db": int(os.getenv("REDIS_DB", c["redis"]["db"])),
@@ -122,14 +122,15 @@ def sync_static_files():
         print(f"Unexpected error during synchronization: {e}")
 
 def validateAccessToken():
-    if env_config["redis"]["enabled"] != "true":
+    if not env_config["redis"]["enabled"]:
         # If Redis is not enabled, skip token validation
         return True
     auth_code = web.ctx.env.get('HTTP_AUTHORIZATION')
+
     if not auth_code is None:
         val = rconn.get(auth_code)
         if val is None or val.decode('utf-8') != auth_code:
-            raise web.HTTPError("403", {"Content-Type": "text/plain"}, "Invalid token")
+            raise web.HTTPError("403", {"Content-Type": "text/plain"}, "Invalid token. Remove the authorization HEADER or register a new token at https://opencitations.net/accesstoken")
     return True
 
 
@@ -380,6 +381,8 @@ if __name__ == "__main__":
     print("Starting API OpenCitations web application...")
     print(f"Configuration: Base URL={env_config['base_url']}")
     print(f"Sync enabled: {env_config['sync_enabled']}")
+    print(f"Redis enabled: {env_config['redis']['enabled']}")
+    print(f"Redis host: {env_config['redis']['host']}")
     
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='API OpenCitations web application')
