@@ -20,15 +20,26 @@ The service requires the following environment variables. These values take prec
 - `SPARQL_ENDPOINT_META`: URL for the internal Meta SPARQL endpoint (used by the API)
 - `LOG_DIR`: Directory path where log files will be stored
 - `SYNC_ENABLED`: Enable/disable static files synchronization (default: false)
+- `REDIS_HOST`: Redis server hostname (default from conf.json)
+- `REDIS_PORT`: Redis server port (default: 6379)
+- `REDIS_DB`: Redis database number (default: 0)
+- `REDIS_PASSWORD`: Redis authentication password
 
 For instance:
 
 ```env
+# API Configuration
 BASE_URL=api.opencitations.net
 LOG_DIR=/home/dir/log/
 SPARQL_ENDPOINT_INDEX=http://qlever-service.default.svc.cluster.local:7011  
 SPARQL_ENDPOINT_META=http://virtuoso-service.default.svc.cluster.local:8890/sparql
 SYNC_ENABLED=true
+
+# Redis Configuration
+REDIS_HOST=redis-service.default.svc.cluster.local
+REDIS_PORT=6379
+REDIS_DB=0
+REDIS_PASSWORD=your_redis_password
 ```
 
 > **Note**: When running with Docker, environment variables always override the corresponding values in `conf.json`. If an environment variable is not set, the application will fall back to the values defined in `conf.json`.
@@ -101,7 +112,11 @@ ENV BASE_URL="api.opencitations.net" \
     LOG_DIR="/mnt/log_dir/oc_api"  \
     SPARQL_ENDPOINT_INDEX="http://qlever-service.default.svc.cluster.local:7011" \
     SPARQL_ENDPOINT_META="http://virtuoso-service.default.svc.cluster.local:8890/sparql" \
-    SYNC_ENABLED="true"
+    SYNC_ENABLED="true" \
+    REDIS_HOST="redis-service.default.svc.cluster.local" \
+    REDIS_PORT="6379" \
+    REDIS_DB="0" \
+    REDIS_PASSWORD="your_redis_password"
 
 # Install system dependencies required for Python package compilation
 # We clean up apt cache after installation to reduce image size

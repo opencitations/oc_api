@@ -8,6 +8,14 @@
   "api_index": [ "src/api/index_v1.hf" ],
   "api_index_v2": [ "src/api/index_v2.hf" ],
   "api_meta": ["src/api/meta_v1.hf"],
+  
+  "redis": {
+    "host": "redis-service.default.svc.cluster.local",
+    "password": "your_redis_password",
+    "port": 6379,
+    "db": 0
+  },
+  
   "sync": {
     "folders": [
         "static/css",

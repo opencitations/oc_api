@@ -14,6 +14,8 @@ import argparse
 from src.ramose import APIManager, Operation, HTMLDocumentationHandler
 from io import StringIO
 
+from redis import Redis
+
 # Load the configuration file
 with open("conf.json") as f:
     c = json.load(f)
@@ -25,7 +27,14 @@ env_config = {
     "log_dir": os.getenv("LOG_DIR", c["log_dir"]),
     "sparql_endpoint_index": os.getenv("SPARQL_ENDPOINT_INDEX", c["sparql_endpoint_index"]),
     "sparql_endpoint_meta": os.getenv("SPARQL_ENDPOINT_META", c["sparql_endpoint_meta"]),
-    "sync_enabled": os.getenv("SYNC_ENABLED", "false").lower() == "true"
+    "sync_enabled": os.getenv("SYNC_ENABLED", "false").lower() == "true",
+
+    "redis": {
+        "host": os.getenv("REDIS_HOST", c["redis"]["host"]),
+        "port": int(os.getenv("REDIS_PORT", c["redis"]["port"])),
+        "db": int(os.getenv("REDIS_DB", c["redis"]["db"])),
+        "password": os.getenv("REDIS_PASSWORD", c["redis"]["password"])
+    },
 }
 
 
@@ -91,6 +100,11 @@ render = web.template.render(c["html"], globals={
 # App Web.py
 app = web.application(urls, globals())
 
+rconn = Redis(host=env_config["redis"]["host"],
+              port=env_config["redis"]["port"], 
+              db=env_config["redis"]["db"], 
+              password=env_config["redis"]["password"])
+
 
 
 def sync_static_files():
@@ -107,17 +121,11 @@ def sync_static_files():
         print(f"Unexpected error during synchronization: {e}")
 
 def validateAccessToken():
-    # auth_code = web.ctx.env.get('HTTP_AUTHORIZATION')
-    # if not auth_code is None:
-    #     val = rconn.get(auth_code)
-    #     if val is None or val != b'1':
-    #         raise web.HTTPError(
-    #             "403 ",
-    #             {
-    #                "Content-Type": "text/plain"
-    #             },
-    #             "The access token provided is not valid."
-    #         )
+    auth_code = web.ctx.env.get('HTTP_AUTHORIZATION')
+    if not auth_code is None:
+        val = rconn.get(auth_code)
+        if val is None or val.decode('utf-8') != auth_code:
+            raise web.HTTPError("403", {"Content-Type": "text/plain"}, "Invalid token")
     return True
 
 

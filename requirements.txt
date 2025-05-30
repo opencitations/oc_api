@@ -40,3 +40,4 @@ SPARQLWrapper
 gitpython
 APScheduler==3.10.1
 markdown
+redis
