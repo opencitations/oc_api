@@ -10,6 +10,7 @@
   "api_meta": ["src/api/meta_v1.hf"],
   
   "redis": {
+    "enabled": "false", 
     "host": "redis-service.default.svc.cluster.local",
     "password": "your_redis_password",
     "port": 6379,

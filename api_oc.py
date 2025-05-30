@@ -30,6 +30,7 @@ env_config = {
     "sync_enabled": os.getenv("SYNC_ENABLED", "false").lower() == "true",
 
     "redis": {
+        "enabled": os.getenv("REDIS_ENABLED", c["redis"]["enabled"]).lower() == "false",
         "host": os.getenv("REDIS_HOST", c["redis"]["host"]),
         "port": int(os.getenv("REDIS_PORT", c["redis"]["port"])),
         "db": int(os.getenv("REDIS_DB", c["redis"]["db"])),
@@ -121,6 +122,9 @@ def sync_static_files():
         print(f"Unexpected error during synchronization: {e}")
 
 def validateAccessToken():
+    if env_config["redis"]["enabled"] != "true":
+        # If Redis is not enabled, skip token validation
+        return True
     auth_code = web.ctx.env.get('HTTP_AUTHORIZATION')
     if not auth_code is None:
         val = rconn.get(auth_code)

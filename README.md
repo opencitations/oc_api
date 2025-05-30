@@ -20,6 +20,7 @@ The service requires the following environment variables. These values take prec
 - `SPARQL_ENDPOINT_META`: URL for the internal Meta SPARQL endpoint (used by the API)
 - `LOG_DIR`: Directory path where log files will be stored
 - `SYNC_ENABLED`: Enable/disable static files synchronization (default: false)
+- `REDIS_ENABLED`: Enable/disable Redis database used for storing tokens (default: false)
 - `REDIS_HOST`: Redis server hostname (default from conf.json)
 - `REDIS_PORT`: Redis server port (default: 6379)
 - `REDIS_DB`: Redis database number (default: 0)
@@ -36,6 +37,7 @@ SPARQL_ENDPOINT_META=http://virtuoso-service.default.svc.cluster.local:8890/spar
 SYNC_ENABLED=true
 
 # Redis Configuration
+REDIS_ENABLED=true
 REDIS_HOST=redis-service.default.svc.cluster.local
 REDIS_PORT=6379
 REDIS_DB=0
@@ -113,6 +115,7 @@ ENV BASE_URL="api.opencitations.net" \
     SPARQL_ENDPOINT_INDEX="http://qlever-service.default.svc.cluster.local:7011" \
     SPARQL_ENDPOINT_META="http://virtuoso-service.default.svc.cluster.local:8890/sparql" \
     SYNC_ENABLED="true" \
+    REDIS_ENABLED="true" \
     REDIS_HOST="redis-service.default.svc.cluster.local" \
     REDIS_PORT="6379" \
     REDIS_DB="0" \
