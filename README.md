@@ -114,12 +114,13 @@ ENV BASE_URL="api.opencitations.net" \
     LOG_DIR="/mnt/log_dir/oc_api"  \
     SPARQL_ENDPOINT_INDEX="http://qlever-service.default.svc.cluster.local:7011" \
     SPARQL_ENDPOINT_META="http://virtuoso-service.default.svc.cluster.local:8890/sparql" \
-    SYNC_ENABLED="true" \
-    REDIS_ENABLED="true" \
-    REDIS_HOST="redis-service.default.svc.cluster.local" \
-    REDIS_PORT="6379" \
-    REDIS_DB="0" \
-    REDIS_PASSWORD="your_redis_password"
+    SYNC_ENABLED="true" 
+  # Uncomment the following lines if you are running the application in a local development environment or any non-Kubernetes deployment scenario.
+  #  REDIS_ENABLED="true" \
+  #  REDIS_HOST="redis-service.default.svc.cluster.local" \
+  #  REDIS_PORT="6379" \
+  #  REDIS_DB="0" \
+  #  REDIS_PASSWORD="your_redis_password"
 
 # Install system dependencies required for Python package compilation
 # We clean up apt cache after installation to reduce image size
