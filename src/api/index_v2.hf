@@ -11,7 +11,7 @@ If you are going to use the REST APIs within an application/code, we encourage y
 <pre style="height: 150px"><code>
 from requests import get
 
-API_CALL = "https://opencitations.net/index/api/v2/references/doi:10.1186/1756-8722-6-59"
+API_CALL = "https://api.opencitations.net/index/v2/references/doi:10.1186/1756-8722-6-59"
 HTTP_HEADERS = {"authorization": "YOUR-OPENCITATIONS-ACCESS-TOKEN"}
 
 get(API_CALL, headers=HTTP_HEADERS)
