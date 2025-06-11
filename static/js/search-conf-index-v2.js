@@ -289,7 +289,7 @@ var heuristics = (function () {
         else {
           id_pref = "";
         }
-        var meta_api_url = 'https://k8s.opencitations.net/meta/api/v1/metadata/';
+        var meta_api_url = 'https://api.opencitations.net/meta/v1/metadata/';
         meta_api_url = meta_api_url + id_pref + str_id;
 
         fetch(meta_api_url)
@@ -376,7 +376,7 @@ var callbackfunctions = (function () {
 
     function meta_call_to_get_ref(conf_params, index, async_bool, callbk_func, key_full_name, data_field, func_name ){
 
-      var call_meta = "https://k8s.opencitations.net/meta/api/v1/metadata/";
+      var call_meta = "https://api.opencitations.net/meta/v1/metadata/";
       // takes an omid url, e.g. "https://w3id.org/oc/meta/br/0610200888"
       var str_id = conf_params[0];
       var link_id = str_id;

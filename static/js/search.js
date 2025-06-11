@@ -65,7 +65,7 @@ for (var i = 0; i < oscar_doms.length; i++) {
 	}
 
 	//always put the table of results
-	str_html_inner = str_html_inner + '<div id="search_results" class="search-results mx-auto col-10 col-md-12"></div></div>';
+	str_html_inner = str_html_inner + '<div id="search_results" class="search-results mx-auto col-10 col-md-11"></div></div>';
 
 	//put it inside the page
 	oscar_doms[i]['container'].innerHTML = '<div id="search" class="search mx-auto">'+ str_html_inner + '</div>';

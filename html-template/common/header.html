@@ -11,7 +11,7 @@ $def with (sp_title, current_subdomain)
           class="d-inline-block align-top"
         />
       </a>
-     
+      
       <!-- Mobile hamburger menu -->
       <button
         class="navbar-toggler"
@@ -24,7 +24,7 @@ $def with (sp_title, current_subdomain)
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-     
+      
       <!-- Main navigation menu -->
       <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
         <ul class="navbar-nav">
@@ -35,19 +35,16 @@ $def with (sp_title, current_subdomain)
               Search
             </a>
           </li>
-         
+          
           <!-- SPARQL dropdown menu -->
-          <li class="nav-item dropdown d-flex me-3">
-            <a class="nav-link fw-semibold px-1 ${'active' if current_subdomain == 'sparql' else ''}"
-               href="https://sparql.opencitations.net">
-              SPARQL
-            </a>
-            <a class="nav-link dropdown-toggle px-0 ms-n2"
-               href="#"
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle fw-semibold px-3 ${'active' if current_subdomain == 'sparql' else ''}"
+               href="https://sparql.opencitations.net"
                id="sparqlDropdown"
                role="button"
                data-bs-toggle="dropdown"
                aria-expanded="false">
+              SPARQL
             </a>
             <ul class="dropdown-menu" aria-labelledby="sparqlDropdown">
               <li>
@@ -62,19 +59,16 @@ $def with (sp_title, current_subdomain)
               </li>
             </ul>
           </li>
-         
+          
           <!-- API dropdown menu -->
-          <li class="nav-item dropdown d-flex">
-            <a class="nav-link fw-semibold px-1 ${'active' if current_subdomain == 'api' else ''}"
-               href="https://api.opencitations.net">
-              API
-            </a>
-            <a class="nav-link dropdown-toggle px-0 ms-n2"
-               href="#"
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle fw-semibold px-3 ${'active' if current_subdomain == 'api' else ''}"
+               href="https://api.opencitations.net"
                id="apiDropdown"
                role="button"
                data-bs-toggle="dropdown"
                aria-expanded="false">
+              API
             </a>
             <ul class="dropdown-menu" aria-labelledby="apiDropdown">
               <li>
@@ -91,7 +85,7 @@ $def with (sp_title, current_subdomain)
               </li>
             </ul>
           </li>
-         
+          
           <!-- Dataset Downloads link -->
           <li class="nav-item">
             <a class="nav-link fw-semibold px-3 ${'active' if current_subdomain == 'download' else ''}"

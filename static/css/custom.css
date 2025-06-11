@@ -58,6 +58,11 @@
     color: #2c3e50;
 }
 
+.display-5 {
+    font-weight: 500;
+    color: #293038;
+}
+
 .card-text {
     font-size: 0.95rem;
 }
@@ -116,4 +121,33 @@ main {
     text-align: center;
     background-color: rgba(255, 255, 255, 0.95);
   }
+}
+
+@media (max-width: 991.98px) {
+    .navbar-nav {
+        text-align: center !important;
+    }
+    
+    .navbar-nav .nav-link {
+        text-align: center !important;
+    }
+    
+    .dropdown-item {
+        text-align: center !important;
+    }
+    
+    .dropdown-menu {
+        position: static !important;
+        width: 100% !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+    
+    .navbar-collapse {
+        background-color: transparent !important;
+        border: none !important;
+        border-bottom: none !important;
+        box-shadow: none !important;
+    }
 }

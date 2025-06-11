@@ -1,108 +1,133 @@
-
-/* Colori OpenCitations */
+/* Neutral institutional colors */
 :root {
     --oc-purple: #9931FC;
     --oc-blue: #2D22DE;
     --oc-light-purple: rgba(153, 49, 252, 0.03);
     --oc-hover-blue: rgba(45, 34, 222, 0.05);
+    /* Variabili istituzionali per le tabelle */
+    --institutional-gray: #24292f;
+    --institutional-light-gray: #f6f8fa;
+    --institutional-border: #d0d7de;
+    --institutional-blue: #2D22DE;
+    --institutional-hover: #eef4fd;
   }
   
-  /* Container principale centrato */
+  /* Main centered container */
   .search.container {
     max-width: 1200px;
     margin: 0 auto;
   }
   
-  /* Wrapper responsive per tabella */
+  /* Responsive wrapper for table */
   #search_results .table-responsive {
     margin: 0 auto;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
   
-  /* Miglioramenti tabella risultati */
+  /* Results table improvements - NEW STYLE */
   #search_results .table.results-tab {
     width: 100%;
     margin: 0 auto;
     border-collapse: separate;
     border-spacing: 0;
-    border-radius: 8px;
-    overflow: hidden;
+    border: 1px solid var(--institutional-border);
     background-color: #fff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    /* Rimosso border-radius e box-shadow per stile istituzionale */
   }
   
-  /* Intestazioni tabella */
+  /* Table headers - NEW STYLE */
   #search_results .results-tab th {
-    background-color: var(--oc-purple) !important;
-    color: white !important;
+    background-color: var(--institutional-light-gray) !important;
+    color: var(--institutional-gray) !important;
     font-weight: 600 !important;
     padding: 12px 15px;
     position: sticky;
     top: 0;
     z-index: 10;
-    border-bottom: none !important;
+    border: 1px solid var(--institutional-border) !important;
+    border-top: none !important;
   }
   
-  /* Righe alternate */
-  #search_results .results-tab tbody tr:nth-child(even) {
-    background-color: var(--oc-light-purple);
+  /* Table cells - NEW STYLE */
+  #search_results .results-tab td {
+    padding: 12px 15px;
+    border: 1px solid var(--institutional-border);
+    border-top: none;
+    vertical-align: top;
+    background-color: #ffffff;
   }
   
-  /* Effetto hover sulle righe */
-  #search_results .results-tab tbody tr:hover {
-    background-color: var(--oc-hover-blue);
+  /* Alternate rows - NEW STYLE */
+  #search_results .results-tab tbody tr:nth-child(even) td {
+    background-color: var(--institutional-light-gray);
   }
   
-  /* Link nelle celle */
+  /* Row hover effect - NEW STYLE */
+  #search_results .results-tab tbody tr:hover td {
+    background-color: var(--institutional-hover);
+  }
+  
+  /* Links in cells - NEW STYLE */
   #search_results .results-tab a.res-val-link {
-    color: var(--oc-blue);
+    color: var(--institutional-blue);
     text-decoration: none;
     transition: color 0.2s;
   }
   
   #search_results .results-tab a.res-val-link:hover {
-    color: var(--oc-purple);
+    color: #0550ae;
     text-decoration: underline;
   }
   
-  /* Miglioramenti footer tabella */
+  /* Table footer improvements */
   #search_results .table.tab-footer {
     background: transparent;
     border: none;
     margin-top: 1rem;
   }
   
-  /* Paginazione */
+  /* Pagination - NEW STYLE */
   #search_results .pagination {
     justify-content: center;
     margin: 1rem 0;
   }
   
   #search_results .pagination .page-item .page-link {
-    color: var(--oc-blue);
-    border-color: rgba(153, 49, 252, 0.2);
+    color: var(--institutional-gray);
+    border-color: var(--institutional-border);
+    background-color: #ffffff;
     margin: 0 2px;
-    border-radius: 4px;
+    border-radius: 0; /* Rimosso border-radius per stile istituzionale */
+    padding: 8px 12px;
+    min-width: 40px;
+    text-align: center;
   }
   
   #search_results .pagination .page-item.active .page-link {
-    background-color: var(--oc-purple);
-    border-color: var(--oc-purple);
+    background-color: var(--institutional-blue);
+    border-color: var(--institutional-blue);
     color: white;
   }
   
   #search_results .pagination .page-item .page-link:hover {
-    background-color: rgba(153, 49, 252, 0.1);
-    color: var(--oc-purple);
+    background-color: var(--institutional-light-gray);
+    color: var(--institutional-gray);
+    border-color: var(--institutional-border);
   }
   
-  /* Layout responsive header */
+  #search_results .pagination .page-item.disabled .page-link {
+    color: #656d76;
+    background-color: #ffffff;
+    border-color: var(--institutional-border);
+  }
+  
+  /* Responsive header layout */
   .search-header .row {
     align-items: center;
   }
   
-  /* Layout filtri e risultati */
+  /* Filters and results layout */
   @media (min-width: 992px) {
     .search-filters {
       padding-right: 2rem;
@@ -113,19 +138,21 @@
     }
   }
   
-  /* Miglioramenti filtri */
+  /* Filter improvements - NEW STYLE */
   .search-filters .filter-values-tab {
-    border-radius: 8px;
+    border: 1px solid var(--institutional-border);
     overflow: hidden;
     margin-bottom: 1rem;
+    /* Rimosso border-radius per stile istituzionale */
   }
   
   .search-filters .filter-values-tab th {
-    background-color: var(--oc-purple);
-    color: white;
+    background-color: var(--institutional-light-gray);
+    color: var(--institutional-gray);
+    border-bottom: 1px solid var(--institutional-border);
   }
   
-  /* Checkbox più grandi */
+  /* Larger checkboxes */
   .search-filters .form-check-input {
     width: 1.2em;
     height: 1.2em;
@@ -135,43 +162,53 @@
     padding: 0.5rem 0;
   }
   
-  /* Bottoni filtro */
+  /* Filter buttons - NEW STYLE */
   .filters-btns .btn-primary {
     background-color: #ffffff;
-    color: var(--oc-purple);
-    border-color: var(--oc-purple);
+    color: var(--institutional-gray);
+    border-color: var(--institutional-border);
+    border-radius: 0; /* Rimosso border-radius per stile istituzionale */
     transition: all 0.3s;
   }
   
   .filters-btns .btn-primary:hover,
   .filters-btns .btn-primary:focus {
-    background-color: var(--oc-purple);
-    color: #ffffff;
-    border-color: var(--oc-purple);
+    background-color: var(--institutional-light-gray);
+    color: var(--institutional-gray);
+    border-color: var(--institutional-border);
   }
   
-  /* Slider filtro */
+  /* Filter slider - NEW STYLE */
   .search-filters .form-range::-webkit-slider-thumb {
-    background-color: var(--oc-purple);
+    background-color: var(--institutional-blue);
+    /* Rimosso border-radius per stile istituzionale */
   }
   
   .search-filters .form-range::-moz-range-thumb {
-    background-color: var(--oc-purple);
+    background-color: var(--institutional-blue);
+    /* Rimosso border-radius per stile istituzionale */
   }
   
-  /* Miglioramenti testo di aiuto */
+  /* Help text improvements */
   .tot-results #tot_val {
-    color: var(--oc-purple);
+    color: var(--institutional-blue);
     font-weight: bold;
   }
   
-  /* Tabella nessun risultato */
+  /* No results table */
   .table.tab-footer.noresults {
     text-align: center;
     padding: 2rem 0;
   }
   
-  /* Media query per dispositivi mobili */
+  .table.tab-footer.noresults .alert {
+    border: 1px solid var(--institutional-border);
+    background-color: var(--institutional-light-gray);
+    color: var(--institutional-gray);
+    border-radius: 0; /* Rimosso border-radius per stile istituzionale */
+  }
+  
+  /* Mobile devices media queries */
   @media (max-width: 768px) {
     #search_results .results-tab td,
     #search_results .results-tab th {
@@ -192,21 +229,125 @@
     }
   }
   
-  /* Spaziatura e margini generali */
+  /* Tablet media queries */
+  @media (max-width: 992px) {
+    #search_results .results-tab {
+      font-size: 13px;
+    }
+    
+    #search_results .results-tab th,
+    #search_results .results-tab td {
+      padding: 10px 12px;
+    }
+  }
+  
+  /* General spacing and margins */
   .search-body {
     margin-top: 1.5rem;
   }
   
   .limit-results-value {
-    color: var(--oc-purple);
+    color: var(--institutional-blue);
     font-weight: bold;
   }
   
-  /* Loader migliorato */
+  /* Improved loader */
   .searchloader.spinner-border {
-    color: var(--oc-purple);
+    color: var(--institutional-blue);
   }
 
   #search_header{
     height: 100%!important;
-  } 
+  }
+  
+  /* Additional styles to improve institutional appearance */
+  
+  /* First column (ID) with monospace font */
+  #search_results .results-tab th:first-child,
+  #search_results .results-tab td:first-child {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    width: 15%;
+  }
+  
+  /* Accessibility improvements */
+  #search_results .results-tab th {
+    font-size: 14px;
+  }
+  
+  #search_results .results-tab td {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  /* Navigation link styles in the table */
+  #search_results .tab-footer .tab-nav-btn {
+    background-color: var(--institutional-light-gray);
+    border: 1px solid var(--institutional-border);
+    color: var(--institutional-gray);
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 0; /* Rimosso border-radius per stile istituzionale */
+    margin: 0 4px;
+  }
+  
+  #search_results .tab-footer .tab-nav-btn:hover {
+    background-color: var(--institutional-hover);
+    color: var(--institutional-gray);
+  }
+  
+  /* Page number styles in navigation */
+  #search_results .tab-footer .pages-nav li a {
+    background-color: #ffffff;
+    border: 1px solid var(--institutional-border);
+    color: var(--institutional-gray);
+    padding: 8px 12px;
+    text-decoration: none;
+    border-radius: 0; /* Rimosso border-radius per stile istituzionale */
+    min-width: 32px;
+    text-align: center;
+    display: inline-block;
+  }
+  
+  #search_results .tab-footer .pages-nav li.active a {
+    background-color: var(--institutional-blue);
+    border-color: var(--institutional-blue);
+    color: #ffffff;
+  }
+  
+  #search_results .tab-footer .pages-nav li a:hover {
+    background-color: var(--institutional-light-gray);
+    color: var(--institutional-gray);
+  }
+  
+  /* No results text styles */
+  #search_results .noresults {
+    color: var(--institutional-gray);
+    font-size: 16px;
+    padding: 48px 24px;
+    text-align: center;
+  }
+  
+  /* Ensure proper spacing for the alert in no results */
+  #search_results .noresults .alert {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  
+  /* Overrides for responsive behavior */
+  @media (max-width: 768px) {
+    #search_results .table.results-tab {
+      font-size: 13px;
+    }
+    
+    #search_results .pagination .page-item .page-link {
+      padding: 6px 8px;
+      font-size: 14px;
+    }
+    
+    #search_results .tab-footer .tab-nav-btn {
+      padding: 6px 12px;
+      font-size: 14px;
+    }
+  }
