@@ -87,8 +87,14 @@ def generate_id_search(ids: str) -> Tuple[str]:
         elif scheme in {'doi', 'issn', 'isbn', 'openalex', 'pmid', 'pmcid', 'url', 'wikidata', 'wikipedia'}:
             other_values.append('''
                 {{
-                    ?identifier literal:hasLiteralValue "'''+literal_value+'''";
-                                datacite:usesIdentifierScheme datacite:'''+scheme+''';
+                    {
+                        ?identifier literal:hasLiteralValue "'''+literal_value+'''"
+                    }
+                    UNION
+                    {
+                        ?identifier literal:hasLiteralValue "'''+literal_value+'''"^^xsd:string
+                    }
+                    ?identifier datacite:usesIdentifierScheme datacite:'''+scheme+''';
                                 ^datacite:hasIdentifier ?res.
                     ?res a fabio:Expression.
                 }}
@@ -115,8 +121,14 @@ def generate_ra_search(identifier:str) -> Tuple[str]:
         return '<https://w3id.org/oc/meta/{0}> ^pro:isHeldBy ?knownRole.'.format(literal_value),
     else:
         return '''
-            ?knownPersonIdentifier literal:hasLiteralValue "{0}"^^<http://www.w3.org/2001/XMLSchema#string>;
-                                datacite:usesIdentifierScheme datacite:{1};
+            {
+                ?knownPersonIdentifier literal:hasLiteralValue "{0}"
+            }
+            UNION
+            {
+                ?knownPersonIdentifier literal:hasLiteralValue "{0}"^^<http://www.w3.org/2001/XMLSchema#string>
+            }
+            ?knownPersonIdentifier datacite:usesIdentifierScheme datacite:{1};
                                 ^datacite:hasIdentifier ?knownPerson.
             ?knownPerson ^pro:isHeldBy ?knownRole.
         '''.format(literal_value, scheme),
