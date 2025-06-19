@@ -87,14 +87,16 @@ def generate_id_search(ids: str) -> Tuple[str]:
         elif scheme in {'doi', 'issn', 'isbn', 'openalex', 'pmid', 'pmcid', 'url', 'wikidata', 'wikipedia'}:
             other_values.append('''
                 {{
-                    {
-                        ?identifier literal:hasLiteralValue "'''+literal_value+'''"
-                    }
-                    UNION
-                    {
-                        ?identifier literal:hasLiteralValue "'''+literal_value+'''"^^xsd:string
-                    }
-                    ?identifier datacite:usesIdentifierScheme datacite:'''+scheme+''';
+                    ?identifier literal:hasLiteralValue "'''+literal_value+'''";
+                                datacite:usesIdentifierScheme datacite:'''+scheme+''';
+                                ^datacite:hasIdentifier ?res.
+                    ?res a fabio:Expression.
+                }}
+            ''',
+            '''
+                {{
+                    ?identifier literal:hasLiteralValue "'''+literal_value+'''"^^<http://www.w3.org/2001/XMLSchema#string>;
+                                datacite:usesIdentifierScheme datacite:'''+scheme+''';
                                 ^datacite:hasIdentifier ?res.
                     ?res a fabio:Expression.
                 }}
