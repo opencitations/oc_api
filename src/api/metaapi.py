@@ -122,16 +122,16 @@ def generate_ra_search(identifier:str) -> Tuple[str]:
     else:
         return '''
             {
-                ?knownPersonIdentifier literal:hasLiteralValue "{0}"
+                ?knownPersonIdentifier literal:hasLiteralValue "'''+literal_value+'''"
             }
             UNION
             {
-                ?knownPersonIdentifier literal:hasLiteralValue "{0}"^^<http://www.w3.org/2001/XMLSchema#string>
+                ?knownPersonIdentifier literal:hasLiteralValue "'''+literal_value+'''"^^<http://www.w3.org/2001/XMLSchema#string>
             }
-            ?knownPersonIdentifier datacite:usesIdentifierScheme datacite:{1};
+            ?knownPersonIdentifier datacite:usesIdentifierScheme datacite:'''+scheme+''';
                                 ^datacite:hasIdentifier ?knownPerson.
             ?knownPerson ^pro:isHeldBy ?knownRole.
-        '''.format(literal_value, scheme),
+        ''',
 
 def create_metadata_output(results):
     header = results[0]
