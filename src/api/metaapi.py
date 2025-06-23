@@ -162,6 +162,8 @@ def process_ordered_list(items):
     items_dict = {}
     role_to_name = {}
     l_author = [item for item in items.split('|') if item is not None and item != ""]
+    if len(l_author) == 0:
+        return ""
     for item in l_author:
         parts = item.split(':')
         name = ':'.join(parts[:-2])
