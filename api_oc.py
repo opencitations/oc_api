@@ -136,8 +136,14 @@ def validateAccessToken():
 
 # Process favicon.ico requests
 class Favicon:
-    def GET(self): 
-        raise web.seeother("/static/favicon.ico")
+    def GET(self):
+        is_https = (
+            web.ctx.env.get('HTTP_X_FORWARDED_PROTO') == 'https' or
+            web.ctx.env.get('HTTPS') == 'on' or
+            web.ctx.env.get('SERVER_PORT') == '443'
+        )
+        protocol = 'https' if is_https else 'http'
+        raise web.seeother(f"{protocol}://{web.ctx.host}/static/favicon.ico")
     
 class RedirectIndex:
     def GET(self):
