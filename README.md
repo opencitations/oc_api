@@ -1,5 +1,9 @@
 # OpenCitations API Service
 
+[<img src="https://img.shields.io/badge/powered%20by-OpenCitations-%239931FC?labelColor=2D22DE" />](http://opencitations.net)
+[![Run tests](https://github.com/opencitations/oc_api/actions/workflows/run_tests.yml/badge.svg?branch=main)](https://github.com/opencitations/oc_api/actions/workflows/run_tests.yml)
+![Coverage](test/coverage-badge.svg)
+
 This repository contains the API service for OpenCitations, allowing users to interact with the OpenCitations datasets through RESTful endpoints.
 
 ## Overview
@@ -147,4 +151,45 @@ EXPOSE 8080
 # Start the application
 # The Python script will now read environment variables for API configurations
 CMD ["python3", "api_oc.py"]
+```
+
+## Testing
+
+### Running Tests Locally
+
+To run the API tests locally, you'll need to have the test environment set up properly. The tests require a Virtuoso database to be running.
+
+#### Prerequisites
+
+1. Install dependencies using uv:
+   ```bash
+   uv sync --dev
+   ```
+
+2. Start the test database:
+   ```bash
+   ./test/start_test_db.sh
+   ```
+
+#### Running the Tests
+
+Once the test database is running, you can execute the tests with coverage:
+
+```bash
+# Run tests with coverage report
+uv run pytest --cov=src --cov-report=term-missing --cov-report=html
+
+# Run only specific test files
+uv run pytest test/test_metaapi.py
+
+# Run tests with verbose output
+uv run pytest -v
+```
+
+#### Stopping the Test Database
+
+After running the tests, stop the test database:
+
+```bash
+./test/stop_test_db.sh
 ```
