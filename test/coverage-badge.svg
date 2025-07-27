@@ -1,21 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="104" height="20" role="img" aria-label="Coverage: 11%">
+<svg width="98.3" height="20" viewBox="0 0 983 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Coverage: 11%">
   <title>Coverage: 11%</title>
-  <linearGradient id="s" x2="0" y2="100%">
-    <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+  <linearGradient id="a" x2="0" y2="100%">
+    <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <clipPath id="r">
-    <rect width="104" height="20" rx="3" fill="#fff"/>
-  </clipPath>
-  <g clip-path="url(#r)">
-    <rect width="61" height="20" fill="#555"/>
-    <rect x="61" width="43" height="20" fill="red"/>
-    <rect width="104" height="20" fill="url(#s)"/>
+  <mask id="m"><rect width="983" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#m)">
+    <rect width="623" height="200" fill="#555"/>
+    <rect width="360" height="200" fill="#E43" x="623"/>
+    <rect width="983" height="200" fill="url(#a)"/>
   </g>
-  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110">
-    <text aria-hidden="true" x="315" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="510">Coverage</text>
-    <text x="315" y="140" transform="scale(.1)" fill="#fff" textLength="510">Coverage</text>
-    <text aria-hidden="true" x="815" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="330">11%</text>
-    <text x="815" y="140" transform="scale(.1)" fill="#fff" textLength="330">11%</text>
+  <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
+    <text x="60" y="148" textLength="523" fill="#000" opacity="0.25">Coverage</text>
+    <text x="50" y="138" textLength="523">Coverage</text>
+    <text x="678" y="148" textLength="260" fill="#000" opacity="0.25">11%</text>
+    <text x="668" y="138" textLength="260">11%</text>
   </g>
+  
 </svg>
