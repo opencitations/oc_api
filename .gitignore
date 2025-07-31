@@ -25,3 +25,7 @@ var/
 .installed.cfg
 *.egg
 .DS_Store
+
+# Tests
+test/virtuoso-test-data/
+.coverage

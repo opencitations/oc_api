@@ -1,0 +1,37 @@
+[project]
+name = "oc-api"
+version = "0.1.0"
+description = "OpenCitations API"
+authors = [
+    {name = "Mario Petrella", email = "mario.petrella@unibo.it"},
+    {name = "Ivan Heibi", email = "ivan.heibi2@unibo.it"},
+    {name = "Arcangelo Massari", email = "arcangelo.massari@unibo.it"}
+]
+license = {text = "ISC"}
+readme = "README.md"
+requires-python = ">=3.9,<3.12"
+dependencies = [
+    "ramose>=1.0.8",
+    "sparqlwrapper>=2.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
+    "virtuoso-utilities>=1.0.0",
+]
+
+[tool.pytest.ini_options]
+addopts = "--cov=src --cov-report=term-missing --cov-report=html"
+pythonpath = "."
+
+[tool.coverage.run]
+source = ["src"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
