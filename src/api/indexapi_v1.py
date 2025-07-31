@@ -110,25 +110,23 @@ def metadata(res, *args):
                 "; ".join(reference_ids)
             ])
 
-
-        entity = "omid:"+omid_uri.split("oc/meta/")[1]
-        r = __ocmeta_parser([entity],"omid")
-        if r is None or all([i in ("", None) for i in r]):
+        # Use SPARQL instead of META API
+        r = __get_full_metadata_sparql([omid_uri])
+        if r is None or omid_uri not in r:
             row.extend(["","","","","","","","",""])
         else:
-            if entity in r:
-                r = r[entity]
-                row.extend([
-                    r["authors_str"],
-                    r["pub_date"],
-                    r["title"],
-                    r["source_title"],
-                    r["volume"],
-                    r["issue"],
-                    r["page"],
-                    r["source_id"],
-                    ""
-                ])
+            metadata = r[omid_uri]
+            row.extend([
+                metadata["authors_str"],
+                metadata["pub_date"],
+                metadata["title"],
+                metadata["source_title"],
+                metadata["volume"],
+                metadata["issue"],
+                metadata["page"],
+                metadata["source_id"],
+                ""
+            ])
 
     return res, True
 
@@ -237,6 +235,166 @@ def sum_all(res, *args):
 # ---
 # Local methods
 # ---
+
+# Get full metadata via SPARQL instead of external META API
+def __get_full_metadata_sparql(omid_uris):
+    sparql_endpoint = env_config["sparql_endpoint_meta"]
+    
+    # SPARQL query to get all necessary metadata fields
+    sparql_query = """
+    PREFIX pro: <http://purl.org/spar/pro/>
+    PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+    PREFIX fabio: <http://purl.org/spar/fabio/>
+    PREFIX datacite: <http://purl.org/spar/datacite/>
+    PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+    PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
+    PREFIX dcterms: <http://purl.org/dc/terms/>
+    PREFIX biro: <http://purl.org/spar/biro/>
+    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+    
+    SELECT DISTINCT ?br ?title ?pubDate 
+           (GROUP_CONCAT(DISTINCT ?startPage; SEPARATOR='-') AS ?page)
+           (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=' __ ') AS ?ids)
+           (GROUP_CONCAT(DISTINCT ?venue_title; SEPARATOR='; ') AS ?source_title)
+           (GROUP_CONCAT(DISTINCT ?venue_id; SEPARATOR=' ') AS ?source_ids)
+           (GROUP_CONCAT(DISTINCT CONCAT(COALESCE(?authorFamily, ""), ", ", COALESCE(?authorGiven, ""), 
+                         IF(BOUND(?orcid), CONCAT(", ", STR(?orcid)), "")); SEPARATOR='; ') AS ?authors)
+           (GROUP_CONCAT(DISTINCT ?volNum; SEPARATOR='') AS ?volume)
+           (GROUP_CONCAT(DISTINCT ?issueNum; SEPARATOR='') AS ?issue)
+    WHERE {
+        VALUES ?br { """ + " ".join(["<"+uri+">" for uri in omid_uris]) + """ }
+        
+        # Title
+        OPTIONAL { ?br dcterms:title ?title. }
+        
+        # Publication date
+        OPTIONAL { ?br prism:publicationDate ?pubDate. }
+        
+        # Page
+        OPTIONAL { 
+            ?br frbr:embodiment ?re.
+            ?re prism:startingPage ?startPage.
+        }
+        
+        # Identifiers
+        OPTIONAL {
+            ?br datacite:hasIdentifier ?identifier.
+            ?identifier datacite:usesIdentifierScheme ?scheme;
+                       literal:hasLiteralValue ?literalValue.
+            BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literalValue) AS ?id)
+        }
+        
+        # Venue, volume, issue
+        OPTIONAL {
+            ?br frbr:partOf ?issue_or_vol.
+            OPTIONAL {
+                ?issue_or_vol a fabio:JournalIssue;
+                             fabio:hasSequenceIdentifier ?issueNum;
+                             frbr:partOf ?vol.
+                ?vol a fabio:JournalVolume;
+                     fabio:hasSequenceIdentifier ?volNum.
+            }
+            OPTIONAL {
+                ?issue_or_vol a fabio:JournalVolume;
+                             fabio:hasSequenceIdentifier ?volNum.
+            }
+            # Get journal info
+            {
+                ?issue_or_vol frbr:partOf+ ?venue.
+                ?venue a fabio:Journal.
+            } UNION {
+                ?br frbr:partOf+ ?venue.
+                ?venue a fabio:Journal.
+            }
+            ?venue dcterms:title ?venue_title.
+            OPTIONAL {
+                ?venue datacite:hasIdentifier ?venue_identifier.
+                ?venue_identifier datacite:usesIdentifierScheme ?venue_scheme;
+                                 literal:hasLiteralValue ?venue_id_value.
+                BIND(CONCAT(STRAFTER(STR(?venue_scheme), "http://purl.org/spar/datacite/"), ":", ?venue_id_value) AS ?venue_id)
+            }
+        }
+        
+        # Authors with ORCID
+        OPTIONAL {
+            ?br pro:isDocumentContextFor ?ar.
+            ?ar pro:withRole pro:author;
+                pro:isHeldBy ?ra.
+            OPTIONAL { ?ra foaf:givenName ?authorGiven. }
+            OPTIONAL { ?ra foaf:familyName ?authorFamily. }
+            OPTIONAL { 
+                ?ra datacite:hasIdentifier ?authorId.
+                ?authorId datacite:usesIdentifierScheme datacite:orcid;
+                         literal:hasLiteralValue ?orcid.
+            }
+        }
+    }
+    GROUP BY ?br ?title ?pubDate
+    """
+    
+    headers = {"Accept": "application/sparql-results+json", "Content-Type": "application/sparql-query"}
+    
+    try:
+        response = post(sparql_endpoint, headers=headers, data=sparql_query, timeout=120)
+        if response.status_code == 200:
+            r = loads(response.text)
+            results = r["results"]["bindings"]
+            
+            # Format results
+            formatted_results = {}
+            for result in results:
+                br_uri = result["br"]["value"]
+                
+                # Extract DOI from IDs
+                doi = ""
+                if "ids" in result and result["ids"]["value"]:
+                    for id_str in result["ids"]["value"].split(" __ "):
+                        if id_str.startswith("doi:"):
+                            doi = id_str.replace("doi:", "")
+                            break
+                
+                # Extract source_id (preferably ISSN)
+                source_id = ""
+                if "source_ids" in result and result["source_ids"]["value"]:
+                    for sid in result["source_ids"]["value"].split(" "):
+                        if sid.startswith("issn:"):
+                            source_id = sid
+                            break
+                    if not source_id and result["source_ids"]["value"]:
+                        source_id = result["source_ids"]["value"].split(" ")[0]
+                
+                # Get full publication date
+                pub_date = result.get("pubDate", {}).get("value", "")
+                
+                # Clean authors - remove empty entries
+                authors = result.get("authors", {}).get("value", "")
+                if authors:
+                    authors_list = []
+                    for author in authors.split("; "):
+                        author = author.strip()
+                        # Remove entries that are just commas or spaces
+                        if author and author not in [", ,", ", ", " ,", ","]:
+                            authors_list.append(author)
+                    authors = "; ".join(authors_list)
+                
+                formatted_results[br_uri] = {
+                    "doi": doi,
+                    "title": result.get("title", {}).get("value", ""),
+                    "authors_str": authors,
+                    "pub_date": pub_date,
+                    "year": pub_date,  # Return full date as year field based on expected output
+                    "source_title": result.get("source_title", {}).get("value", ""),
+                    "source_id": source_id,
+                    "volume": result.get("volume", {}).get("value", ""),
+                    "issue": result.get("issue", {}).get("value", ""),
+                    "page": result.get("page", {}).get("value", "")
+                }
+            
+            return formatted_results
+            
+    except Exception as e:
+        print(f"SPARQL error: {e}")
+        return {}
 
 def __ocmeta_parser(ids, pre="doi"):
     api = "https://api.opencitations.net/meta/v1/metadata/"
