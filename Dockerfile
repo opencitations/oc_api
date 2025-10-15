@@ -39,4 +39,4 @@ CMD ["gunicorn", \
      "--worker-connections", "500", \
      "--timeout", "1000", \
      "-b", "0.0.0.0:8080", \
-     "api_oc:app.wsgifunc()"]
+     "api_oc:application"]
