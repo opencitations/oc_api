@@ -25,12 +25,18 @@ WORKDIR /website
 # The code is already present in the repo, no need to git clone
 COPY . .
 
-# Install Python dependencies from requirements.txt
-RUN pip install -r requirements.txt
+# Install Python dependencies from requirements.txt + gunicorn and gevent
+RUN pip install -r requirements.txt && \
+    pip install gunicorn gevent
 
 # Expose the port that our service will listen on
 EXPOSE 8080
 
-# Start the application
-# The Python script will now read environment variables for SPARQL configurations
-CMD ["python3", "api_oc.py"]
+# Start the application with gunicorn instead of python directly
+CMD ["gunicorn", \
+     "-w", "2", \
+     "--worker-class", "gevent", \
+     "--worker-connections", "500", \
+     "--timeout", "1000", \
+     "-b", "0.0.0.0:8080", \
+     "api_oc:app.wsgifunc()"]
