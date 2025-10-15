@@ -35,7 +35,7 @@ EXPOSE 8080
 CMD ["gunicorn", \
      "-w", "2", \
      "--worker-class", "gevent", \
-     "--worker-connections", "500", \
+     "--worker-connections", "800", \
      "--timeout", "1000", \
      "-b", "0.0.0.0:8080", \
      "api_oc:application"]

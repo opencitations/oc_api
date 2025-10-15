@@ -2,10 +2,9 @@ name: Docker Build and Push
 
 on:
   push:
-    branches: [ main, master, guni_test ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ main, master, guni_test ]
-  workflow_dispatch:
+    branches: [ main, master ]
 
 env:
   SERVIZIO_OC: oc_api
