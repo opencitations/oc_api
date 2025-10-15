@@ -26,8 +26,7 @@ WORKDIR /website
 COPY . .
 
 # Install Python dependencies from requirements.txt + gunicorn and gevent
-RUN pip install -r requirements.txt && \
-    pip install gunicorn gevent
+RUN pip install -r requirements.txt
 
 # Expose the port that our service will listen on
 EXPOSE 8080

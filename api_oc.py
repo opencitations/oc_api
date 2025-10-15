@@ -100,7 +100,9 @@ render = web.template.render(c["html"], globals={
 
 # App Web.py
 app = web.application(urls, globals())
-application = app.wsgifunc() 
+
+application = app.wsgifunc()
+
 rconn = Redis(host=env_config["redis"]["host"],
               port=env_config["redis"]["port"], 
               db=env_config["redis"]["db"], 
