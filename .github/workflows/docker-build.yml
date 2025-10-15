@@ -2,11 +2,11 @@ name: Docker Build and Push
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, guni_test ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master, guni_test ]
   workflow_dispatch:
-    
+
 env:
   SERVIZIO_OC: oc_api
   DOCKER_REGISTRY: opencitations
