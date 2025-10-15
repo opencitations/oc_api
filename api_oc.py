@@ -58,6 +58,7 @@ active = {
 # URL Mapping
 urls = (
     "/", "Main",
+    "/static/(.*)", "Static",
     '/favicon.ico', 'Favicon',
     "/sparql/index", "SparqlIndex",
     "/sparql/meta", "SparqlMeta",
@@ -167,6 +168,36 @@ class Header:
     def GET(self):
         current_subdomain = web.ctx.host.split('.')[0].lower()
         return render.header(sp_title="", current_subdomain=current_subdomain)
+
+class Static:
+    def GET(self, name):
+        """Serve static files"""
+        static_dir = "static"  # o c.get("static", "static") se hai la path in conf.json
+        file_path = os.path.join(static_dir, name)
+        
+        if not os.path.exists(file_path):
+            raise web.notfound()
+        
+        # Content types
+        ext = os.path.splitext(name)[1]
+        content_types = {
+            '.css': 'text/css',
+            '.js': 'application/javascript',
+            '.png': 'image/png',
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.gif': 'image/gif',
+            '.svg': 'image/svg+xml',
+            '.ico': 'image/x-icon',
+            '.woff': 'font/woff',
+            '.woff2': 'font/woff2',
+            '.ttf': 'font/ttf',
+        }
+        
+        web.header('Content-Type', content_types.get(ext, 'application/octet-stream'))
+        
+        with open(file_path, 'rb') as f:
+            return f.read()
 
 class Sparql:
     def __init__(self, sparql_endpoint, sparql_endpoint_title, yasqe_sparql_endpoint):
