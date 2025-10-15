@@ -25,7 +25,7 @@ WORKDIR /website
 # The code is already present in the repo, no need to git clone
 COPY . .
 
-# Install Python dependencies from requirements.txt + gunicorn and gevent
+# Install Python dependencies from requirements.txt
 RUN pip install -r requirements.txt
 
 # Expose the port that our service will listen on
@@ -36,6 +36,6 @@ CMD ["gunicorn", \
      "-w", "2", \
      "--worker-class", "gevent", \
      "--worker-connections", "800", \
-     "--timeout", "1000", \
+     "--timeout", "1200", \
      "-b", "0.0.0.0:8080", \
      "api_oc:application"]
