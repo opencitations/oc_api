@@ -31,6 +31,11 @@ RUN pip install -r requirements.txt
 # Expose the port that our service will listen on
 EXPOSE 8080
 
-# Start the application
-# The Python script will now read environment variables for SPARQL configurations
-CMD ["python3", "api_oc.py"]
+# Start the application with gunicorn instead of python directly
+CMD ["gunicorn", \
+     "-w", "2", \
+     "--worker-class", "gevent", \
+     "--worker-connections", "800", \
+     "--timeout", "1200", \
+     "-b", "0.0.0.0:8080", \
+     "api_oc:application"]
