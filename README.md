@@ -31,7 +31,6 @@ The service requires the following environment variables. These values take prec
 - `REDIS_PASSWORD`: Redis authentication password
 
 For instance:
-
 ```env
 # API Configuration
 BASE_URL=api.opencitations.net
@@ -53,7 +52,6 @@ REDIS_PASSWORD=your_redis_password
 ### Static Files Synchronization
 
 The application can synchronize static files from a GitHub repository. This configuration is managed in `conf.json`:
-
 ```json
 {
   "oc_services_templates": "https://github.com/opencitations/oc_services_templates",
@@ -82,12 +80,9 @@ When static sync is enabled (via `--sync-static` or `SYNC_ENABLED=true`), the ap
 
 ## Running Options
 
-The application supports the following command line arguments:
+### Local Development
 
-- `--sync-static`: Synchronize static files at startup and enable periodic sync (every 30 minutes)
-- `--port PORT`: Specify the port to run the application on (default: 8080)
-
-Examples:
+For local development and testing, the application uses the built-in web.py HTTP server:
 ```bash
 # Run with default settings
 python3 api_oc.py
@@ -102,12 +97,26 @@ python3 api_oc.py --port 8085
 python3 api_oc.py --sync-static --port 8085
 ```
 
-The Docker container is configured to run with `--sync-static` enabled by default.
+The application supports the following command line arguments:
+
+- `--sync-static`: Synchronize static files at startup and enable periodic sync (every 30 minutes)
+- `--port PORT`: Specify the port to run the application on (default: 8080)
+
+### Production Deployment (Docker)
+
+When running in Docker/Kubernetes, the application uses **Gunicorn** as the WSGI HTTP server for better performance and concurrency handling:
+
+- **Server**: Gunicorn with gevent workers
+- **Workers**: 4 concurrent worker processes
+- **Worker Type**: gevent (async) for handling thousands of simultaneous requests
+- **Timeout**: 1000 seconds (to handle long-running SPARQL queries)
+- **Connections per worker**: 1000 simultaneous connections
+
+The Docker container automatically uses Gunicorn and is configured with static sync enabled by default.
+
+> **Note**: The application code automatically detects the execution environment. When run with `python3 api_oc.py`, it uses the built-in web.py server. When run with Gunicorn (as in Docker), it uses the WSGI interface.
 
 ### Dockerfile
-
-You can change these variables in the Dockerfile:
-
 ```dockerfile
 # Base image: Python slim for a lightweight container
 FROM python:3.11-slim
@@ -118,7 +127,7 @@ ENV BASE_URL="api.opencitations.net" \
     LOG_DIR="/mnt/log_dir/oc_api"  \
     SPARQL_ENDPOINT_INDEX="http://qlever-service.default.svc.cluster.local:7011" \
     SPARQL_ENDPOINT_META="http://virtuoso-service.default.svc.cluster.local:8890/sparql" \
-    SYNC_ENABLED="true" 
+    SYNC_ENABLED="true"
   # Uncomment the following lines if you are running the application in a local development environment or any non-Kubernetes deployment scenario.
   #  REDIS_ENABLED="true" \
   #  REDIS_HOST="redis-service.default.svc.cluster.local" \
@@ -132,25 +141,28 @@ RUN apt-get update && \
     apt-get install -y \
     git \
     python3-dev \
-    build-essential && \
-    apt-get clean
+    build-essential
 
 # Set the working directory for our application
 WORKDIR /website
 
-# Clone the specific branch (api) from the repository
-# The dot at the end means clone into current directory
+# Copy the application code from the GitHub repo
 RUN git clone --single-branch --branch main https://github.com/opencitations/oc_api .
 
-# Install Python dependencies from requirements.txt
+# Install Python dependencies from requirements.txt + gunicorn and gevent
 RUN pip install -r requirements.txt
 
 # Expose the port that our service will listen on
 EXPOSE 8080
 
-# Start the application
-# The Python script will now read environment variables for API configurations
-CMD ["python3", "api_oc.py"]
+# Start the application with gunicorn for production
+CMD ["gunicorn", \
+     "-w", "2", \
+     "--worker-class", "gevent", \
+     "--worker-connections", "800", \
+     "--timeout", "1200", \
+     "-b", "0.0.0.0:8080", \
+     "api_oc:application"]
 ```
 
 ## Testing
@@ -162,19 +174,18 @@ To run the API tests locally, you'll need to have the test environment set up pr
 #### Prerequisites
 
 1. Install dependencies using uv:
-   ```bash
+```bash
    uv sync --dev
-   ```
+```
 
 2. Start the test database:
-   ```bash
+```bash
    ./test/start_test_db.sh
-   ```
+```
 
 #### Running the Tests
 
 Once the test database is running, you can execute the tests with coverage:
-
 ```bash
 # Run tests with coverage report
 uv run pytest --cov=src --cov-report=term-missing --cov-report=html
@@ -189,7 +200,6 @@ uv run pytest -v
 #### Stopping the Test Database
 
 After running the tests, stop the test database:
-
 ```bash
 ./test/stop_test_db.sh
 ```
