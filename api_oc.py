@@ -172,7 +172,7 @@ class Header:
 class Static:
     def GET(self, name):
         """Serve static files"""
-        static_dir = "static"  # o c.get("static", "static") se hai la path in conf.json
+        static_dir = "static"
         file_path = os.path.join(static_dir, name)
         
         if not os.path.exists(file_path):

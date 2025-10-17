@@ -2,9 +2,9 @@ name: Docker Build and Push
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, gunicorn-fix-synch ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master, gunicorn-fix-synch ]
 
 env:
   SERVIZIO_OC: oc_api

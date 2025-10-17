@@ -10,14 +10,11 @@ ENV BASE_URL="api.opencitations.net" \
     SYNC_ENABLED="true"
 
 # Install system dependencies required for Python package compilation
-# We clean up apt cache after installation to reduce image size
 RUN apt-get update && \
     apt-get install -y \
     git \
     python3-dev \
-    build-essential && \
-    apt-get clean
-
+    build-essential
 # Set the working directory for our application
 WORKDIR /website
 
@@ -27,6 +24,10 @@ COPY . .
 
 # Install Python dependencies from requirements.txt
 RUN pip install -r requirements.txt
+# Check if synchronization is enabled annd updatge requirements if needed
+RUN if [ "$SYNC_ENABLED" = "true" ]; then \
+        python3 sync_static.py --auto ; \
+    fi
 
 # Expose the port that our service will listen on
 EXPOSE 8080
