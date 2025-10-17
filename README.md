@@ -107,10 +107,10 @@ The application supports the following command line arguments:
 When running in Docker/Kubernetes, the application uses **Gunicorn** as the WSGI HTTP server for better performance and concurrency handling:
 
 - **Server**: Gunicorn with gevent workers
-- **Workers**: 4 concurrent worker processes
+- **Workers**: 2 concurrent worker processes
 - **Worker Type**: gevent (async) for handling thousands of simultaneous requests
-- **Timeout**: 1000 seconds (to handle long-running SPARQL queries)
-- **Connections per worker**: 1000 simultaneous connections
+- **Timeout**: 1200 seconds (to handle long-running SPARQL queries)
+- **Connections per worker**: 800 simultaneous connections
 
 The Docker container automatically uses Gunicorn and is configured with static sync enabled by default.
 
@@ -136,7 +136,6 @@ ENV BASE_URL="api.opencitations.net" \
   #  REDIS_PASSWORD="your_redis_password"
 
 # Install system dependencies required for Python package compilation
-# We clean up apt cache after installation to reduce image size
 RUN apt-get update && \
     apt-get install -y \
     git \
@@ -149,7 +148,7 @@ WORKDIR /website
 # Copy the application code from the GitHub repo
 RUN git clone --single-branch --branch main https://github.com/opencitations/oc_api .
 
-# Install Python dependencies from requirements.txt + gunicorn and gevent
+# Install Python dependencies from requirements.txt
 RUN pip install -r requirements.txt
 
 # Expose the port that our service will listen on
