@@ -9,10 +9,6 @@ ENV BASE_URL="api.opencitations.net" \
     SPARQL_ENDPOINT_META="http://virtuoso-service.default.svc.cluster.local:8890/sparql" \
     SYNC_ENABLED="true" 
 
-# Specify that we are using gunicorn as the WSGI server (mandatory)
-# Do not change this value unless you modify api_oc.py accordingly
-ENV WSGI_SERVER="gunicorn"
-
 # Install system dependencies required for Python package compilation
 RUN apt-get update && \
     apt-get install -y \
@@ -33,10 +29,4 @@ RUN pip install -r requirements.txt
 EXPOSE 8080
 
 # Start the application with gunicorn instead of python directly
-CMD ["gunicorn", \
-     "-w", "2", \
-     "--worker-class", "gevent", \
-     "--worker-connections", "800", \
-     "--timeout", "1200", \
-     "-b", "0.0.0.0:8080", \
-     "api_oc:application"]
+CMD ["gunicorn", "-c", "gunicorn_config.py", "api_oc:application"]

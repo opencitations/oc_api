@@ -109,8 +109,6 @@ rconn = Redis(host=env_config["redis"]["host"],
               db=env_config["redis"]["db"], 
               password=env_config["redis"]["password"])
 
-
-
 def sync_static_files():
     """
     Function to synchronize static files using sync_static.py
@@ -123,29 +121,6 @@ def sync_static_files():
         print(f"Error during static files synchronization: {e}")
     except Exception as e:
         print(f"Unexpected error during synchronization: {e}")
-
-def initialize_application():
-    """
-    Initialize application: print configuration and sync static files if enabled.
-    This runs both when started with gunicorn and when run directly with python.
-    """
-    print("=" * 60)
-    print("Starting API OpenCitations web application...")
-    print("=" * 60)
-    print(f"Configuration: Base URL={env_config['base_url']}")
-    print(f"Sync enabled: {env_config['sync_enabled']}")
-    print(f"Redis enabled: {env_config['redis']['enabled']}")
-    print(f"Redis host: {env_config['redis']['host']}")
-    print(f"SPARQL Index endpoint: {env_config['sparql_endpoint_index']}")
-    print(f"SPARQL Meta endpoint: {env_config['sparql_endpoint_meta']}")
-    print("=" * 60)
-    
-    # Sync static files if enabled
-    if env_config["sync_enabled"]:
-        print("Static sync is enabled (SYNC_ENABLED=true)")
-        sync_static_files()
-    else:
-        print("Static sync is disabled")
 
 def validateAccessToken():
     if not env_config["redis"]["enabled"]:
@@ -434,11 +409,6 @@ class Api:
                 else:
                     raise web.HTTPError(
                         "404 ", {"Content-Type": content_type}, "No API operation found at URL '%s'" % call)
-
-
-if os.getenv("WSGI_SERVER") == "gunicorn":
-    print("Detected gunicorn environment (WSGI_SERVER=gunicorn)")
-    initialize_application()
 
 
 # Run the application on localhost for testing/development
