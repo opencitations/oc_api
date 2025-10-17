@@ -7,7 +7,11 @@ ENV BASE_URL="api.opencitations.net" \
     LOG_DIR="/mnt/log_dir/oc_api"  \
     SPARQL_ENDPOINT_INDEX="http://qlever-service.default.svc.cluster.local:7011" \
     SPARQL_ENDPOINT_META="http://virtuoso-service.default.svc.cluster.local:8890/sparql" \
-    SYNC_ENABLED="true"
+    SYNC_ENABLED="true" 
+
+# Specify that we are using gunicorn as the WSGI server (mandatory)
+# Do not change this value unless you modify api_oc.py accordingly
+ENV WSGI_SERVER="gunicorn"
 
 # Install system dependencies required for Python package compilation
 RUN apt-get update && \
@@ -24,10 +28,6 @@ COPY . .
 
 # Install Python dependencies from requirements.txt
 RUN pip install -r requirements.txt
-# Check if synchronization is enabled annd updatge requirements if needed
-RUN if [ "$SYNC_ENABLED" = "true" ]; then \
-        python3 sync_static.py --auto ; \
-    fi
 
 # Expose the port that our service will listen on
 EXPOSE 8080
