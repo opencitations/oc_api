@@ -9,6 +9,9 @@ ENV BASE_URL="api.opencitations.net" \
     SPARQL_ENDPOINT_META="http://virtuoso-service.default.svc.cluster.local:8890/sparql" \
     SYNC_ENABLED="true" 
 
+
+# Ensure Python output is unbuffered
+ENV PYTHONUNBUFFERED=1
 # Install system dependencies required for Python package compilation
 RUN apt-get update && \
     apt-get install -y \
@@ -29,4 +32,4 @@ RUN pip install -r requirements.txt
 EXPOSE 8080
 
 # Start the application with gunicorn instead of python directly
-CMD ["gunicorn", "-c", "gunicorn_config.py", "api_oc:application"]
+CMD ["gunicorn", "-c", "gunicorn.conf.py", "api_oc:application"]
