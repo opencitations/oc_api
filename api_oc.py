@@ -109,8 +109,6 @@ rconn = Redis(host=env_config["redis"]["host"],
               db=env_config["redis"]["db"], 
               password=env_config["redis"]["password"])
 
-
-
 def sync_static_files():
     """
     Function to synchronize static files using sync_static.py
@@ -172,7 +170,7 @@ class Header:
 class Static:
     def GET(self, name):
         """Serve static files"""
-        static_dir = "static"  # o c.get("static", "static") se hai la path in conf.json
+        static_dir = "static"
         file_path = os.path.join(static_dir, name)
         
         if not os.path.exists(file_path):
@@ -413,8 +411,7 @@ class Api:
                         "404 ", {"Content-Type": content_type}, "No API operation found at URL '%s'" % call)
 
 
-
-# Run the application
+# Run the application on localhost for testing/development
 if __name__ == "__main__":
     # Add startup log
     print("Starting API OpenCitations web application...")

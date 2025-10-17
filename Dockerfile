@@ -7,17 +7,17 @@ ENV BASE_URL="api.opencitations.net" \
     LOG_DIR="/mnt/log_dir/oc_api"  \
     SPARQL_ENDPOINT_INDEX="http://qlever-service.default.svc.cluster.local:7011" \
     SPARQL_ENDPOINT_META="http://virtuoso-service.default.svc.cluster.local:8890/sparql" \
-    SYNC_ENABLED="true"
+    SYNC_ENABLED="true" 
 
+
+# Ensure Python output is unbuffered
+ENV PYTHONUNBUFFERED=1
 # Install system dependencies required for Python package compilation
-# We clean up apt cache after installation to reduce image size
 RUN apt-get update && \
     apt-get install -y \
     git \
     python3-dev \
-    build-essential && \
-    apt-get clean
-
+    build-essential
 # Set the working directory for our application
 WORKDIR /website
 
@@ -32,10 +32,4 @@ RUN pip install -r requirements.txt
 EXPOSE 8080
 
 # Start the application with gunicorn instead of python directly
-CMD ["gunicorn", \
-     "-w", "2", \
-     "--worker-class", "gevent", \
-     "--worker-connections", "800", \
-     "--timeout", "1200", \
-     "-b", "0.0.0.0:8080", \
-     "api_oc:application"]
+CMD ["gunicorn", "-c", "gunicorn.conf.py", "api_oc:application"]
