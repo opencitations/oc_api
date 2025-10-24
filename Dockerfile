@@ -26,7 +26,7 @@ WORKDIR /website
 COPY . .
 
 # Install Python dependencies from requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port that our service will listen on
 EXPOSE 8080

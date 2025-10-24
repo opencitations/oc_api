@@ -3,9 +3,9 @@ import sys
 import subprocess
 
 # Worker configuration
-workers = 2
+workers = 4
 worker_class = "gevent"
-worker_connections = 800
+worker_connections = 200
 timeout = 1200
 bind = "0.0.0.0:8080"
 
