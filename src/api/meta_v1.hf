@@ -2,6 +2,7 @@
 #type api
 #base https://api.opencitations.net/meta
 #title The REST API for OpenCitations Meta
+#html_meta_description OpenCitations Meta REST API: retrieve bibliographic metadata, authors, editors, venues using DOI, ORCID, PMID, OMID, ISBN, ISSN identifiers. Free access.
 #description This is the REST API for OpenCitations Meta, the OpenCitations dataset containing bibliographic metadata associated with the documents involved in the citations stored in the OpenCitations Indexes. All the present operations return either a JSON document (default) or a CSV document according to the mimetype specified in the `Accept` header of the request. If you would like to suggest an additional operation to be included in this API, please use the [issue tracker](https://github.com/opencitations/api/issues) of the OpenCitations APIs available on GitHub.
 
 If you are going to use the REST APIs within an application/code, we encourage you to get the [OpenCitations Access Token](https://opencitations.net/accesstoken) and specify it in the "authorization" header of your REST API call. Here is a usage example in Python:

@@ -143,6 +143,10 @@ class HTMLDocumentationHandler(DocumentationHandler):
         """This method returns the title string defined in the API specification."""
         return conf["conf_json"][0]["title"]
 
+    def __htmlmetadescription(self, conf):
+        """This method returns the HTML meta-description string defined in the API specification."""
+        return conf["conf_json"][0]["html_meta_description"]
+
     def __sidebar(self, conf):
         """This method builds the sidebar of the API documentation"""
         result = ""
@@ -724,7 +728,7 @@ The operations that this API implements are:
         """This method generates the HTML documentation of an API described in configuration file."""
         if base_url is None:
             first_key = next(iter(self.conf_doc))
-            conf = self.conf_doc[first_key]
+            conf = self.conf_doc[first_key] 
         else:
             conf = self.conf_doc['/'+base_url]
 
@@ -734,6 +738,7 @@ The operations that this API implements are:
         <title>%s</title>
         <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
         <meta name="viewport" content="width=device-width" />
+        <meta name="description" content="%s"/>
         <style>%s</style>
         %s
     </head>
@@ -743,7 +748,16 @@ The operations that this API implements are:
         <section id="operations">%s</section>
         <footer>%s</footer>
     </body>
-</html>""" % (self.__title(conf), self.__css(), self.__css_path(css_path), self.__sidebar(conf), self.__header(conf), self.__operations(conf), self.__footer())
+</html>""" % (
+            self.__title(conf),
+            self.__htmlmetadescription(conf),
+            self.__css(),
+            self.__css_path(css_path),
+            self.__sidebar(conf),
+            self.__header(conf),
+            self.__operations(conf),
+            self.__footer()
+        )
 
     def get_index(self, css_path=None):
         """This method generates the index of all the HTML documentations that can be
