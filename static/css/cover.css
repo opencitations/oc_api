@@ -99,7 +99,11 @@ dd > blockquote {
 }
 
 .search-entry .form-control{
-  font-size:20px;
+  font-size:15pt;
+}
+.search-entry .form-control::placeholder {
+  color: #999999 ;
+  opacity: 1;
 }
 
 pre code {
