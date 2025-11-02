@@ -15,7 +15,7 @@
   /* padding-top: 5%; */
   width:100%;
   height:auto;
-  overflow:auto
+  margin-bottom: 80px;
 }
 
 #search_extra{
@@ -24,8 +24,9 @@
 }
 
 #search_header{
-  width:100%;
+  /*width:100%;
   height: 50px;
+  margin-bottom: 20px;*/
 }
 
 #rows_per_page {
@@ -34,6 +35,7 @@
 }
 #rows_per_page div{
   display: inline-block;
+  font-size: 14pt;
 }
 
 .tot-results {
@@ -102,11 +104,13 @@ ul.search-elem li{
   word-wrap:break-word;
 }
 .results-tab th {
-  border-color: black !important;
+  border-color: white !important;
   border-top: none !important;
   border-bottom: solid !important;
-  font-size: medium;
-  font-weight: 100;
+  font-size: large;
+  background: gray;
+  color: white;
+  border-left: solid 1px;
 }
 
 .results-tab td a{color: black; text-decoration: underline;}
@@ -181,7 +185,7 @@ spanfooter + spanfooter {
 
 .search-header{font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;}
 
-.search-header .rows-per-page{font-size: 130%;}
+/*.search-header .rows-per-page{font-size: 130%;}*/
 .search-header .rows-per-page .input
 {
   width: 60px;
@@ -208,6 +212,7 @@ spanfooter + spanfooter {
 }
 
 select {
+  width: unset !important;
   text-indent: 0%;
   /* margin: 5px; */
 }
@@ -352,10 +357,14 @@ td ar + ar {
 /* ================================= */
 .search-extra{font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;}
 
+.search-box *{
+    font-size: 1.1rem !important;
+  }
+
 .search-entry{
   font-size: 230%;
   margin-top: 70px;
-  width: 75%;
+  width: 65%;
   margin-right: auto;
   margin-left: auto;
 }
@@ -555,6 +564,16 @@ input[type=range]::-moz-range-track {
 
 
 @media only screen and (max-width: 700px) {
+
+  .container{
+    padding: 0px !important;
+  }
+
+  .search-entry {
+    width: 100% !important;
+    padding: 0px !important;
+  }
+
   #search_header{
     font-size: 85%;
   }
@@ -566,6 +585,26 @@ input[type=range]::-moz-range-track {
     float:left;
     width: 100%;
   }
+
+  .search-box *{
+    font-size: 1.4rem !important;
+  }
+
+  .search-box input{
+    width: 100% !important;
+  }
+  .search-box select{
+    margin: 0px !important;
+    width: 100% !important;
+    max-width: unset !important;
+    color: var(--main-bg-color);
+
+  }
+  .search-box button{
+    margin-top: 20px;
+    width: 100% !important;
+  }
+
   .limit-results {
     margin-top: 20px;
     display: inline-block;

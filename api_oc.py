@@ -1,7 +1,7 @@
 import web
 import os
 import json
-from src.wl import WebLogger
+#from src.wl import WebLogger
 import requests
 import urllib.parse as urlparse
 import re
@@ -51,7 +51,6 @@ active = {
     "oci": "tools",
     "intrepid": "tools",
     "api": "querying",
-    "api": "querying",
     "search": "querying"
 }
 
@@ -70,19 +69,19 @@ urls = (
 )
 
 # Set the web logger
-web_logger = WebLogger(env_config["base_url"], env_config["log_dir"], [
-    "HTTP_X_FORWARDED_FOR", # The IP address of the client
-    "REMOTE_ADDR",          # The IP address of internal balancer
-    "HTTP_USER_AGENT",      # The browser type of the visitor
-    "HTTP_REFERER",         # The URL of the page that called your program
-    "HTTP_HOST",            # The hostname of the page being attempted
-    "REQUEST_URI",          # The interpreted pathname of the requested document
-                            # or CGI (relative to the document root)
-    "HTTP_AUTHORIZATION",   # Access token
-    ],
-    # comment this line only for test purposes
-     {"REMOTE_ADDR": ["130.136.130.1", "130.136.2.47", "127.0.0.1"]}
-)
+# web_logger = WebLogger(env_config["base_url"], env_config["log_dir"], [
+#     "HTTP_X_FORWARDED_FOR", # The IP address of the client
+#     "REMOTE_ADDR",          # The IP address of internal balancer
+#     "HTTP_USER_AGENT",      # The browser type of the visitor
+#     "HTTP_REFERER",         # The URL of the page that called your program
+#     "HTTP_HOST",            # The hostname of the page being attempted
+#     "REQUEST_URI",          # The interpreted pathname of the requested document
+#                             # or CGI (relative to the document root)
+#     "HTTP_AUTHORIZATION",   # Access token
+#     ],
+#     # comment this line only for test purposes
+#      {"REMOTE_ADDR": ["130.136.130.1", "130.136.2.47", "127.0.0.1"]}
+# )
 
 # API Managers
 meta_api_manager = APIManager(c["api_meta"])
@@ -104,10 +103,22 @@ app = web.application(urls, globals())
 
 application = app.wsgifunc()
 
-rconn = Redis(host=env_config["redis"]["host"],
-              port=env_config["redis"]["port"], 
-              db=env_config["redis"]["db"], 
-              password=env_config["redis"]["password"])
+if env_config["redis"]["enabled"]:
+    try:
+        rconn = Redis(
+            host=env_config["redis"]["host"],
+            port=env_config["redis"]["port"], 
+            db=env_config["redis"]["db"], 
+            password=env_config["redis"]["password"]
+        )
+        # Test della connessione
+        rconn.ping()
+        print("Redis connection established")
+    except Exception as e:
+        print(f"Redis connection failed: {e}")
+        rconn = None
+else:
+    rconn = None
 
 def sync_static_files():
     """
@@ -123,7 +134,7 @@ def sync_static_files():
         print(f"Unexpected error during synchronization: {e}")
 
 def validateAccessToken():
-    if not env_config["redis"]["enabled"]:
+    if not env_config["redis"]["enabled"] or rconn is None:
         # If Redis is not enabled, skip token validation
         return True
     auth_code = web.ctx.env.get('HTTP_AUTHORIZATION')
@@ -205,7 +216,7 @@ class Sparql:
         self.collparam = ["query"]
 
     def GET(self):
-        web_logger.mes()
+        #web_logger.mes()
         content_type = web.ctx.env.get('CONTENT_TYPE')
         return self.__run_query_string(self.sparql_endpoint_title, web.ctx.env.get("QUERY_STRING"), content_type)
 
@@ -247,7 +258,7 @@ class Sparql:
                 web.header('Content-Type', 'application/sparql-results+json')
             else:
                 web.header('Content-Type', req.headers["content-type"])
-            web_logger.mes()
+            #web_logger.mes()
             req.encoding = "utf-8"
             return req.text
         else:
@@ -298,7 +309,7 @@ class Sparql:
 
 class Main:
     def GET(self):
-        web_logger.mes()
+        #web_logger.mes()
         current_subdomain = web.ctx.host.split('.')[0].lower()
         return render.api(active="", sp_title="", sparql_endpoint="", current_subdomain=current_subdomain, render=render)
 
@@ -362,7 +373,7 @@ class Api:
                 web.header('Content-Type', "text/html")
                 web.header('Access-Control-Allow-Methods', '*')
                 web.header('Access-Control-Allow-Headers', 'Authorization')
-                web_logger.mes()
+                #web_logger.mes()
                 return doc.get_documentation()[1]
             else:
                 content_type = web.ctx.env.get('HTTP_ACCEPT')
@@ -391,7 +402,7 @@ class Api:
                         web.header('Access-Control-Allow-Methods', '*')
                         web.header('Access-Control-Allow-Headers',
                                    'Authorization')
-                        web_logger.mes()
+                        #web_logger.mes()
                         return res
                     else:
                         try:

@@ -46,7 +46,7 @@ class WebLogger(object):
             if not path.exists(file_path):
                 file_dir = path.dirname(file_path)
                 if not path.exists(file_dir):
-                    makedirs(file_dir)
+                    makedirs(file_dir, exist_ok=True)
                 open(file_path, "a").close()
 
             file_handler = logging.FileHandler(file_path)

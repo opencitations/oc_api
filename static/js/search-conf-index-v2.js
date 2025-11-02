@@ -44,7 +44,12 @@ var search_conf = {
       "regex":"(.+)",
       "query": [`
             {
-                ?identifier literal:hasLiteralValue "[[VAR]]" .
+                {
+                  ?identifier literal:hasLiteralValue "[[VAR]]" .
+                }UNION{
+                  ?identifier literal:hasLiteralValue "[[VAR]]"^^<http://www.w3.org/2001/XMLSchema#string> .
+                }
+
                 ?citing datacite:hasIdentifier ?identifier .
                 SERVICE <${endpoint_index}/sparql> {
                       ?oci a cito:Citation .
@@ -65,7 +70,12 @@ var search_conf = {
       "regex":"(.+)",
       "query": [`
             {
-                ?identifier literal:hasLiteralValue "[[VAR]]" .
+                {
+                  ?identifier literal:hasLiteralValue "[[VAR]]" .
+                }UNION{
+                  ?identifier literal:hasLiteralValue "[[VAR]]"^^<http://www.w3.org/2001/XMLSchema#string> .
+                }
+
                 ?cited datacite:hasIdentifier ?identifier .
                 SERVICE <${endpoint_index}/sparql> {
                       ?oci a cito:Citation .
@@ -117,23 +127,23 @@ var search_conf = {
         "citing_ref": {"name": "meta_call_to_get_ref", "param": {"fields":["citing"]}, "async": true},
         "cited_ref": {"name": "meta_call_to_get_ref", "param": {"fields":["cited"]}, "async": true}
       },
-      "extra_elems":[
-        {"elem_type": "a","elem_value": "Back to search" ,"elem_class": "btn btn-primary left" ,"elem_innerhtml": "Show the search interface", "others": {"href": "/"}}
-      ]
+      // "extra_elems":[
+      //   {"elem_type": "a","elem_value": "Back to search" ,"elem_class": "btn btn-primary left btn-sm" ,"elem_innerhtml": "Back to the search", "others": {"href": "/"}}
+      // ]
     }
   ],
 
   "page_limit": [5,10,15,20,30,40,50],
   "def_results_limit": 1,
   "search_base_path": "search",
-  "advanced_search": true,
+  "advanced_search": false,
   "def_adv_category": "citation",
   "adv_btn_title": "Search in the OpenCitations Indexes",
 
   "progress_loader":{
             "visible": true,
             "spinner": true,
-            "title":"Searching in the OpenCitations Indexes ...",
+            "title":"Searching in OpenCitations ...",
             "subtitle":"Be patient - this search might take several seconds!",
             "abort":{"title":"Abort Search","href_link":"/"}
           },
