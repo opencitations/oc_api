@@ -1,0 +1,202 @@
+$def with (url)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Resource Not Found | OpenCitations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 60px 40px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .error-code {
+            font-size: 120px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 32px;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
+        .description {
+            font-size: 18px;
+            color: #718096;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .resource-info {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 25px 0;
+            border-radius: 5px;
+            text-align: left;
+        }
+        
+        .resource-info strong {
+            color: #2d3748;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .resource-info code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 14px;
+            color: #667eea;
+            word-break: break-all;
+        }
+        
+        .suggestions {
+            margin-top: 40px;
+            text-align: left;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+        
+        .suggestions h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .suggestions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .suggestions li {
+            color: #4a5568;
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .suggestions li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .suggestions a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .suggestions a:hover {
+            text-decoration: underline;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #a0aec0;
+            font-size: 14px;
+        }
+        
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 40px 25px;
+            }
+            
+            .error-code {
+                font-size: 80px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .description {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-code">404</div>
+        <h1>Resource Not Found</h1>
+        <p class="description">
+            Sorry, we couldn't find the resource you're looking for.
+        </p>
+        
+        <div class="resource-info">
+            <strong>Requested Resource:</strong>
+            <code>$url</code>
+        </div>
+        
+        <div class="suggestions">
+            <h3>What you can do:</h3>
+            <ul>
+                <li>Check if the URL is correct</li>
+                <li>Read our <a href="https://api.opencitations.net">API documentation</a></li>
+                <li>Visit our <a href="https://opencitations.net">Website</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p><a href="https://opencitations.net">OpenCitations</a></p>
+        </div>
+    </div>
+</body>
+</html>

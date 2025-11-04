@@ -63,8 +63,8 @@ urls = (
     "/sparql/meta", "SparqlMeta",
     "/index/?", "RedirectIndex",
     "/meta/?", "RedirectMeta",
-    "/(index)(/v[0-9].*)", "Api",
-    "/(meta)(/v[0-9].*)", "Api"
+    "/(index)(/v[1-2].*)", "Api",
+    "/(meta)(/v1.*)", "Api"
     
 )
 
@@ -98,9 +98,23 @@ render = web.template.render(c["html"], globals={
     'render': lambda *args, **kwargs: render(*args, **kwargs)
 })
 
+# common folder
+render_common = web.template.render(c["html"] + '/common', globals={
+    'str': str,
+    'isinstance': isinstance
+})
+
+def notfound_custom():
+    """Custom 404 page"""
+    return web.notfound(render_common.notfound(web.ctx.home + web.ctx.fullpath))
+
 # App Web.py
 app = web.application(urls, globals())
 
+# Custom 404 handler
+app.notfound = notfound_custom
+
+# Gunicorn WSGI application
 application = app.wsgifunc()
 
 if env_config["redis"]["enabled"]:
