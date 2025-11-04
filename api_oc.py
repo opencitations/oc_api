@@ -38,7 +38,6 @@ env_config = {
     },
 }
 
-print("Configuration loaded:", env_config)
 
 active = {
     "corpus": "datasets",
