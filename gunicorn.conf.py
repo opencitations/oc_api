@@ -5,12 +5,16 @@ import subprocess
 # Worker configuration
 workers = 4
 worker_class = "gevent"
-worker_connections = 400
+worker_connections = 600
 timeout = 1200
 bind = "0.0.0.0:8080"
 
+# Memory limits
+max_requests = 1000
+max_requests_jitter = 100
+
 # Logging
-accesslog = "-"
+accesslog = None
 errorlog = "-"
 loglevel = "info"
 
