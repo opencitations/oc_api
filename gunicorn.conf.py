@@ -3,10 +3,11 @@ import sys
 import subprocess
 
 # Worker configuration
-workers = 4
+workers = 6
 worker_class = "gevent"
-worker_connections = 600
+worker_connections = 300
 timeout = 1200
+graceful_timeout = 180
 bind = "0.0.0.0:8080"
 
 # Memory limits
