@@ -57,6 +57,7 @@ active = {
 # URL Mapping
 urls = (
     "/", "Main",
+    "/health", "Health",
     "/static/(.*)", "Static",
     '/favicon.ico', 'Favicon',
     "/sparql/index", "SparqlIndex",
@@ -171,6 +172,12 @@ class Favicon:
         protocol = 'https' if is_https else 'http'
         raise web.seeother(f"{protocol}://{web.ctx.host}/static/favicon.ico")
     
+class Health:
+    """Lightweight health check endpoint for Kubernetes probes"""
+    def GET(self):
+        web.header('Content-Type', 'application/json')
+        return '{"status": "ok"}'
+    
 class RedirectIndex:
     def GET(self):
         # Redirect from /index to /index/v2
@@ -279,7 +286,7 @@ class Sparql:
             raise web.HTTPError(
                 str(req.status_code)+" ", {"Content-Type": req.headers["content-type"]}, req.text)
 
-    def __is_update_query(self, query):
+    def __is_update_query(self, query): 
         query = re.sub(r'^\s*#.*$', '', query, flags=re.MULTILINE)
         query = '\n'.join(line for line in query.splitlines() if line.strip()) 
         try:
