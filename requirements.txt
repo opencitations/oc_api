@@ -42,5 +42,5 @@ APScheduler==3.10.1
 markdown
 redis
 gunicorn>=22.0.0
-gevent
+gevent>=1.4
 zope.event
