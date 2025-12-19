@@ -3,7 +3,7 @@ import sys
 import subprocess
 
 # Worker configuration
-workers = 6
+workers = 5
 worker_class = "gevent"
 worker_connections = 300
 timeout = 1200
@@ -11,8 +11,11 @@ graceful_timeout = 180
 bind = "0.0.0.0:8080"
 
 # Memory limits
-max_requests = 1000
-max_requests_jitter = 100
+max_requests = 10000
+max_requests_jitter = 200
+
+#The number of seconds to wait for requests on a Keep-Alive connection.
+keepalive = 20
 
 # Logging
 accesslog = None
