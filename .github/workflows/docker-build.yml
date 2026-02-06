@@ -2,9 +2,9 @@ name: Docker Build and Push
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, 2026-fix-ramose-envs ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master, 2026-fix-ramose-envs ]
 
 env:
   SERVIZIO_OC: oc_api

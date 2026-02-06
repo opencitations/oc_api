@@ -85,11 +85,11 @@ urls = (
 # )
 
 # API Managers
-meta_api_manager = APIManager(c["api_meta"])
+meta_api_manager = APIManager(c["api_meta"], endpoint_override=env_config["sparql_endpoint_meta"])
 meta_doc_manager = HTMLDocumentationHandler(meta_api_manager)
-index_api_manager = APIManager(c["api_index"])
+index_api_manager = APIManager(c["api_index"], endpoint_override=env_config["sparql_endpoint_index"])
 index_doc_manager = HTMLDocumentationHandler(index_api_manager)
-index_api_manager_v2 = APIManager(c["api_index_v2"])
+index_api_manager_v2 = APIManager(c["api_index_v2"], endpoint_override=env_config["sparql_endpoint_index"])
 index_doc_manager_v2 = HTMLDocumentationHandler(index_api_manager_v2)
 
 

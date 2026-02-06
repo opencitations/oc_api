@@ -1449,11 +1449,12 @@ class APIManager(object):
                 maxInt = int(maxInt/10)
 
     # Constructor: START
-    def __init__(self, conf_files):
+    def __init__(self, conf_files, endpoint_override=None):
         """This is the constructor of the APIManager class. It takes in input a list of API configuration files, each
         defined according to the Hash Format and following a particular structure, and stores all the operations
-        defined within a dictionary. The structure of each item in the dictionary of the operations is defined as
-        follows:
+        defined within a dictionary. Optionally, an endpoint_override parameter can be provided to override the
+        SPARQL endpoint defined in the configuration files (useful for staging/production environments).
+        The structure of each item in the dictionary of the operations is defined as follows:
 
         {
             "/api/v1/references/(.+)": {
@@ -1486,7 +1487,7 @@ class APIManager(object):
                     base_url = item["url"]
                     self.base_url.append(item["url"])
                     website = item["base"]
-                    tp = item["endpoint"]
+                    tp = endpoint_override if endpoint_override else item["endpoint"]
                     if "addon" in item:
                         addon_abspath = abspath(dirname(conf_file) + sep + item["addon"])
                         path.append(dirname(addon_abspath))
