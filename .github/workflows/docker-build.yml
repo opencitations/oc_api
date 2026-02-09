@@ -2,9 +2,9 @@ name: Docker Build and Push
 
 on:
   push:
-    branches: [ main, master, fix-sparqlquery-str-format ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ main, master, fix-sparqlquery-str-format ]
+    branches: [ main, master ]
 
 env:
   SERVIZIO_OC: oc_api
