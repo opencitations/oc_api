@@ -30,7 +30,7 @@ from collections import defaultdict
 # Load the configuration file
 with open("conf.json") as f:
     c = json.load(f)
-    
+
 
 # Docker ENV variables
 env_config = {
@@ -176,7 +176,9 @@ def __get_omid_of(s, multi = False):
         PREFIX datacite: <http://purl.org/spar/datacite/>
         PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
         SELECT ?br {
-            ?identifier literal:hasLiteralValue '"""+s+"""'.
+            { ?identifier literal:hasLiteralValue '"""+s+"""'^^<http://www.w3.org/2001/XMLSchema#string>. }
+            UNION
+            {?identifier literal:hasLiteralValue '"""+s+"""'.}
             ?br datacite:hasIdentifier ?identifier
         }
     """
@@ -189,7 +191,9 @@ def __get_omid_of(s, multi = False):
             PREFIX ns1: <http://purl.org/vocab/frbr/core#>
             PREFIX fabio: <http://purl.org/spar/fabio/>
             SELECT ?br {
-            	?identifier literal:hasLiteralValue '"""+s+"""'^^<http://www.w3.org/2001/XMLSchema#string>.
+            	{ ?identifier literal:hasLiteralValue '"""+s+"""'^^<http://www.w3.org/2001/XMLSchema#string>. }
+                UNION
+                {?identifier literal:hasLiteralValue '"""+s+"""'.}
             	?venue datacite:hasIdentifier ?identifier .
               	{?br ns1:partOf ?venue .}
               	UNION { ?br ns1:partOf/ns1:partOf ?venue . }
