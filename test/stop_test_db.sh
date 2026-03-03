@@ -2,12 +2,14 @@
 
 set -e
 
-CONTAINER_NAME="virtuoso-test-api"
+META_CONTAINER="virtuoso-meta-test"
+INDEX_CONTAINER="qlever.server.oc-index-test"
 
-if docker ps -q -f name="$CONTAINER_NAME" | grep -q .; then
-    docker stop "$CONTAINER_NAME"
-fi
-
-if docker ps -aq -f name="$CONTAINER_NAME" | grep -q .; then
-    docker rm "$CONTAINER_NAME"
-fi 
+for container in "$META_CONTAINER" "$INDEX_CONTAINER"; do
+    if docker ps -q -f name="$container" | grep -q .; then
+        docker stop "$container"
+    fi
+    if docker ps -aq -f name="$container" | grep -q .; then
+        docker rm "$container"
+    fi
+done
