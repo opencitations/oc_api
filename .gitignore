@@ -27,5 +27,8 @@ var/
 .DS_Store
 
 # Tests
-test/virtuoso-test-data/
+test/virtuoso-meta-data/*
+!test/virtuoso-meta-data/meta_subset.nq
+test/qlever-index-data/*
+!test/qlever-index-data/index_subset.nt
 .coverage

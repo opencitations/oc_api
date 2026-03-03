@@ -19,7 +19,7 @@ dependencies = [
 dev = [
     "pytest>=8.4.1",
     "pytest-cov>=6.2.1",
-    "virtuoso-utilities>=1.0.0",
+    "qlever>=0.5.45",
 ]
 
 [tool.pytest.ini_options]
