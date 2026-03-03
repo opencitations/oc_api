@@ -2,7 +2,7 @@
 
 [<img src="https://img.shields.io/badge/powered%20by-OpenCitations-%239931FC?labelColor=2D22DE" />](http://opencitations.net)
 [![Run tests](https://github.com/opencitations/oc_api/actions/workflows/run_tests.yml/badge.svg?branch=main)](https://github.com/opencitations/oc_api/actions/workflows/run_tests.yml)
-![Coverage](test/coverage-badge.svg)
+[![Coverage](test/coverage-badge.svg)](https://opencitations.github.io/oc_api/coverage/)
 
 This repository contains the API service for OpenCitations, allowing users to interact with the OpenCitations datasets through RESTful endpoints.
 
