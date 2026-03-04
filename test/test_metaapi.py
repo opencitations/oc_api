@@ -1,58 +1,18 @@
 import json
-import os
-import sys
-import tempfile
-from io import StringIO
 
 import pytest
 
+from conftest import create_api_manager, execute_operation
 from ramose import APIManager
 
 
 @pytest.fixture(scope="session")
 def api_manager() -> APIManager:
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    original_config = os.path.join(current_dir, "..", "src", "api", "meta_v1.hf")
-
-    with open(original_config, 'r', encoding='utf8') as f:
-        config_content = f.read()
-
-    config_content = config_content.replace(
-        '#base https://api.opencitations.net/meta',
-        '#base http://127.0.0.1:8891'
-    )
-    config_content = config_content.replace(
-        '#endpoint http://virtuoso-service.default.svc.cluster.local:8890/sparql',
-        '#endpoint http://127.0.0.1:8891/sparql'
-    )
-    config_content = config_content.replace(
-        '#addon metaapi',
-        '#addon ../src/api/metaapi'
-    )
-
-    tmp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.hf', delete=False, dir=current_dir)
-    tmp_file.write(config_content)
-    tmp_file.close()
-    tmp_config_file = tmp_file.name
-
-    try:
-        return APIManager([tmp_config_file])
-    finally:
-        os.unlink(tmp_config_file)
-
-
-def execute_operation(api_manager: APIManager, operation_url: str) -> str:
-    old_stdout = sys.stdout
-    sys.stdout = StringIO()
-    op = api_manager.get_op(operation_url)
-    if isinstance(op, tuple):
-        print(f"Error: {op[1]}")
-    else:
-        status, result, _ = op.exec(method="get", content_type="application/json")
-        print(result)
-    output = sys.stdout.getvalue()
-    sys.stdout = old_stdout
-    return output
+    return create_api_manager("src/api/meta_v1.hf", {
+        "#base https://api.opencitations.net/meta": "#base http://127.0.0.1:8891",
+        "#endpoint http://virtuoso-service.default.svc.cluster.local:8890/sparql": "#endpoint http://127.0.0.1:8891/sparql",
+        "#addon metaapi": "#addon ../src/api/metaapi",
+    })
 
 
 def normalize_string(s: str) -> str:
@@ -110,6 +70,19 @@ def test_metadata_retrieval_editor_inbook(api_manager):
 
 
 EXPECTED_AUTHOR_WORKS = [
+    {
+        "id": "doi:10.1162/qss_a_00292 omid:br/062104388184",
+        "title": "OpenCitations Meta",
+        "author": "Massari, Arcangelo [orcid:0000-0002-8420-0696 omid:ra/06250110138]; Mariani, Fabio [orcid:0000-0002-7382-0187 omid:ra/0621012370562]; Heibi, Ivan [orcid:0000-0001-5366-5194 omid:ra/0621012370563]; Peroni, Silvio [orcid:0000-0003-0530-4305 omid:ra/0621012370564]; Shotton, David [orcid:0000-0001-5506-523X omid:ra/0621012370565]",
+        "pub_date": "2024",
+        "issue": "1",
+        "volume": "5",
+        "venue": "Quantitative Science Studies [issn:2641-3337 openalex:S4210195326 omid:br/062501778099]",
+        "type": "journal article",
+        "page": "50-75",
+        "publisher": "Mit Press [crossref:281 omid:ra/0610116105]",
+        "editor": ""
+    },
     {
         "id": "doi:10.5334/johd.178 omid:br/06404693975",
         "title": "The Integration Of The Japan Link Center's Bibliographic Data Into OpenCitations",
