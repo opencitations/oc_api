@@ -574,4 +574,94 @@ def test_venue_citation_count(api_manager: APIManager) -> None:
     result = json.loads(
         execute_operation(api_manager, "/v2/venue-citation-count/issn:2641-3337")
     )
-    assert result == [{"count": "5"}]
+    assert result == [{"count": "6"}]
+
+
+ZENODO_DMP_OMID = "omid:br/060504627"
+ZENODO_DMP_DOI = "doi:10.5281/zenodo.4733919"
+ZENODO_DMP_PIDS = f"{ZENODO_DMP_OMID} {ZENODO_DMP_DOI}"
+
+DOI_ERRORS_OMID = "omid:br/061202127149"
+DOI_ERRORS_DOI = "doi:10.1007/s11192-022-04367-w"
+DOI_ERRORS_OPENALEX = "openalex:W3214893238"
+DOI_ERRORS_PIDS = f"{DOI_ERRORS_OMID} {DOI_ERRORS_DOI} {DOI_ERRORS_OPENALEX}"
+
+ZENODO_CLEANING_OMID = "omid:br/060504675"
+ZENODO_CLEANING_DOI = "doi:10.5281/zenodo.4734512"
+ZENODO_CLEANING_PIDS = f"{ZENODO_CLEANING_OMID} {ZENODO_CLEANING_DOI}"
+
+QSS_ARTICLE_OMID = "omid:br/062501777134"
+QSS_ARTICLE_DOI = "doi:10.1162/qss_a_00023"
+QSS_ARTICLE_OPENALEX = "openalex:W3106215946"
+QSS_ARTICLE_PIDS = f"{QSS_ARTICLE_OMID} {QSS_ARTICLE_DOI} {QSS_ARTICLE_OPENALEX}"
+
+QSS_CITING_OMID = "omid:br/062104388184"
+QSS_CITING_DOI = "doi:10.1162/qss_a_00292"
+QSS_CITING_PIDS = f"{QSS_CITING_OMID} {QSS_CITING_DOI}"
+
+EXPECTED_ZENODO_DMP_CITATIONS = [
+    {
+        "oci": "061202127149-060504627",
+        "citing": DOI_ERRORS_PIDS,
+        "cited": ZENODO_DMP_PIDS,
+        "creation": "2022-06",
+        "timespan": "P0Y11M",
+        "journal_sc": "no",
+        "author_sc": "yes",
+    },
+    {
+        "oci": "060504675-060504627",
+        "citing": ZENODO_CLEANING_PIDS,
+        "cited": ZENODO_DMP_PIDS,
+        "creation": "2021-06-08",
+        "timespan": "-P0Y0M1D",
+        "journal_sc": "yes",
+        "author_sc": "yes",
+    },
+]
+
+EXPECTED_QSS_ARTICLE_CITATIONS = [
+    {
+        "oci": "062104388184-062501777134",
+        "citing": QSS_CITING_PIDS,
+        "cited": QSS_ARTICLE_PIDS,
+        "creation": "2024",
+        "timespan": "P3Y",
+        "journal_sc": "yes",
+        "author_sc": "no",
+    },
+    {
+        "oci": "061202127149-062501777134",
+        "citing": DOI_ERRORS_PIDS,
+        "cited": QSS_ARTICLE_PIDS,
+        "creation": "2022-06",
+        "timespan": "P2Y4M",
+        "journal_sc": "no",
+        "author_sc": "yes",
+    },
+]
+
+
+def test_citations_negative_timespan(api_manager: APIManager) -> None:
+    result = json.loads(
+        execute_operation(api_manager, f"/v2/citations/{ZENODO_DMP_OMID}")
+    )
+    assert normalize_citations(result) == normalize_citations(
+        EXPECTED_ZENODO_DMP_CITATIONS
+    )
+
+
+def test_citation_count_zenodo_dmp(api_manager: APIManager) -> None:
+    result = json.loads(
+        execute_operation(api_manager, f"/v2/citation-count/{ZENODO_DMP_OMID}")
+    )
+    assert result == [{"count": "2"}]
+
+
+def test_citations_with_author_sc(api_manager: APIManager) -> None:
+    result = json.loads(
+        execute_operation(api_manager, f"/v2/citations/{QSS_ARTICLE_OMID}")
+    )
+    assert normalize_citations(result) == normalize_citations(
+        EXPECTED_QSS_ARTICLE_CITATIONS
+    )

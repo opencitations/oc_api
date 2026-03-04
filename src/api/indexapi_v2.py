@@ -292,13 +292,12 @@ def __br_meta_metadata(values):
               BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literalValue) AS ?id)
           }
           OPTIONAL {
-              {
-                ?val a fabio:JournalArticle;
-                      frbr:partOf+ ?venue.
-                ?venue a fabio:Journal.
-              } UNION {
-                ?val frbr:partOf ?venue.
-              }
+              ?val a fabio:JournalArticle;
+                    frbr:partOf+ ?venue.
+              ?venue a fabio:Journal.
+          }
+          OPTIONAL {
+              ?val frbr:partOf ?venue.
           }
           OPTIONAL {
               ?val pro:isDocumentContextFor ?arAuthor.
