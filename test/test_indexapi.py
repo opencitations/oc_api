@@ -3,7 +3,7 @@ import json
 import pytest
 
 from conftest import create_api_manager, execute_operation
-from ramose import APIManager
+from src.ramose import APIManager
 
 MAIN_PAPER_OMID = "omid:br/062104388184"
 MAIN_PAPER_DOI = "doi:10.1162/qss_a_00292"
@@ -538,3 +538,40 @@ def test_references_no_outgoing(api_manager: APIManager) -> None:
         execute_operation(api_manager, "/v2/references/omid:br/06103007140")
     )
     assert result == []
+
+
+def test_citations_by_doi(api_manager: APIManager) -> None:
+    result = json.loads(execute_operation(api_manager, f"/v2/citations/{MAIN_PAPER_DOI}"))
+    assert normalize_citations(result) == normalize_citations(EXPECTED_CITATIONS)
+
+
+def test_references_by_doi(api_manager: APIManager) -> None:
+    result = json.loads(execute_operation(api_manager, f"/v2/references/{MAIN_PAPER_DOI}"))
+    assert normalize_citations(result) == normalize_citations(EXPECTED_REFERENCES)
+
+
+def test_citation_count_by_doi(api_manager: APIManager) -> None:
+    result = json.loads(execute_operation(api_manager, f"/v2/citation-count/{MAIN_PAPER_DOI}"))
+    assert result == [{"count": "4"}]
+
+
+def test_reference_count_by_doi(api_manager: APIManager) -> None:
+    result = json.loads(execute_operation(api_manager, f"/v2/reference-count/{MAIN_PAPER_DOI}"))
+    assert result == [{"count": "45"}]
+
+
+def test_citation_count_by_pmid(api_manager: APIManager) -> None:
+    result = json.loads(execute_operation(api_manager, "/v2/citation-count/pmid:25378340"))
+    assert result == [{"count": "1"}]
+
+
+def test_reference_count_by_pmid(api_manager: APIManager) -> None:
+    result = json.loads(execute_operation(api_manager, "/v2/reference-count/pmid:25378340"))
+    assert result == [{"count": "0"}]
+
+
+def test_venue_citation_count(api_manager: APIManager) -> None:
+    result = json.loads(
+        execute_operation(api_manager, "/v2/venue-citation-count/issn:2641-3337")
+    )
+    assert result == [{"count": "5"}]
