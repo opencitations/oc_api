@@ -1,6 +1,8 @@
 import json
+from unittest.mock import patch
 
 import pytest
+from requests import RequestException
 
 from conftest import create_api_manager, execute_operation
 from src.ramose import APIManager
@@ -658,6 +660,13 @@ def test_citation_count_zenodo_dmp(api_manager: APIManager) -> None:
     assert result == [{"count": "2"}]
 
 
+def test_citation_count_nonexistent_doi(api_manager: APIManager) -> None:
+    result = json.loads(
+        execute_operation(api_manager, "/v2/citation-count/doi:10.9999/nonexistent")
+    )
+    assert result == [{"count": "0"}]
+
+
 def test_citations_with_author_sc(api_manager: APIManager) -> None:
     result = json.loads(
         execute_operation(api_manager, f"/v2/citations/{QSS_ARTICLE_OMID}")
@@ -665,3 +674,19 @@ def test_citations_with_author_sc(api_manager: APIManager) -> None:
     assert normalize_citations(result) == normalize_citations(
         EXPECTED_QSS_ARTICLE_CITATIONS
     )
+
+
+def test_citation_count_meta_sparql_failure(api_manager: APIManager) -> None:
+    with patch("indexapi_v2.post", side_effect=RequestException):
+        result = json.loads(
+            execute_operation(api_manager, f"/v2/citation-count/{MAIN_PAPER_DOI}")
+        )
+    assert result == [{"count": "0"}]
+
+
+def test_citations_meta_sparql_failure(api_manager: APIManager) -> None:
+    with patch("indexapi_v2.post", side_effect=RequestException):
+        result = json.loads(
+            execute_operation(api_manager, f"/v2/citations/{MAIN_PAPER_OMID}")
+        )
+    assert result == []

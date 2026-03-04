@@ -24,7 +24,6 @@ from re import sub,findall
 from json import loads
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from dateutil.parser import parse
 from collections import defaultdict
 
 # Load the configuration file
@@ -556,30 +555,14 @@ def __cit_duration(citing_complete_pub_date, cited_complete_pub_date):
     def ___contains_days(date):
         return date is not None and len(date) >= 10
 
-    DEFAULT_DATE = datetime(1970, 1, 1, 0, 0)
+    consider_years = ___contains_years(citing_complete_pub_date) and ___contains_years(cited_complete_pub_date)
     consider_months = ___contains_months(citing_complete_pub_date) and ___contains_months(cited_complete_pub_date)
     consider_days = ___contains_days(citing_complete_pub_date) and ___contains_days(cited_complete_pub_date)
 
-    try:
-        if citing_complete_pub_date == "" or citing_complete_pub_date == None:
-            return ""
-        citing_pub_datetime = parse(
-            citing_complete_pub_date, default=DEFAULT_DATE
-        )
-    except ValueError:  # It is not a leap year
-        citing_pub_datetime = parse(
-            citing_complete_pub_date[:7] + "-28", default=DEFAULT_DATE
-        )
-    try:
-        if cited_complete_pub_date == "" or cited_complete_pub_date == None:
-            return ""
-        cited_pub_datetime = parse(
-            cited_complete_pub_date, default=DEFAULT_DATE
-        )
-    except ValueError:  # It is not a leap year
-        cited_pub_datetime = parse(
-            cited_complete_pub_date[:7] + "-28", default=DEFAULT_DATE
-        )
+    if not consider_years:
+        return ""
+    citing_pub_datetime = datetime.strptime((citing_complete_pub_date + "-01-01")[:10], "%Y-%m-%d")
+    cited_pub_datetime = datetime.strptime((cited_complete_pub_date + "-01-01")[:10], "%Y-%m-%d")
 
     delta = relativedelta(citing_pub_datetime, cited_pub_datetime)
 
