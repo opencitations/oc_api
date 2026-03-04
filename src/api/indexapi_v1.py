@@ -18,7 +18,7 @@ __author__ = 'Arcangelo Massari & Ivan Heibi'
 import json
 import os
 from urllib.parse import quote, unquote
-from requests import get,post
+from requests import RequestException, get, post
 from rdflib import Graph, URIRef
 from re import sub,findall
 from json import loads
@@ -86,11 +86,11 @@ def metadata(res, *args):
         citation = res_entities[idx]["citation"]
         reference = res_entities[idx]["reference"]
         entities = citation.split("; ") + reference.split("; ") + [omid_uri]
-        r = __br_meta_metadata(["<"+e+">" for e in entities])
-        if r is None or all([i in ("", None) for i in r]):
+        br_meta, _ = __br_meta_metadata(["<"+e+">" for e in entities])
+        if not br_meta:
             row.extend(["","",""])
         else:
-            k_omids_uris = r[0]
+            k_omids_uris = br_meta
 
             citation_ids = []
             for e in citation.split("; "):
@@ -359,7 +359,9 @@ def __get_omid_of(s, multi = False):
         PREFIX datacite: <http://purl.org/spar/datacite/>
         PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
         SELECT ?br {
-            ?identifier literal:hasLiteralValue '"""+s+"""'.
+            { ?identifier literal:hasLiteralValue '"""+s+"""'^^<http://www.w3.org/2001/XMLSchema#string>. }
+            UNION
+            { ?identifier literal:hasLiteralValue '"""+s+"""'. }
             ?br datacite:hasIdentifier ?identifier
         }
     """
@@ -369,14 +371,12 @@ def __get_omid_of(s, multi = False):
     omid_l = []
     try:
         response = post(sparql_endpoint, headers=headers, data=sparql_query, timeout=45)
-        if response.status_code == 200:
-            r = loads(response.text)
-            results = r["results"]["bindings"]
-            if len(results) > 0:
-                for elem in results:
-                    omid_val = elem["br"]["value"].split("meta/br/")[1]
-                    omid_l.append(omid_val)
-    except:
+        response.raise_for_status()
+        r = loads(response.text)
+        results = r["results"]["bindings"]
+        for elem in results:
+            omid_l.append(elem["br"]["value"].split("meta/br/")[1])
+    except RequestException:
         return ""
 
     if len(omid_l) == 0:
@@ -402,10 +402,10 @@ def __get_unique_brs_metadata(l_url_brs):
     brs_meta = {}
     while i < len(l_brs):
         chunk = l_brs[i:i + chunk_size]
-        m_br = __br_meta_metadata(chunk)
-        brs_meta.update( m_br[0] )
+        chunk_meta, chunk_keys = __br_meta_metadata(chunk)
+        brs_meta.update(chunk_meta)
         if i == 0:
-            res.append(m_br[1])
+            res.append(chunk_keys)
         i += chunk_size
 
     unique_brs_anyid = []
@@ -453,13 +453,12 @@ def __br_meta_metadata(values):
               BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literalValue) AS ?id)
           }
           OPTIONAL {
-              {
-                ?val a fabio:JournalArticle;
-                      frbr:partOf+ ?venue.
-                ?venue a fabio:Journal.
-              } UNION {
-                ?val frbr:partOf ?venue.
-              }
+              ?val a fabio:JournalArticle;
+                    frbr:partOf+ ?venue.
+              ?venue a fabio:Journal.
+          }
+          OPTIONAL {
+              ?val frbr:partOf ?venue.
           }
           OPTIONAL {
               ?val pro:isDocumentContextFor ?arAuthor.
@@ -474,24 +473,22 @@ def __br_meta_metadata(values):
 
     try:
         response = post(sparql_endpoint, headers=headers, data=sparql_query)
-        if response.status_code == 200:
-            r = loads(response.text)
-            results = r["results"]["bindings"]
-            res_json = {}
-            if len(results) > 0:
-                for elem in results:
-                    res_json[elem["val"]["value"]] = elem
-            return res_json,["val","pubDate","ids","source","author"]
-
-    except:
-        return None,None
+        response.raise_for_status()
+        r = loads(response.text)
+        results = r["results"]["bindings"]
+        res_json: dict[str, dict[str, dict[str, str]]] = {}
+        for elem in results:
+            res_json[elem["val"]["value"]] = elem
+        return res_json, ["val", "pubDate", "ids", "source", "author"]
+    except RequestException:
+        return {}, []
 
 def __normalise(o):
     if o is None:
         s = ""
     else:
         s = str(o)
-    return sub("\s+", " ", s).strip()
+    return sub(r"\s+", " ", s).strip()
 
 def __get_id_val(val, reverse = False):
     if not reverse:

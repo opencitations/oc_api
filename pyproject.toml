@@ -29,6 +29,7 @@ pythonpath = "."
 
 [tool.coverage.run]
 source = ["src"]
+omit = ["src/ramose.py"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]

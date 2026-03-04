@@ -4,6 +4,14 @@ import tempfile
 from src.ramose import APIManager
 
 
+def normalize_citation(citation: dict[str, str]) -> dict[str, str]:
+    return {k: " ".join(sorted(v.split())) if k in ("citing", "cited") else v for k, v in citation.items()}
+
+
+def normalize_citations(citations: list[dict[str, str]]) -> list[dict[str, str]]:
+    return sorted([normalize_citation(c) for c in citations], key=lambda x: x["oci"])
+
+
 def execute_operation(api_manager: APIManager, operation_url: str) -> str:
     op = api_manager.get_op(operation_url)
     if isinstance(op, tuple):
