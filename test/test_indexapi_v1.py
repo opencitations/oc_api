@@ -150,7 +150,8 @@ def test_reference_count_zero(api_manager: APIManager) -> None:
 
 
 def test_citation_count_meta_sparql_failure(api_manager: APIManager) -> None:
-    with patch("indexapi_v1.post", side_effect=RequestException):
+    with patch("indexapi_v1.post", side_effect=RequestException), \
+         patch("indexapi_common.post", side_effect=RequestException):
         result = json.loads(
             execute_operation(api_manager, f"/v1/citation-count/{QSS_ARTICLE_DOI}")
         )
@@ -158,7 +159,8 @@ def test_citation_count_meta_sparql_failure(api_manager: APIManager) -> None:
 
 
 def test_citations_meta_sparql_failure(api_manager: APIManager) -> None:
-    with patch("indexapi_v1.post", side_effect=RequestException):
+    with patch("indexapi_v1.post", side_effect=RequestException), \
+         patch("indexapi_common.post", side_effect=RequestException):
         result = json.loads(
             execute_operation(api_manager, f"/v1/citations/{QSS_ARTICLE_DOI}")
         )
