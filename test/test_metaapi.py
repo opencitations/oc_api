@@ -123,6 +123,19 @@ EXPECTED_AUTHOR_WORKS = [
         "editor": ""
     },
     {
+        "id": "doi:10.5281/zenodo.4733919 omid:br/060504627",
+        "title": "Classes Of Errors In DOI Names (Data Management Plan)",
+        "author": "Boente, Ricarda [orcid:0000-0002-2133-8735 omid:ra/06908359558]; Massari, Arcangelo [orcid:0000-0002-8420-0696 omid:ra/06250110138]; Santini, Cristian [orcid:0000-0001-7363-6737 omid:ra/067099715]; Tural, Deniz [orcid:0000-0002-6391-4198 omid:ra/06908359559]",
+        "pub_date": "2021-06-09",
+        "issue": "",
+        "volume": "",
+        "venue": "",
+        "type": "",
+        "page": "",
+        "publisher": "Zenodo [omid:ra/0601747331]",
+        "editor": ""
+    },
+    {
         "id": "doi:10.5281/zenodo.4733920 omid:br/060504628",
         "title": "Classes Of Errors In DOI Names (Data Management Plan)",
         "author": "Boente, Ricarda [orcid:0000-0002-2133-8735 omid:ra/06908359558]; Massari, Arcangelo [orcid:0000-0002-8420-0696 omid:ra/06250110138]; Santini, Cristian [orcid:0000-0001-7363-6737 omid:ra/067099715]; Tural, Deniz [orcid:0000-0002-6391-4198 omid:ra/06908359559]",
@@ -133,6 +146,19 @@ EXPECTED_AUTHOR_WORKS = [
         "type": "",
         "page": "",
         "publisher": "Zenodo [omid:ra/0601747332]",
+        "editor": ""
+    },
+    {
+        "id": "doi:10.5281/zenodo.4734512 omid:br/060504675",
+        "title": "Cleaning Different Types Of DOI Errors Found In Cited References On Crossref Using Automated Methods",
+        "author": "Boente, Ricarda [orcid:0000-0002-2133-8735 omid:ra/06908359558]; Massari, Arcangelo [orcid:0000-0002-8420-0696 omid:ra/06250110138]; Santini, Cristian [orcid:0000-0001-7363-6737 omid:ra/067099715]; Tural, Deniz [orcid:0000-0002-6391-4198 omid:ra/06908359559]",
+        "pub_date": "2021-06-08",
+        "issue": "",
+        "volume": "",
+        "venue": "",
+        "type": "report",
+        "page": "",
+        "publisher": "Zenodo [omid:ra/0601747492]",
         "editor": ""
     }
 ]
