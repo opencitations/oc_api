@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-from ramose import APIManager
+from src.ramose import APIManager
 
 
 def execute_operation(api_manager: APIManager, operation_url: str) -> str:

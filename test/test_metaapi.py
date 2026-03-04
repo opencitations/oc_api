@@ -3,7 +3,7 @@ import json
 import pytest
 
 from conftest import create_api_manager, execute_operation
-from ramose import APIManager
+from src.ramose import APIManager
 
 
 @pytest.fixture(scope="session")
