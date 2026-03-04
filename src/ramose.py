@@ -43,6 +43,8 @@ from os.path import abspath, dirname, basename
 from os import path as pt
 from os import sep, getcwd
 from itertools import product
+from requests import Session as _RequestsSession
+_http_session = _RequestsSession()
 
 
 # Costanti per regex
@@ -1369,10 +1371,10 @@ class Operation(object):
                     # TODO: use threads to make it parallel
 
                     if self.sparql_http_method == "get":
-                        r = get(self.tp + "?query=" + quote(query),
+                        r = _http_session.get(self.tp + "?query=" + quote(query),
                                 headers={"Accept": "text/csv"})
                     else:
-                        r = post(self.tp, data=query, headers={"Accept": "text/csv",
+                        r = _http_session.post(self.tp, data=query, headers={"Accept": "text/csv",
                                                                "Content-Type": "application/sparql-query"})
                     r.encoding = "utf-8"
 
