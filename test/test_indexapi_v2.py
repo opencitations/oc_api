@@ -668,7 +668,8 @@ def test_citations_with_author_sc(api_manager: APIManager) -> None:
 
 
 def test_citation_count_meta_sparql_failure(api_manager: APIManager) -> None:
-    with patch("indexapi_v2.post", side_effect=RequestException):
+    with patch("indexapi_v2.post", side_effect=RequestException), \
+         patch("indexapi_common.post", side_effect=RequestException):
         result = json.loads(
             execute_operation(api_manager, f"/v2/citation-count/{MAIN_PAPER_DOI}")
         )
@@ -676,7 +677,8 @@ def test_citation_count_meta_sparql_failure(api_manager: APIManager) -> None:
 
 
 def test_citations_meta_sparql_failure(api_manager: APIManager) -> None:
-    with patch("indexapi_v2.post", side_effect=RequestException):
+    with patch("indexapi_v2.post", side_effect=RequestException), \
+         patch("indexapi_common.post", side_effect=RequestException):
         result = json.loads(
             execute_operation(api_manager, f"/v2/citations/{MAIN_PAPER_OMID}")
         )
