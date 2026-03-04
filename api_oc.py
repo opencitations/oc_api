@@ -266,10 +266,10 @@ class Sparql:
         if accept is None or accept == "*/*" or accept == "":
             accept = "application/sparql-results+xml"
         if is_post:
-            req = requests.post(self.sparql_endpoint, data=data,
+            req = session.post(self.sparql_endpoint, data=data,
                               headers={'content-type': content_type, "accept": accept})
         else:
-            req = requests.get("%s?%s" % (self.sparql_endpoint, data),
+            req = session.get("%s?%s" % (self.sparql_endpoint, data),
                              headers={'content-type': content_type, "accept": accept})
 
         if req.status_code == 200:
