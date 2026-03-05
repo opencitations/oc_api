@@ -13,8 +13,9 @@ import sys
 import argparse
 from src.ramose import APIManager, Operation, HTMLDocumentationHandler
 from io import StringIO
-
 from redis import Redis
+
+session = requests.Session()
 
 # Load the configuration file
 with open("conf.json") as f:
