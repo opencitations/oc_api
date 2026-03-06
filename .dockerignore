@@ -1,0 +1,15 @@
+.git
+.github
+.gitignore
+.env
+.venv
+__pycache__
+*.pyc
+*.md
+LICENSE
+test/
+log/
+.coverage
+htmlcov/
+docker_version.txt
+.python-version

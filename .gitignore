@@ -29,3 +29,8 @@ var/
 # Tests
 test/virtuoso-test-data/
 .coverage
+
+
+# uv
+.venv/
+.python-version
