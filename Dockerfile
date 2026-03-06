@@ -30,7 +30,7 @@ ENV PATH="/root/.local/bin:$PATH"
 WORKDIR /website
 
 # Copy dependency files first for better Docker layer caching
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml uv.lock README.md ./
 
 # Install dependencies (frozen = use exact lockfile versions)
 RUN uv sync --frozen --no-dev --no-install-project

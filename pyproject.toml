@@ -1,6 +1,6 @@
 [project]
 name = "oc-api"
-version = "2.0.2"
+version = "2.0.3"
 description = "OpenCitations API"
 authors = [
     {name = "Mario Petrella", email = "mario.petrella@unibo.it"},
@@ -8,6 +8,7 @@ authors = [
     {name = "Arcangelo Massari", email = "arcangelo.massari@unibo.it"}
 ]
 license = {text = "ISC"}
+readme = "README.md"
 requires-python = ">=3.9,<3.12"
 dependencies = [
     "apscheduler==3.10.1",
@@ -72,4 +73,11 @@ pythonpath = "."
 
 [tool.coverage.run]
 source = ["src"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
