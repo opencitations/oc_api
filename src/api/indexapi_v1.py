@@ -474,7 +474,7 @@ def __br_meta_metadata(values):
     data = {"query": sparql_query}
 
     try:
-        response = post(sparql_endpoint, headers=headers, data=sparql_query)
+        response = post(sparql_endpoint, headers=headers, data=sparql_query, timeout=60)
         if response.status_code == 200:
             r = loads(response.text)
             results = r["results"]["bindings"]

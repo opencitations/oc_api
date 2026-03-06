@@ -1372,10 +1372,10 @@ class Operation(object):
 
                     if self.sparql_http_method == "get":
                         r = _http_session.get(self.tp + "?query=" + quote(query),
-                                headers={"Accept": "text/csv"})
+                                headers={"Accept": "text/csv"}, timeout=60)
                     else:
                         r = _http_session.post(self.tp, data=query, headers={"Accept": "text/csv",
-                                                               "Content-Type": "application/sparql-query"})
+                                                               "Content-Type": "application/sparql-query"}, timeout=60)
                     r.encoding = "utf-8"
 
                     sc = r.status_code
