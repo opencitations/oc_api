@@ -1,11 +1,11 @@
 [project]
 name = "oc-api"
-version = "2.0.0test"
+version = "2.0.0"
 description = "OpenCitations API"
 authors = [
-    {name = "Mario Petrella", email = "mario.petrella@unibo.it"},
-    {name = "Ivan Heibi", email = "ivan.heibi2@unibo.it"},
-    {name = "Arcangelo Massari", email = "arcangelo.massari@unibo.it"}
+    {name = "Mario Petrella", email = "mario.petrella[at]unibo[dot]it"},
+    {name = "Ivan Heibi", email = "ivan.heibi2[at]unibo[dot]it"},
+    {name = "Arcangelo Massari", email = "arcangelo.massari[at]unibo[dot]it"}
 ]
 license = {text = "ISC"}
 readme = "README.md"
