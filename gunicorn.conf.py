@@ -6,7 +6,7 @@ import subprocess
 workers = 4
 worker_class = "gevent"
 worker_connections = 200
-timeout = 900
+timeout = 180
 graceful_timeout = 180
 bind = "0.0.0.0:8080"
 

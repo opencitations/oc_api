@@ -84,17 +84,23 @@ When static sync is enabled (via `--sync-static` or `SYNC_ENABLED=true`), the ap
 
 For local development and testing, the application uses the built-in web.py HTTP server:
 ```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install dependencies
+uv sync
+
 # Run with default settings
-python3 api_oc.py
+uv run python api_oc.py
 
 # Run with static sync enabled
-python3 api_oc.py --sync-static
+uv run python api_oc.py --sync-static
 
 # Run on custom port
-python3 api_oc.py --port 8085
+uv run python api_oc.py --port 8085
 
 # Run with both options
-python3 api_oc.py --sync-static --port 8085
+uv run python api_oc.py --sync-static --port 8085
 ```
 
 The application supports the following command line arguments:
@@ -107,60 +113,28 @@ The application supports the following command line arguments:
 When running in Docker/Kubernetes, the application uses **Gunicorn** as the WSGI HTTP server for better performance and concurrency handling:
 
 - **Server**: Gunicorn with gevent workers
-- **Workers**: 2 concurrent worker processes
-- **Worker Type**: gevent (async) for handling thousands of simultaneous requests
-- **Timeout**: 1200 seconds (to handle long-running SPARQL queries)
-- **Connections per worker**: 800 simultaneous connections
+- **Workers**: 4 concurrent worker processes
+- **Worker Type**: gevent (async) for handling simultaneous requests
+- **Timeout**: 180 seconds
+- **Connections per worker**: 200 simultaneous connections
+
+The Docker image version is read from `pyproject.toml` (single source of truth). To publish a new image on DockerHub, update the `version` field in `pyproject.toml` and push to `main` — the GitHub Actions workflow will build and push the new tag automatically, skipping the build if that version already exists.
+
+```bash
+VERSION=$(grep -m1 '^version' pyproject.toml | cut -d'"' -f2)
+
+docker build -t opencitations/oc_api:$VERSION .
+docker run -p 8080:8080 \
+  -e SPARQL_ENDPOINT_INDEX=http://qlever:7011 \
+  -e SPARQL_ENDPOINT_META=http://virtuoso:8890/sparql \
+  opencitations/oc_api:$VERSION
+```
 
 The Docker container automatically uses Gunicorn and is configured with static sync enabled by default.
 
-> **Note**: The application code automatically detects the execution environment. When run with `python3 api_oc.py`, it uses the built-in web.py server. When run with Gunicorn (as in Docker), it uses the WSGI interface.
+> **Note**: The application code automatically detects the execution environment. When run with `uv run python api_oc.py`, it uses the built-in web.py server. When run with Gunicorn (as in Docker), it uses the WSGI interface.
 
 You can customize the Gunicorn server configuration by modifying the `gunicorn.conf.py` file.
-
-### Dockerfile
-```dockerfile
-# Base image: Python slim for a lightweight container
-FROM python:3.11-slim
-
-# Define environment variables with default values
-# These can be overridden during container runtime
-ENV BASE_URL="api.opencitations.net" \
-    LOG_DIR="/mnt/log_dir/oc_api"  \
-    SPARQL_ENDPOINT_INDEX="http://qlever-service.default.svc.cluster.local:7011" \
-    SPARQL_ENDPOINT_META="http://virtuoso-service.default.svc.cluster.local:8890/sparql" \
-    SYNC_ENABLED="true"
-  # Uncomment the following lines if you are running the application in a local development environment or any non-Kubernetes deployment scenario.
-  #  REDIS_ENABLED="true" \
-  #  REDIS_HOST="redis-service.default.svc.cluster.local" \
-  #  REDIS_PORT="6379" \
-  #  REDIS_DB="0" \
-  #  REDIS_PASSWORD="your_redis_password"
-
-# Ensure Python output is unbuffered
-ENV PYTHONUNBUFFERED=1
-# Install system dependencies required for Python package compilation
-RUN apt-get update && \
-    apt-get install -y \
-    git \
-    python3-dev \
-    build-essential
-
-# Set the working directory for our application
-WORKDIR /website
-
-# Copy the application code from the GitHub repo
-RUN git clone --single-branch --branch main https://github.com/opencitations/oc_api .
-
-# Install Python dependencies from requirements.txt
-RUN pip install -r requirements.txt
-
-# Expose the port that our service will listen on
-EXPOSE 8080
-
-# Start the application with gunicorn for production
-CMD ["gunicorn", "-c", "gunicorn.conf.py", "api_oc:application"]
-```
 
 ## Testing
 
