@@ -18,16 +18,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Read version from docker_version.txt
+    - name: Read version from pyproject.toml
       id: get_version
       run: |
-        if [ ! -f docker_version.txt ]; then
-          echo "Error: docker_version.txt file not found"
+        if [ ! -f pyproject.toml ]; then
+          echo "Error: pyproject.toml file not found"
           exit 1
         fi
-        VERSION=$(cat docker_version.txt | tr -d '\n\r' | xargs)
+        VERSION=$(grep -m1 '^version' pyproject.toml | cut -d'"' -f2)
         if [ -z "$VERSION" ]; then
-          echo "Error: empty version in docker_version.txt"
+          echo "Error: empty version in pyproject.toml"
           exit 1
         fi
         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT

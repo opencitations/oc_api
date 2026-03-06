@@ -9,27 +9,37 @@ ENV BASE_URL="api.opencitations.net" \
     SPARQL_ENDPOINT_META="http://virtuoso-service.default.svc.cluster.local:8890/sparql" \
     SYNC_ENABLED="true" 
 
-
 # Ensure Python output is unbuffered
 ENV PYTHONUNBUFFERED=1
-# Install system dependencies required for Python package compilation
+
+# Install system dependencies + uv
 RUN apt-get update && \
     apt-get install -y \
     git \
     python3-dev \
-    build-essential
+    build-essential \
+    curl && \
+    curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Make uv available in PATH
+ENV PATH="/root/.local/bin:$PATH"
+
 # Set the working directory for our application
 WORKDIR /website
 
-# Copy the application code from the repository to the container
-# The code is already present in the repo, no need to git clone
-COPY . .
+# Copy dependency files first for better Docker layer caching
+COPY pyproject.toml uv.lock README.md ./
 
-# Install Python dependencies from requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Install dependencies (frozen = use exact lockfile versions)
+RUN uv sync --frozen --no-dev --no-install-project
+
+# Copy application code
+COPY . .
 
 # Expose the port that our service will listen on
 EXPOSE 8080
 
-# Start the application with gunicorn instead of python directly
-CMD ["gunicorn", "-c", "gunicorn.conf.py", "api_oc:application"]
+# Start the application with gunicorn via uv
+CMD ["uv", "run", "gunicorn", "-c", "gunicorn.conf.py", "api_oc:application"]

@@ -268,10 +268,10 @@ class Sparql:
             accept = "application/sparql-results+xml"
         if is_post:
             req = session.post(self.sparql_endpoint, data=data,
-                              headers={'content-type': content_type, "accept": accept})
+                              headers={'content-type': content_type, "accept": accept}, timeout=60)
         else:
             req = session.get("%s?%s" % (self.sparql_endpoint, data),
-                             headers={'content-type': content_type, "accept": accept})
+                             headers={'content-type': content_type, "accept": accept}, timeout=60)
 
         if req.status_code == 200:
             web.header('Access-Control-Allow-Origin', '*')

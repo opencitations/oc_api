@@ -1,6 +1,6 @@
 [project]
 name = "oc-api"
-version = "0.1.0"
+version = "2.0.4"
 description = "OpenCitations API"
 authors = [
     {name = "Mario Petrella", email = "mario.petrella@unibo.it"},
@@ -11,8 +11,53 @@ license = {text = "ISC"}
 readme = "README.md"
 requires-python = ">=3.9,<3.12"
 dependencies = [
+    "apscheduler==3.10.1",
+    "astroid>=3.3.11",
+    "autopep8>=2.3.2",
+    "certifi>=2019.11.28",
+    "charset-normalizer>=3.4.2",
+    "flake8>=7.3.0",
+    "gevent>=1.4",
+    "gitpython>=3.1.46",
+    "gunicorn>=22.0.0",
+    "idna>=2.8",
+    "isodate>=0.6.1",
+    "isort>=6.1.0",
+    "jedi>=0.17.2",
+    "lazy-object-proxy>=1.12.0",
+    "lxml>=6.0.2",
+    "markdown>=3.1.1",
+    "mccabe>=0.7.0",
+    "mypy>=1.19.1",
+    "mypy-extensions>=1.1.0",
+    "pycodestyle>=2.14.0",
+    "pydocstyle>=6.3.0",
+    "pyflakes>=3.4.0",
+    "pylint>=3.3.9",
+    "pyparsing>=3.2.3",
+    "python-dateutil>=2.9.0.post0",
+    "python-jsonrpc-server>=0.4.0",
+    "python-language-server>=0.36.2",
+    "python-lsp-jsonrpc>=1.1.2",
+    "python-lsp-server>=1.12.2",
+    "pytz>=2026.1.post1",
     "ramose>=1.0.8",
+    "rdflib>=6.1.1",
+    "rdflib-jsonld>=0.6.2",
+    "redis>=7.0.1",
+    "requests>=2.32.4",
+    "rope>=1.14.0",
+    "six>=1.13.0",
+    "snowballstemmer>=3.0.1",
     "sparqlwrapper>=2.0.0",
+    "toml>=0.10.2",
+    "typing-extensions>=4.14.1",
+    "ujson>=5.11.0",
+    "urllib3>=1.26.5",
+    "web-py>=0.62",
+    "wrapt>=2.1.2",
+    "yapf>=0.43.0",
+    "zope-event>=6.0",
 ]
 
 [dependency-groups]
