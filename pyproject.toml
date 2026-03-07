@@ -1,6 +1,6 @@
 [project]
 name = "oc-api"
-version = "2.0.5"
+version = "2.0.6"
 description = "OpenCitations API"
 authors = [
     {name = "Mario Petrella", email = "mario.petrella@unibo.it"},
@@ -45,7 +45,7 @@ dependencies = [
     "rdflib>=6.1.1",
     "rdflib-jsonld>=0.6.2",
     "redis>=7.0.1",
-    "requests>=2.32.4",
+    "requests>=2.4.0",
     "rope>=1.14.0",
     "six>=1.13.0",
     "snowballstemmer>=3.0.1",
