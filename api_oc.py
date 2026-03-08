@@ -1,12 +1,11 @@
 import web
 import os
 import json
-#from src.wl import WebLogger
 import requests
 import urllib.parse as urlparse
 import re
 import csv
-from urllib.parse import parse_qs, unquote
+from urllib.parse import unquote
 from rdflib.plugins.sparql.parser import parseUpdate
 import subprocess
 import sys
@@ -70,21 +69,6 @@ urls = (
     
 )
 
-# Set the web logger
-# web_logger = WebLogger(env_config["base_url"], env_config["log_dir"], [
-#     "HTTP_X_FORWARDED_FOR", # The IP address of the client
-#     "REMOTE_ADDR",          # The IP address of internal balancer
-#     "HTTP_USER_AGENT",      # The browser type of the visitor
-#     "HTTP_REFERER",         # The URL of the page that called your program
-#     "HTTP_HOST",            # The hostname of the page being attempted
-#     "REQUEST_URI",          # The interpreted pathname of the requested document
-#                             # or CGI (relative to the document root)
-#     "HTTP_AUTHORIZATION",   # Access token
-#     ],
-#     # comment this line only for test purposes
-#      {"REMOTE_ADDR": ["130.136.130.1", "130.136.2.47", "127.0.0.1"]}
-# )
-
 # API Managers
 meta_api_manager = APIManager(c["api_meta"], endpoint_override=env_config["sparql_endpoint_meta"])
 meta_doc_manager = HTMLDocumentationHandler(meta_api_manager)
@@ -97,7 +81,7 @@ index_doc_manager_v2 = HTMLDocumentationHandler(index_api_manager_v2)
 render = web.template.render(c["html"], globals={
     'str': str,
     'isinstance': isinstance,
-    'render': lambda *args, **kwargs: render(*args, **kwargs)
+    'render': lambda *args, **kwargs: render(*args, **kwargs)  # type: ignore[operator]
 })
 
 # common folder
@@ -108,7 +92,7 @@ render_common = web.template.render(c["html"] + '/common', globals={
 
 def notfound_custom():
     """Custom 404 page"""
-    return web.notfound(render_common.notfound(web.ctx.home + web.ctx.fullpath))
+    return web.notfound(render_common.notfound(web.ctx.home + web.ctx.fullpath))  # type: ignore[operator]
 
 # App Web.py
 app = web.application(urls, globals())
@@ -155,8 +139,8 @@ def validateAccessToken():
         return True
     auth_code = web.ctx.env.get('HTTP_AUTHORIZATION')
 
-    if not auth_code is None:
-        val = rconn.get(auth_code)
+    if auth_code is not None:
+        val: bytes | None = rconn.get(auth_code)  # type: ignore[assignment]
         if val is None or val.decode('utf-8') != auth_code:
             raise web.HTTPError("403", {"Content-Type": "text/plain"}, "Invalid token. Remove the authorization HEADER or register a new token at https://opencitations.net/accesstoken")
     return True
@@ -198,7 +182,7 @@ class RedirectMeta:
 class Header:
     def GET(self):
         current_subdomain = web.ctx.host.split('.')[0].lower()
-        return render.header(sp_title="", current_subdomain=current_subdomain)
+        return render.header(sp_title="", current_subdomain=current_subdomain)  # type: ignore[operator]
 
 class Static:
     def GET(self, name):
@@ -249,8 +233,7 @@ class Sparql:
         if "application/x-www-form-urlencoded" in content_type:
             return self.__run_query_string(active["sparql"], cur_data, True, content_type)
         elif "application/sparql-query" in content_type:
-            isupdate = None
-            isupdate, sanitizedQuery = self.__is_update_query(cur_data)
+            isupdate, _ = self.__is_update_query(cur_data)
             if not isupdate:
                 return self.__contact_tp(cur_data, True, content_type)
             else:
@@ -296,22 +279,19 @@ class Sparql:
         except Exception:
             return False, query
 
-    def __run_query_string(self, active, query_string, is_post=False,
-                          content_type="application/x-www-form-urlencoded"):
-        # Add redirect if no query string is provided
+    def __run_query_string(self, _active: str, query_string: str, is_post: bool = False,
+                          content_type: str = "application/x-www-form-urlencoded") -> str:
         if query_string is None or query_string.strip() == "":
             raise web.seeother('/')
-        
+
         parsed_query = urlparse.parse_qs(query_string)
-        current_subdomain = web.ctx.host.split('.')[0].lower()
 
         for k in self.collparam:
             if k in parsed_query:
                 query = parsed_query[k][0]
-                isupdate = None
-                isupdate, sanitizedQuery = self.__is_update_query(query)
+                isupdate, _ = self.__is_update_query(query)
 
-                if isupdate != None:
+                if isupdate is not None:
                     if isupdate:
                         raise web.HTTPError(
                             "403 ",
@@ -333,7 +313,7 @@ class Main:
     def GET(self):
         #web_logger.mes()
         current_subdomain = web.ctx.host.split('.')[0].lower()
-        return render.api(active="", sp_title="", sparql_endpoint="", current_subdomain=current_subdomain, render=render)
+        return render.api(active="", sp_title="", sparql_endpoint="", current_subdomain=current_subdomain, render=render)  # type: ignore[operator]
 
 class SparqlIndex(Sparql):
     def __init__(self):
@@ -348,7 +328,7 @@ class SparqlMeta(Sparql):
        
 class Api:
 
-    def OPTIONS(self, dataset, call):
+    def OPTIONS(self, _dataset: str, _call: str) -> None:
         # remember to remove the slash at the end
         org_ref = web.ctx.env.get('HTTP_REFERER')
         if org_ref is not None:
@@ -364,6 +344,7 @@ class Api:
     def GET(self, dataset, call):
         validateAccessToken()
         man = None
+        doc = None
 
         if dataset == "":
             raise web.redirect("/")
@@ -378,8 +359,7 @@ class Api:
             man = meta_api_manager
             doc = meta_doc_manager
 
-
-        if man is None:
+        if man is None or doc is None:
             raise web.notfound()
         else:
             if re.match("^/v[1-9]*/?$", call):
@@ -436,7 +416,7 @@ class Api:
                                         next(csv.DictReader(f)), ensure_ascii=False)
                             raise web.HTTPError(
                                 str(status_code)+" ", {"Content-Type": content_type}, mes)
-                        except:
+                        except Exception:
                             raise web.HTTPError(
                                 str(status_code)+" ", {"Content-Type": content_type}, str(res))
                 else:

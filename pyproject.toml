@@ -66,6 +66,7 @@ dev = [
     "pytest>=8.4.1",
     "pytest-cov>=6.2.1",
     "qlever>=0.5.45",
+    "ruff>=0.15.5",
 ]
 
 [tool.pytest.ini_options]
