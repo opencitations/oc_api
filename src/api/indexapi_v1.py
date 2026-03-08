@@ -16,13 +16,11 @@
 
 __author__ = 'Arcangelo Massari & Ivan Heibi'
 
-from requests import RequestException, get, post
+from requests import RequestException, post
 from json import loads
-from re import sub, findall
 from indexapi_common import (
     lower,  # noqa: F401 - used by ramose via getattr
     env_config,
-    br_meta_metadata,
     get_unique_brs_metadata,
     get_pub_date,
     get_source,
@@ -34,89 +32,10 @@ from indexapi_common import (
 )
 
 
-def split_dois2omids(s):
-    l_omids = []
-    for d in s.split("__"):
-        l_omids.extend(__get_omid_of(d))
-    return " ".join(l_omids),
-
 def id2omids(s):
     if "omid" in s:
         return s.replace("omid:br/","<https://w3id.org/oc/meta/br/") +">",
     return __get_omid_of(s),
-
-def metadata(res, *args):
-    header = res[0]
-    oci_idx = header.index(args[0])
-    citation_idx = header.index(args[1])
-    reference_idx = header.index(args[2])
-
-    res_entities = {}
-    if len(res) > 1:
-        for idx, row in enumerate(res[1:]):
-            res_entities[idx] = {
-                "omid": row[oci_idx][1],
-                "citation": row[citation_idx][1],
-                "reference": row[reference_idx][1]
-            }
-
-    # delete the item + citing + cited columns
-    res = [[elem for idx, elem in enumerate(row) if idx != oci_idx and idx != citation_idx and idx != reference_idx] for row in res]
-
-    header = res[0]
-    additional_fields = ["doi" , "citation_count", "citation", "reference", "author", "year", "title", "source_title", "volume", "issue", "page", "source_id", "oa_link"]
-    header.extend(additional_fields)
-
-    # org value: <https://w3id.org/oc/meta/br/06NNNNNN>
-    for idx, row in enumerate(res[1:]):
-        omid_uri = res_entities[idx]["omid"]
-        citation = res_entities[idx]["citation"]
-        reference = res_entities[idx]["reference"]
-        entities = citation.split("; ") + reference.split("; ") + [omid_uri]
-        br_meta, _ = br_meta_metadata(["<"+e+">" for e in entities])
-        if not br_meta:
-            row.extend(["","",""])
-        else:
-            k_omids_uris = br_meta
-
-            citation_ids = []
-            for e in citation.split("; "):
-                if e in k_omids_uris:
-                    citation_ids.append(__get_doi(k_omids_uris[e],True))
-
-            reference_ids = []
-            for e in reference.split("; "):
-                if e in k_omids_uris:
-                    reference_ids.append(__get_doi(k_omids_uris[e],True))
-
-            row.extend([
-                __get_doi(k_omids_uris[omid_uri],True),
-                str(len(citation_ids)),
-                "; ".join(citation_ids),
-                "; ".join(reference_ids)
-            ])
-
-
-        entity = "omid:"+omid_uri.split("oc/meta/")[1]
-        r = __ocmeta_parser([entity],"omid")
-        if r is None or all([i in ("", None) for i in r]):
-            row.extend(["","","","","","","","",""])
-        else:
-            if entity in r:
-                r = r[entity]
-                row.extend([
-                    r["authors_str"],
-                    r["pub_date"],
-                    r["title"],
-                    r["source_title"],
-                    r["volume"],
-                    r["issue"],
-                    r["page"],
-                    r["source_id"],
-                    ""
-                ])
-
-    return res, True
 
 def count_unique_cits(res, *args):
     header = res[0]
@@ -204,100 +123,6 @@ def citations_info(res, *args):
 # Local methods
 # ---
 
-def __ocmeta_parser(ids, pre="doi"):
-    api = "https://api.opencitations.net/meta/v1/metadata/"
-
-    r = get(api + "__".join(ids), headers={"User-Agent": "INDEX REST API (via OpenCitations - http://opencitations.net; mailto:contact@opencitations.net)"}, timeout=60)
-
-    f_res = {}
-    if r.status_code == 200:
-        json_res = loads(r.text)
-        if len(json_res) > 0:
-
-            for body in json_res:
-
-                id = None
-                omid = None
-                if "id" in body:
-                    for p_id in body["id"].split(" "):
-                        if str(p_id).startswith(pre):
-                            id = str(p_id)
-                        if str(p_id).startswith("omid"):
-                            omid = str(p_id)
-
-                if omid is None:
-                    continue
-
-                authors = []
-                authors_orcid = []
-                if "author" in body:
-                    if body["author"] != "":
-                        for author in body["author"].split(";"):
-                            author_string = author
-                            author_orcid = findall(r"orcid\:([\d\-^\]]{1,})",author)
-                            author_ids = findall(r"\[.{1,}\]",author)
-                            if len(author_ids) > 0:
-                                author_string = author.replace(author_ids[0],"").strip()
-                                if len(author_orcid) > 0:
-                                    authors_orcid.append(author_orcid[0].strip())
-                                    author_string = author_string+", "+author_orcid[0].strip()
-                            if author_string is not None:
-                                authors.append(__normalise(author_string))
-
-                source_title = ""
-                source_id = ""
-                if "venue" in body:
-                    if body["venue"] != "":
-                        source_title_string = body["venue"]
-
-                        source_issn = findall(r"(issn\:[\d\-^\]]{1,})",source_title_string)
-                        source_isbn = findall(r"(isbn\:[\d\-^\]]{1,})",source_title_string)
-                        source_ids = findall(r"\[.{1,}\]",source_title_string)
-                        if len(source_ids) > 0:
-                            source_title_string = source_title_string.replace(source_ids[0],"").strip()
-                        if len(source_issn) > 0:
-                            source_id = source_issn[0]
-                        elif len(source_isbn) > 0:
-                            source_id = source_isbn[0]
-                        source_title = source_title_string
-
-                pub_date = ""
-                if "pub_date" in body:
-                    pub_date = __normalise(body["pub_date"])
-
-                title = ""
-                if "title" in body:
-                    title = body["title"]
-
-                volume = ""
-                if "volume" in body:
-                    volume = __normalise(body["volume"])
-
-                issue = ""
-                if "issue" in body:
-                    issue = __normalise(body["issue"])
-
-                page = ""
-                if "page" in body:
-                    page = __normalise(body["page"])
-
-                f_res[omid] = {
-                    "id": id,
-                    "authors_str": "; ".join(authors),
-                    "authors_orcid": authors_orcid,
-                    "pub_date": pub_date,
-                    "title": title,
-                    "source_title": source_title,
-                    "source_id": source_id,
-                    "volume": volume,
-                    "issue": issue,
-                    "page":page
-                }
-
-        return f_res
-
-    return f_res
-
 def __get_omid_of(s):
     MULTI_VAL_MAX = 9000
     sparql_endpoint = env_config["sparql_endpoint_meta"]
@@ -331,20 +156,10 @@ def __get_omid_of(s):
         sparql_values.append( " ".join(["<https://w3id.org/oc/meta/br/"+e+">" for e in omid_l[i:i + MULTI_VAL_MAX]]) )
     return sparql_values
 
-def __normalise(o):
-    if o is None:
-        s = ""
-    else:
-        s = str(o)
-    return sub(r"\s+", " ", s).strip()
-
-def __get_doi(elem, value_key = False):
+def __get_doi(elem):
     str_ids = []
     if "ids" in elem:
-        ids = elem["ids"]
-        if value_key:
-            ids = ids["value"]
-        for id in ids.split(" __ "):
+        for id in elem["ids"].split(" __ "):
             if id.startswith("doi:"):
                 str_ids.append(id.split("doi:")[1])
 
