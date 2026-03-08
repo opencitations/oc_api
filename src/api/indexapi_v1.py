@@ -33,9 +33,37 @@ from indexapi_common import (
 
 
 def id2omids(s):
-    if "omid" in s:
-        return s.replace("omid:br/","<https://w3id.org/oc/meta/br/") +">",
-    return __get_omid_of(s),
+    MULTI_VAL_MAX = 9000
+    sparql_endpoint = env_config["sparql_endpoint_meta"]
+
+    sparql_query = """
+        PREFIX datacite: <http://purl.org/spar/datacite/>
+        PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+        SELECT ?br {
+            { ?identifier literal:hasLiteralValue '"""+s+"""'^^<http://www.w3.org/2001/XMLSchema#string>. }
+            UNION
+            { ?identifier literal:hasLiteralValue '"""+s+"""'. }
+            ?br datacite:hasIdentifier ?identifier
+        }
+    """
+
+    headers={"Accept": "application/sparql-results+json", "Content-Type": "application/sparql-query"}
+    try:
+        response = post(sparql_endpoint, headers=headers, data=sparql_query, timeout=45)
+        response.raise_for_status()
+    except RequestException:
+        return "",
+    r = loads(response.text)
+    results = r["results"]["bindings"]
+    omid_l = [elem["br"]["value"].split("meta/br/")[1] for elem in results]
+
+    if len(omid_l) == 0:
+        return "",
+
+    sparql_values = []
+    for i in range(0, len(omid_l), MULTI_VAL_MAX):
+        sparql_values.append( " ".join(["<https://w3id.org/oc/meta/br/"+e+">" for e in omid_l[i:i + MULTI_VAL_MAX]]) )
+    return sparql_values,
 
 def count_unique_cits(res, *args):
     header = res[0]
@@ -48,14 +76,8 @@ def count_unique_cits(res, *args):
         citing_to_dedup = []
         cited_to_dedup = []
         for row in res[1:]:
-            citing_val = row[citing_idx]
-            cited_val = row[cited_idx]
-            if isinstance(citing_val, tuple):
-                citing_to_dedup.extend(citing_val)
-                cited_to_dedup.extend(cited_val)
-            else:
-                citing_to_dedup.append(citing_val)
-                cited_to_dedup.append(cited_val)
+            citing_to_dedup.extend(row[citing_idx])
+            cited_to_dedup.extend(row[cited_idx])
 
         citing_to_dedup_meta = get_unique_brs_metadata( list(set(citing_to_dedup)) )
         cited_to_dedup_meta = get_unique_brs_metadata( list(set(cited_to_dedup)) )
@@ -80,14 +102,8 @@ def citations_info(res, *args):
         citing_to_dedup = []
         cited_to_dedup = []
         for row in res[1:]:
-            citing_val = row[citing_idx]
-            cited_val = row[cited_idx]
-            if isinstance(citing_val, tuple):
-                citing_to_dedup.extend(citing_val)
-                cited_to_dedup.extend(cited_val)
-            else:
-                citing_to_dedup.append(citing_val)
-                cited_to_dedup.append(cited_val)
+            citing_to_dedup.extend(row[citing_idx])
+            cited_to_dedup.extend(row[cited_idx])
 
         citing_to_dedup_meta = get_unique_brs_metadata( list(set(citing_to_dedup)) )
         cited_to_dedup_meta = get_unique_brs_metadata( list(set(cited_to_dedup)) )
@@ -118,43 +134,6 @@ def citations_info(res, *args):
 
     return f_res, True
 
-
-# ---
-# Local methods
-# ---
-
-def __get_omid_of(s):
-    MULTI_VAL_MAX = 9000
-    sparql_endpoint = env_config["sparql_endpoint_meta"]
-
-    sparql_query = """
-        PREFIX datacite: <http://purl.org/spar/datacite/>
-        PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
-        SELECT ?br {
-            { ?identifier literal:hasLiteralValue '"""+s+"""'^^<http://www.w3.org/2001/XMLSchema#string>. }
-            UNION
-            { ?identifier literal:hasLiteralValue '"""+s+"""'. }
-            ?br datacite:hasIdentifier ?identifier
-        }
-    """
-
-    headers={"Accept": "application/sparql-results+json", "Content-Type": "application/sparql-query"}
-    try:
-        response = post(sparql_endpoint, headers=headers, data=sparql_query, timeout=45)
-        response.raise_for_status()
-    except RequestException:
-        return ""
-    r = loads(response.text)
-    results = r["results"]["bindings"]
-    omid_l = [elem["br"]["value"].split("meta/br/")[1] for elem in results]
-
-    if len(omid_l) == 0:
-        return ""
-
-    sparql_values = []
-    for i in range(0, len(omid_l), MULTI_VAL_MAX):
-        sparql_values.append( " ".join(["<https://w3id.org/oc/meta/br/"+e+">" for e in omid_l[i:i + MULTI_VAL_MAX]]) )
-    return sparql_values
 
 def __get_doi(elem):
     str_ids = []
