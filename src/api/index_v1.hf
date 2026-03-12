@@ -20,7 +20,7 @@ get(API_CALL, headers=HTTP_HEADERS)
 
 <p style="color: #CC0000"><strong>Note:</strong> we use certain legacy APIs for historical and compatibility reasons. While we encourage the use of our latest and more efficient <a href="https://api.opencitations.net/index/v2">V2 APIs</a>, we understand that some applications may still rely on these older endpoints. Please note that legacy APIs may not receive updates or support, and their use may be phased out in the future. We recommend transitioning to our current <a href="https://api.opencitations.net/index/v2">V2 APIs</a> for improved performance, security, and reliability.</p>
 
-<p style="color: #CC0000">The "/metadata" operation in DEPRECATED.</p>
+<p style="color: #CC0000">The “/metadata” operation has been DEPRECATED.</p>
 
 #version Version 1.2.0 (2023-11-06)
 #contacts [contact@opencitations.net](mailto:contact@opencitations.net)
