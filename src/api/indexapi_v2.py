@@ -243,7 +243,7 @@ def __get_unique_brs_metadata(l_url_brs, citation_count_call = False):
         chunk = l_brs[i:i + chunk_size]
         m_br = None
         if citation_count_call:
-            m_br = __br_meta_anyids(check)
+            m_br = __br_meta_anyids(chunk)
         else:
             m_br = __br_meta_metadata(chunk)
         brs_meta.update( m_br[0] )
