@@ -72,8 +72,8 @@ def count_unique_cits(res, *args):
                 citing_to_dedup.append(citing_val)
                 cited_to_dedup.append(cited_val)
 
-        citing_to_dedup_meta = __get_unique_brs_metadata( list(set(citing_to_dedup)) )
-        cited_to_dedup_meta = __get_unique_brs_metadata( list(set(cited_to_dedup)) )
+        citing_to_dedup_meta = __get_unique_brs_metadata( list(set(citing_to_dedup)), True )
+        cited_to_dedup_meta = __get_unique_brs_metadata( list(set(cited_to_dedup)), True )
         for _k_citing in citing_to_dedup_meta.keys():
             for _k_cited in cited_to_dedup_meta.keys():
                 set_oci.add( (_k_citing,_k_cited) )
@@ -231,7 +231,7 @@ def __get_omid_of(s, multi = False):
     # return the only omid given as result
     return omid_l[0]
 
-def __get_unique_brs_metadata(l_url_brs):
+def __get_unique_brs_metadata(l_url_brs, citation_count_call = False):
 
     res = []
     l_brs = ["<"+_url_br+">" for _url_br in l_url_brs]
@@ -241,7 +241,11 @@ def __get_unique_brs_metadata(l_url_brs):
     brs_meta = {}
     while i < len(l_brs):
         chunk = l_brs[i:i + chunk_size]
-        m_br = __br_meta_metadata(chunk)
+        m_br = None
+        if citation_count_call:
+            m_br = __br_meta_anyids(chunk)
+        else:
+            m_br = __br_meta_metadata(chunk)
         brs_meta.update( m_br[0] )
         if i == 0:
             res.append(m_br[1])
@@ -321,6 +325,46 @@ def __br_meta_metadata(values):
                 for elem in results:
                     res_json[elem["val"]["value"]] = elem
             return res_json,["val","pubDate","ids","source","author"]
+
+    except:
+        return None,None
+
+def __br_meta_anyids(values):
+    sparql_endpoint = env_config["sparql_endpoint_meta"]
+
+    # SPARQL query
+    sparql_query = """
+    PREFIX pro: <http://purl.org/spar/pro/>
+    PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+    PREFIX fabio: <http://purl.org/spar/fabio/>
+    PREFIX datacite: <http://purl.org/spar/datacite/>
+    PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+    PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
+    SELECT DISTINCT ?val (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=' __ ') AS ?ids)
+    WHERE {
+    	  VALUES ?val { """+" ".join(values)+""" }
+          OPTIONAL {
+              ?val datacite:hasIdentifier ?identifier.
+              ?identifier datacite:usesIdentifierScheme ?scheme;
+                  literal:hasLiteralValue ?literalValue.
+              BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literalValue) AS ?id)
+          }
+     } GROUP BY ?val
+    """
+
+    headers={"Accept": "application/sparql-results+json", "Content-Type": "application/sparql-query"}
+    data = {"query": sparql_query}
+
+    try:
+        response = post(sparql_endpoint, headers=headers, data=sparql_query, timeout=60)
+        if response.status_code == 200:
+            r = loads(response.text)
+            results = r["results"]["bindings"]
+            res_json = {}
+            if len(results) > 0:
+                for elem in results:
+                    res_json[elem["val"]["value"]] = elem
+            return res_json,["val","ids"]
 
     except:
         return None,None
