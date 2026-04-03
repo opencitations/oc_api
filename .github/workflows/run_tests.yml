@@ -37,7 +37,8 @@ jobs:
 
     - name: Run tests with coverage
       run: |
-        echo "COVERAGE=$(uv run pytest | tee /dev/stderr | grep TOTAL | awk '{print $4}')" >> $GITHUB_ENV
+        uv run pytest | tee pytest-output.txt
+        echo "COVERAGE=$(grep TOTAL pytest-output.txt | awk '{print $4}')" >> $GITHUB_ENV
 
     - name: Upload coverage artifact
       if: matrix.python-version == '3.10'
