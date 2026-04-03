@@ -37,6 +37,7 @@ jobs:
 
     - name: Run tests with coverage
       run: |
+        set -o pipefail
         uv run pytest | tee pytest-output.txt
         echo "COVERAGE=$(grep TOTAL pytest-output.txt | awk '{print $4}')" >> $GITHUB_ENV
 

@@ -24,6 +24,7 @@ VIRTUOSO_ISQL_PORT = 1112
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 QLEVER_DATA_DIR = os.path.join(TEST_DIR, "qlever-index-data")
 VIRTUOSO_DATA_DIR = os.path.join(TEST_DIR, "virtuoso-meta-data")
+VIRTUOSO_DB_DIR = os.path.join(VIRTUOSO_DATA_DIR, "database")
 
 
 def _wait_for_http(port: int, timeout: int = 60) -> None:
@@ -88,23 +89,13 @@ def virtuoso_endpoint():
             "-p", f"{VIRTUOSO_HTTP_PORT}:8890",
             "-p", f"{VIRTUOSO_ISQL_PORT}:1111",
             "-e", "DBA_PASSWORD=dba",
-            "-e", "VIRT_Parameters_DirsAllowed=/",
-            "-v", f"{VIRTUOSO_DATA_DIR}:/data",
+            "-v", f"{VIRTUOSO_DB_DIR}:/opt/virtuoso-opensource/database",
             VIRTUOSO_IMAGE,
         ],
         check=True,
         capture_output=True,
     )
     _wait_for_virtuoso(VIRTUOSO_CONTAINER)
-    subprocess.run(
-        [
-            "docker", "exec", VIRTUOSO_CONTAINER,
-            "isql", "1111", "dba", "dba",
-            "exec=ld_dir('/data', 'meta_subset.nq', ''); rdf_loader_run(); checkpoint;",
-        ],
-        check=True,
-        capture_output=True,
-    )
     yield f"http://127.0.0.1:{VIRTUOSO_HTTP_PORT}/sparql"
     subprocess.run(["docker", "stop", VIRTUOSO_CONTAINER], capture_output=True)
     subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)

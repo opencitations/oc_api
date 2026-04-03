@@ -28,10 +28,10 @@ var/
 
 # Tests
 test/virtuoso-test-data/
-test/virtuoso-meta-data/*
-!test/virtuoso-meta-data/meta_subset.nq
-test/qlever-index-data/*
-!test/qlever-index-data/index_subset.nt
+test/virtuoso-meta-data/database/virtuoso.lck
+test/virtuoso-meta-data/database/virtuoso.log
+test/virtuoso-meta-data/index_entities.txt
+test/qlever-index-data/oc-index-test.server-log.txt
 .coverage
 
 # uv
