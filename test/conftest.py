@@ -6,7 +6,7 @@ import time
 import pytest
 import requests
 
-from src.ramose import APIManager
+from ramose import APIManager
 
 # v0.5.45
 QLEVER_IMAGE = "adfreiburg/qlever@sha256:4672a53f0ff4e55ac921d25832a21ec0bb3ca08f54d7c1950d04ebf6af7b8c21"

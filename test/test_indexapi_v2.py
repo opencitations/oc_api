@@ -5,7 +5,7 @@ import pytest
 from requests import RequestException
 
 from conftest import create_api_manager, execute_operation, normalize_citations
-from src.ramose import APIManager
+from ramose import APIManager
 
 
 @pytest.fixture(scope="session")

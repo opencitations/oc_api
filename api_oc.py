@@ -10,7 +10,7 @@ from rdflib.plugins.sparql.parser import parseUpdate
 import subprocess
 import sys
 import argparse
-from src.ramose import APIManager, Operation, HTMLDocumentationHandler
+from ramose import APIManager, Operation, HTMLDocumentationHandler
 from io import StringIO
 from redis import Redis
 
