@@ -21,45 +21,38 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.10", "3.11", "3.12"]
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    
-    - name: Install uv
-      uses: astral-sh/setup-uv@v6
-    
-    - name: Install dependencies
-      run: uv sync --dev
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-    - name: Start test database
-      run: ./test/start_test_db.sh
+    - name: Install uv
+      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
+      with:
+        enable-cache: true
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: uv sync --dev --locked
 
     - name: Run tests with coverage
       run: |
-        echo "COVERAGE=$(uv run pytest --cov=src --cov-report=term-missing --cov-report=html | tee /dev/stderr | grep TOTAL | awk '{print $4}')" >> $GITHUB_ENV
-
-    - name: Stop test database
-      if: always()
-      run: ./test/stop_test_db.sh
+        set -o pipefail
+        uv run pytest | tee pytest-output.txt
+        echo "COVERAGE=$(grep TOTAL pytest-output.txt | awk '{print $4}')" >> $GITHUB_ENV
 
     - name: Upload coverage artifact
       if: matrix.python-version == '3.10'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
       with:
         name: coverage-report
         path: ${{ env.COVERAGE_REPORT_PATH }}
-        
+
     - name: Generate coverage badge
       if: matrix.python-version == '3.10'
       run: |
         COVERAGE_NUM=$(echo ${{ env.COVERAGE }} | sed 's/%//')
-        
+
         if (( $(echo "$COVERAGE_NUM >= 90" | bc -l) )); then
           COLOR="green"
         elif (( $(echo "$COVERAGE_NUM >= 75" | bc -l) )); then
@@ -69,9 +62,9 @@ jobs:
         else
           COLOR="red"
         fi
-        
+
         echo "BADGE_COLOR=$COLOR" >> $GITHUB_ENV
-      
+
     - name: Create coverage badge
       if: matrix.python-version == '3.10'
       uses: emibcn/badge-action@v2.0.3
@@ -80,7 +73,7 @@ jobs:
         status: '${{ env.COVERAGE }}'
         color: '${{ env.BADGE_COLOR }}'
         path: 'test/coverage-badge.svg'
-        
+
     - name: Commit coverage badge
       if: matrix.python-version == '3.10' && github.event_name == 'push'
       run: |
@@ -89,3 +82,32 @@ jobs:
         git add test/coverage-badge.svg
         git diff --staged --quiet || git commit -m "Update coverage badge"
         git push
+
+  deploy-coverage:
+    needs: CheckCoverage
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download coverage artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: coverage-report
+          path: site/coverage
+
+      - name: Setup Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0

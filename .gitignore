@@ -28,8 +28,11 @@ var/
 
 # Tests
 test/virtuoso-test-data/
+test/virtuoso-meta-data/database/virtuoso.lck
+test/virtuoso-meta-data/database/virtuoso.log
+test/virtuoso-meta-data/index_entities.txt
+test/qlever-index-data/oc-index-test.server-log.txt
 .coverage
-
 
 # uv
 .venv/
