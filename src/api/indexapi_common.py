@@ -69,16 +69,48 @@ def br_meta_metadata(values):
     return res_json, ["val", "pubDate", "ids", "source", "author"]
 
 
-def get_unique_brs_metadata(l_url_brs):
+def br_meta_anyids(values):
+    sparql_endpoint = env_config["sparql_endpoint_meta"]
+
+    sparql_query = """
+    PREFIX datacite: <http://purl.org/spar/datacite/>
+    PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+    SELECT DISTINCT ?val (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=' __ ') AS ?ids)
+    WHERE {
+          VALUES ?val { """ + " ".join(values) + """ }
+          OPTIONAL {
+              ?val datacite:hasIdentifier ?identifier.
+              ?identifier datacite:usesIdentifierScheme ?scheme;
+                  literal:hasLiteralValue ?literalValue.
+              BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literalValue) AS ?id)
+          }
+     } GROUP BY ?val
+    """
+
+    headers = {"Accept": "application/sparql-results+json", "Content-Type": "application/sparql-query"}
+
+    try:
+        response = post(sparql_endpoint, headers=headers, data=sparql_query)
+        response.raise_for_status()
+    except RequestException:
+        return {}, []
+    r = loads(response.text)
+    results = r["results"]["bindings"]
+    res_json = {elem["val"]["value"]: elem for elem in results}
+    return res_json, ["val", "ids"]
+
+
+def get_unique_brs_metadata(l_url_brs, ids_only=False):
     res: list[list[str]] = []
     l_brs = ["<" + _url_br + ">" for _url_br in l_url_brs]
 
+    fetch = br_meta_anyids if ids_only else br_meta_metadata
     i = 0
     chunk_size = 3000
     brs_meta: dict[str, dict[str, dict[str, str]]] = {}
     while i < len(l_brs):
         chunk = l_brs[i:i + chunk_size]
-        m_br = br_meta_metadata(chunk)
+        m_br = fetch(chunk)
         brs_meta.update(m_br[0])
         if i == 0:
             res.append(m_br[1])

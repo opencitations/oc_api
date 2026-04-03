@@ -7,10 +7,11 @@ from src.ramose import APIManager
 
 
 @pytest.fixture(scope="session")
-def api_manager() -> APIManager:
+def api_manager(virtuoso_endpoint: str) -> APIManager:
+    virtuoso_base = virtuoso_endpoint.rsplit("/", 1)[0]
     return create_api_manager("src/api/meta_v1.hf", {
-        "#base https://api.opencitations.net/meta": "#base http://127.0.0.1:8891",
-        "#endpoint http://virtuoso-service.default.svc.cluster.local:8890/sparql": "#endpoint http://127.0.0.1:8891/sparql",
+        "#base https://api.opencitations.net/meta": f"#base {virtuoso_base}",
+        "#endpoint http://virtuoso-service.default.svc.cluster.local:8890/sparql": f"#endpoint {virtuoso_endpoint}",
         "#addon metaapi": "#addon ../src/api/metaapi",
     })
 

@@ -9,14 +9,14 @@ from src.ramose import APIManager
 
 
 @pytest.fixture(scope="session")
-def api_manager() -> APIManager:
+def api_manager(qlever_endpoint: str, virtuoso_endpoint: str) -> APIManager:
     return create_api_manager("src/api/index_v2.hf", {
-        "#base https://api.opencitations.net/index": "#base http://127.0.0.1:7011",
-        "#endpoint http://qlever-service.default.svc.cluster.local:7011": "#endpoint http://127.0.0.1:7011",
+        "#base https://api.opencitations.net/index": f"#base {qlever_endpoint}",
+        "#endpoint http://qlever-service.default.svc.cluster.local:7011": f"#endpoint {qlever_endpoint}",
         "#addon indexapi_v2": "#addon ../src/api/indexapi_v2",
     }, env_vars={
-        "SPARQL_ENDPOINT_INDEX": "http://127.0.0.1:7011",
-        "SPARQL_ENDPOINT_META": "http://127.0.0.1:8891/sparql",
+        "SPARQL_ENDPOINT_INDEX": qlever_endpoint,
+        "SPARQL_ENDPOINT_META": virtuoso_endpoint,
     })
 
 
@@ -665,6 +665,14 @@ def test_citations_with_author_sc(api_manager: APIManager) -> None:
     assert normalize_citations(result) == normalize_citations(
         EXPECTED_QSS_ARTICLE_CITATIONS
     )
+
+
+def test_citation_count_meta_anyids_failure(api_manager: APIManager) -> None:
+    with patch("indexapi_common.post", side_effect=RequestException):
+        result = json.loads(
+            execute_operation(api_manager, f"/v2/citation-count/{MAIN_PAPER_OMID}")
+        )
+    assert result == [{"count": "0"}]
 
 
 def test_citation_count_meta_sparql_failure(api_manager: APIManager) -> None:

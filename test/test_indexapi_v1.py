@@ -9,14 +9,14 @@ from src.ramose import APIManager
 
 
 @pytest.fixture(scope="session")
-def api_manager() -> APIManager:
+def api_manager(qlever_endpoint: str, virtuoso_endpoint: str) -> APIManager:
     return create_api_manager("src/api/index_v1.hf", {
-        "#base https://api.opencitations.net/index": "#base http://127.0.0.1:7011",
-        "#endpoint http://qlever-service.default.svc.cluster.local:7011": "#endpoint http://127.0.0.1:7011",
+        "#base https://api.opencitations.net/index": f"#base {qlever_endpoint}",
+        "#endpoint http://qlever-service.default.svc.cluster.local:7011": f"#endpoint {qlever_endpoint}",
         "#addon indexapi_v1": "#addon ../src/api/indexapi_v1",
     }, env_vars={
-        "SPARQL_ENDPOINT_INDEX": "http://127.0.0.1:7011",
-        "SPARQL_ENDPOINT_META": "http://127.0.0.1:8891/sparql",
+        "SPARQL_ENDPOINT_INDEX": qlever_endpoint,
+        "SPARQL_ENDPOINT_META": virtuoso_endpoint,
     })
 
 
