@@ -1,0 +1,136 @@
+name: Smoke Test
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+env:
+  SPARQL_ENDPOINT_INDEX: https://sparql.opencitations.net/index
+  SPARQL_ENDPOINT_META: https://sparql.opencitations.net/meta
+  SYNC_ENABLED: "false"
+  BASE_URL: http://localhost:8080
+  PREVIEW: "?preview=true"
+
+jobs:
+  smoketest:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+
+    - name: Install dependencies
+      run: uv sync --frozen --no-dev
+
+    - name: Start Gunicorn
+      run: |
+        uv run gunicorn -c gunicorn.conf.py api_oc:application &
+        echo "Waiting for server to start..."
+        for i in $(seq 1 30); do
+          if curl -s -o /dev/null -w "%{http_code}" ${BASE_URL}/health | grep -q "200"; then
+            echo "Server is ready!"
+            break
+          fi
+          echo "  attempt $i/30..."
+          sleep 2
+        done
+
+    - name: Run smoke tests
+      run: |
+        PASS=0
+        FAIL=0
+        TOTAL=0
+
+        check() {
+            local label="$1"
+            local url="$2"
+            local expected_code="${3:-200}"
+            TOTAL=$((TOTAL + 1))
+
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "$url")
+
+            if [ "$code" == "$expected_code" ]; then
+                echo "  ✓ ${label} → ${code}"
+                PASS=$((PASS + 1))
+            else
+                echo "  ✗ ${label} → ${code} (expected ${expected_code})"
+                FAIL=$((FAIL + 1))
+            fi
+        }
+
+        echo ""
+        echo "============================================"
+        echo " oc-api smoke test"
+        echo " Target: ${BASE_URL}"
+        echo "============================================"
+
+        # Health
+        echo ""
+        echo "[Health]"
+        check "GET /health" "${BASE_URL}/health"
+
+        # Documentation pages
+        echo ""
+        echo "[Documentation]"
+        check "GET /meta/v1 (docs)" "${BASE_URL}/meta/v1${PREVIEW}"
+        check "GET /index/v1 (docs)" "${BASE_URL}/index/v1${PREVIEW}"
+        check "GET /index/v2 (docs)" "${BASE_URL}/index/v2${PREVIEW}"
+
+        # Meta API v1 operations
+        echo ""
+        echo "[Meta API v1]"
+        check "metadata by DOI" "${BASE_URL}/meta/v1/metadata/doi:10.1007/978-1-4020-9632-7${PREVIEW}"
+        check "metadata by OMID" "${BASE_URL}/meta/v1/metadata/omid:br/0612058700${PREVIEW}"
+        check "metadata by ISBN" "${BASE_URL}/meta/v1/metadata/isbn:9781402096327${PREVIEW}"
+        check "author by ORCID" "${BASE_URL}/meta/v1/author/orcid:0000-0002-8420-0696${PREVIEW}"
+        check "editor by ORCID" "${BASE_URL}/meta/v1/editor/orcid:0000-0003-2098-4759${PREVIEW}"
+
+        # Index API v1 operations
+        echo ""
+        echo "[Index API v1]"
+        check "citation by OCI" "${BASE_URL}/index/v1/citation/06101801781-06180334099${PREVIEW}"
+        check "citations by DOI" "${BASE_URL}/index/v1/citations/10.1186/1756-8722-6-59${PREVIEW}"
+        check "references by DOI" "${BASE_URL}/index/v1/references/10.1186/1756-8722-6-59${PREVIEW}"
+        check "citation-count" "${BASE_URL}/index/v1/citation-count/10.1142/9789812701527_0009${PREVIEW}"
+        check "reference-count" "${BASE_URL}/index/v1/reference-count/10.1186/1756-8722-6-59${PREVIEW}"
+
+        # Index API v2 operations
+        echo ""
+        echo "[Index API v2]"
+        check "citation by OCI" "${BASE_URL}/index/v2/citation/06101801781-06180334099${PREVIEW}"
+        check "citations by DOI" "${BASE_URL}/index/v2/citations/doi:10.1108/jd-12-2013-0166${PREVIEW}"
+        check "references by DOI" "${BASE_URL}/index/v2/references/doi:10.7717/peerj-cs.421${PREVIEW}"
+        check "citation-count" "${BASE_URL}/index/v2/citation-count/doi:10.1108/jd-12-2013-0166${PREVIEW}"
+        check "reference-count" "${BASE_URL}/index/v2/reference-count/doi:10.7717/peerj-cs.421${PREVIEW}"
+        check "venue-citation-count" "${BASE_URL}/index/v2/venue-citation-count/issn:0138-9130${PREVIEW}"
+
+        # Summary
+        echo ""
+        echo "============================================"
+        if [ $FAIL -eq 0 ]; then
+            echo " Result: ALL PASSED (${PASS}/${TOTAL})"
+        else
+            echo " Result: ${FAIL} FAILED, ${PASS} passed (${TOTAL} total)"
+        fi
+        echo "============================================"
+        echo ""
+
+        exit $FAIL
+
+    - name: Stop Gunicorn
+      if: always()
+      run: |
+        pkill -f gunicorn || true
