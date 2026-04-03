@@ -140,37 +140,14 @@ You can customize the Gunicorn server configuration by modifying the `gunicorn.c
 
 ### Running Tests Locally
 
-To run the API tests locally, you'll need to have the test environment set up properly. The tests require a Virtuoso database to be running.
+The tests require Docker. Pytest fixtures in `test/conftest.py` automatically start and stop the QLever and Virtuoso containers.
 
-#### Prerequisites
-
-1. Install dependencies using uv:
+1. Install dependencies:
 ```bash
-   uv sync --dev
+uv sync --dev
 ```
 
-2. Start the test database:
+2. Run the tests:
 ```bash
-   ./test/start_test_db.sh
-```
-
-#### Running the Tests
-
-Once the test database is running, you can execute the tests with coverage:
-```bash
-# Run tests with coverage report
 uv run pytest --cov=src --cov-report=term-missing --cov-report=html
-
-# Run only specific test files
-uv run pytest test/test_metaapi.py
-
-# Run tests with verbose output
-uv run pytest -v
-```
-
-#### Stopping the Test Database
-
-After running the tests, stop the test database:
-```bash
-./test/stop_test_db.sh
 ```
