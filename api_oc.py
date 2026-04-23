@@ -249,26 +249,49 @@ class Sparql:
         accept = web.ctx.env.get('HTTP_ACCEPT')
         if accept is None or accept == "*/*" or accept == "":
             accept = "application/sparql-results+xml"
-        if is_post:
-            req = session.post(self.sparql_endpoint, data=data,
-                              headers={'content-type': content_type, "accept": accept}, timeout=60)
-        else:
-            req = session.get("%s?%s" % (self.sparql_endpoint, data),
-                             headers={'content-type': content_type, "accept": accept}, timeout=60)
 
-        if req.status_code == 200:
-            web.header('Access-Control-Allow-Origin', '*')
-            web.header('Access-Control-Allow-Credentials', 'true')
-            if req.headers["content-type"] == "application/json":
-                web.header('Content-Type', 'application/sparql-results+json')
-            else:
-                web.header('Content-Type', req.headers["content-type"])
-            #web_logger.mes()
-            req.encoding = "utf-8"
-            return req.text
+        if is_post:
+            req = session.post(
+                self.sparql_endpoint,
+                data=data,
+                headers={'content-type': content_type, "accept": accept},
+                timeout=60,
+                stream=True,
+            )
         else:
+            req = session.get(
+                "%s?%s" % (self.sparql_endpoint, data),
+                headers={'content-type': content_type, "accept": accept},
+                timeout=60,
+                stream=True,
+            )
+
+        if req.status_code != 200:
+            body = req.text
+            req.close()
             raise web.HTTPError(
-                str(req.status_code)+" ", {"Content-Type": req.headers["content-type"]}, req.text)
+                str(req.status_code) + " ",
+                {"Content-Type": req.headers.get("content-type", "text/plain")},
+                body,
+            )
+
+        web.header('Access-Control-Allow-Origin', '*')
+        web.header('Access-Control-Allow-Credentials', 'true')
+        upstream_ct = req.headers.get("content-type", "application/octet-stream")
+        if upstream_ct.startswith("application/json"):
+            web.header('Content-Type', 'application/sparql-results+json')
+        else:
+            web.header('Content-Type', upstream_ct)
+
+        def _stream():
+            try:
+                for chunk in req.iter_content(chunk_size=65536):
+                    if chunk:
+                        yield chunk
+            finally:
+                req.close()
+
+        return _stream()
 
     def __is_update_query(self, query): 
         query = re.sub(r'^\s*#.*$', '', query, flags=re.MULTILINE)
