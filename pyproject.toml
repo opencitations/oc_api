@@ -14,7 +14,7 @@ dependencies = [
     "apscheduler==3.10.1",
     "astroid>=3.3.11",
     "autopep8>=2.3.2",
-    "certifi>=2019.11.28",
+    "certifi>=2024.7.4",
     "charset-normalizer>=3.4.2",
     "flake8>=7.3.0",
     "gevent>=1.4",
