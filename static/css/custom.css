@@ -127,15 +127,15 @@ main {
     .navbar-nav {
         text-align: center !important;
     }
-    
+
     .navbar-nav .nav-link {
         text-align: center !important;
     }
-    
+
     .dropdown-item {
         text-align: center !important;
     }
-    
+
     .dropdown-menu {
         position: static !important;
         width: 100% !important;
@@ -143,7 +143,7 @@ main {
         box-shadow: none !important;
         background: transparent !important;
     }
-    
+
     .navbar-collapse {
         background-color: transparent !important;
         border: none !important;
@@ -168,12 +168,12 @@ footer {
   .nav-item.dropdown {
     position: relative;
   }
-  
+
   .dropdown-desktop-wrapper {
     display: flex;
     align-items: center;
   }
-  
+
   .dropdown-toggle-split {
     margin-left: -18px;
     padding: 0.375rem 0.5rem;
@@ -182,11 +182,11 @@ footer {
     color: inherit;
     text-decoration: none;
   }
-  
+
   .dropdown-toggle-split::after {
     margin-left: 0;
   }
-  
+
   /* Hover shows dropdown on desktop */
   .navbar .dropdown:hover .dropdown-menu {
     display: block;
@@ -206,8 +206,8 @@ footer {
     font-weight: 600!important;
     border-bottom: 2px solid #9931FC;
     background-color: rgba(184, 120, 244, 0.07);
-  } 
-  
+  }
+
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -228,4 +228,344 @@ footer {
 /* Remove default Bootstrap dropdown arrow from main links */
 .nav-link-main::after {
   display: none !important;
+}
+
+
+
+/*Authors hide*/
+
+/* hide checkbox */
+.truncate .toggle {
+  display: none;
+}
+
+/* collapsed */
+.truncate .limit-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* expanded (only affects same container) */
+.more-content{
+  display: none;
+}
+.truncate .toggle:checked ~ .more-content {
+  display: block;
+}
+
+/* button text */
+.truncate .more {
+  /*content: "... Show more";*/
+  color: blue;
+  cursor: pointer;
+}
+
+.truncate .toggle ~ .less {
+ display: none;
+  color: blue;
+  cursor: pointer;
+}
+
+/* toggle label text */
+.truncate .toggle:checked ~ .less {
+ display: block;
+}
+
+.truncate .toggle:checked ~ .more {
+ display: none;
+}
+
+.maxheight{
+  max-height: 2lh;
+}
+
+
+.results-tab {
+  width: 95%;
+  margin: 20px;
+}
+
+.results-tab th {
+  display: none;
+}
+
+.results-tab tr {
+  display: flex;
+  width: 100% !important;
+  background: unset;
+  margin-bottom: 20px;
+  border-radius: 15px !important;
+  box-shadow: 0 5px 15px 0 rgba(0,0,0,0.2);
+}
+
+.results-tab td {
+  justify-content: space-between;
+  padding: 20px;
+  border: solid 1px lightgray;
+}
+
+.results-tab td strong{
+  font-size: 1.2em;
+}
+.results-tab td p{
+  margin-top: 0.9em;
+}
+
+.results-tab tr td:first-child {
+  text-align: center;
+  font-size: 0.9em;
+  writing-mode: vertical-rl; /* text flows top-to-bottom, right-to-left */
+  width: 5%;
+  border-right: solid 1px darkgray !important;
+}
+
+
+.results-tab td::before {
+  content: attr(data-label);
+  font-weight: 600;
+  color: #555;
+}
+
+.results-tab tr td:not(:first-child) {
+  width: 50%;
+}
+
+td[field="oci"] {
+  font-size: 1.2em;
+  color: white;
+  padding: 20px;
+}
+
+
+td[field="ext_data.citing_ref.reference"]::before {
+  content: "Citing";       /* text inside the pseudo-div */
+  display: block;
+  background-color: rgb(160,95,241); /* optional styling */
+  margin-bottom: 10px;
+  color: white;
+  font-weight: bold;
+  padding: 2px 4px;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 1.1em;
+  border-radius: 5px;
+}
+
+td[field="ext_data.cited_ref.reference"]::before {
+  content: "Cited";       /* text inside the pseudo-div */
+  display: block;            /* behaves like a block element */
+  background-color: rgb(49,109,244	); /* optional styling */
+  color: white;
+  font-weight: bold;
+  padding: 2px 4px;
+  margin: 0 auto;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 1.1em;
+  border-radius: 5px;
+}
+
+.results-tab .btn.btn-primary {
+    background-color: #e9e9e9 !important;
+    color: #4f4f4f !important;
+    border-color: transparent;
+    text-decoration-line: none;
+    transition: 0.5s;
+    margin: 2px;
+}
+
+.results-tab .btn.btn-primary:hover {
+    color: black !important;
+    background-color: #f0f0f0 !important;
+    border-color: transparent;
+}
+
+#search_header{
+  /*display: none !important;*/
+  width: fit-content;
+  margin-left: auto;
+  margin-right: 8% !important;
+}
+
+#rows_per_page{
+  padding: 18px;
+  background: rgba(0,0,0,0.04);
+  border-radius: 15px !important;
+  box-shadow: 0 2px 7px 0 rgba(0,0,0,0.2);
+}
+
+#rows_per_page .form-select{
+  font-size: 1.1em;
+  text-align: center;
+}
+
+#tot_val{
+  font-size: 1.5em !important;
+}
+
+.res-val-link {
+  padding: 10px;
+  background-color: #f8f7f7;
+  color: black !important;
+  text-decoration: none;
+  border-radius: 6px;
+  border: solid 1px lightgray;
+  font-size: 1.3em;
+}
+
+.results-tab .vallbl {
+  font-size: 1.1em
+}
+
+a.idwidget{
+
+  text-decoration: underline;
+  text-decoration-color: #3b82f6 !important; /* A nice blue */
+  text-underline-offset: 4px !important;
+  text-decoration-thickness: 2px !important;
+  transition: all 0.3s ease;
+}
+a.idwidget:hover{
+  color: unset !important;
+  text-decoration-color: #1d4ed8 !important; /* A nice blue */
+  text-underline-offset: 6px !important; /* A nice blue */
+}
+
+
+@media only screen and (max-width: 700px) {
+
+  .container{
+    padding: 0px !important;
+  }
+
+  .search-entry {
+    width: 100% !important;
+    padding: 0px !important;
+  }
+
+  #search_header{
+    font-size: 85%;
+  }
+
+  #search_filters{
+    border-top: solid;
+    border-color: #f2f2f2;
+    margin-top: 10px;
+    float:left;
+    width: 100%;
+  }
+
+  .search-box *{
+    font-size: 1.4rem !important;
+  }
+
+  .search-box input{
+    width: 100% !important;
+  }
+  .search-box select{
+    margin: 0px !important;
+    width: 100% !important;
+    max-width: unset !important;
+    color: var(--main-bg-color);
+
+  }
+  .search-box button{
+    margin-top: 20px;
+    width: 100% !important;
+  }
+
+  .limit-results {
+    margin-top: 20px;
+    display: inline-block;
+    font-size: 120%;
+    float:left;
+    width: 100%;
+    text-align: center;
+  }
+  .slider-container{
+    width: 100%;
+  }
+  .filters-btns {
+    float: none;
+    margin-top: 8%;
+    margin-bottom:4%;
+  }
+  #filter_values_list{
+    width: 100%;
+  }
+
+
+  #rows_per_page {
+    display:block;
+    float:left;
+    /*margin-left:26%;*/
+  }
+
+  #sort_results {
+    /*display:block;*/
+    float:right;
+    margin-right:3%;
+  }
+
+  #export_results{
+    display:block;
+    float:left;
+    margin-right: 20px;
+    display: none;
+  }
+  #search_results{
+    width: 100%;
+  }
+  .results-tab tr{
+    display: block;
+  }
+  .results-tab td {
+    display: block;
+    width: 100% !important;
+  }
+  .results-tab tr td:first-child {
+    text-align: center;
+    font-size: 1em;
+    writing-mode: unset; /* text flows top-to-bottom, right-to-left */
+    width: unset;
+  }
+  .results-tab tr {
+    border-bottom: none ;
+    margin-top: 25px !important;
+  }
+  .tab-nav-btn.next{float:right; margin-top: 10px; margin-right: 10px;}
+  .tab-nav-btn.prev{float:left; margin-top: 10px; margin-left: 10px;}
+
+  #search_header{
+    margin: auto !important;
+  }
+
+  #search_header #rows_per_page{
+    display: table-row !important;
+  }
+
+  #search_header .tot-results{
+    margin: 0 !important;
+    margin-top: 20px !important;
+  }
+
+  div.row {
+   margin-right: 0 !important;
+ }
+
+}
+
+@media only screen and (max-width: 420px) {
+
+  .res-val-link {
+  padding: 5px!important;
+  background-color: #f8f7f7;
+  color: black !important;
+  text-decoration: none;
+  border-radius: 6px;
+  border: solid 1px lightgray;
+  font-size: 1em!important;
+}
+
 }

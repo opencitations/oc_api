@@ -1,6 +1,6 @@
 [project]
 name = "oc-api"
-version = "2.5.0"
+version = "2.5.1"
 description = "OpenCitations API"
 authors = [
     {name = "Mario Petrella", email = "mario.petrella@unibo.it"},
@@ -14,11 +14,11 @@ dependencies = [
     "apscheduler==3.10.1",
     "astroid>=3.3.11",
     "autopep8>=2.3.2",
-    "certifi>=2019.11.28",
+    "certifi>=2024.7.4",
     "charset-normalizer>=3.4.2",
     "flake8>=7.3.0",
     "gevent>=1.4",
-    "gitpython>=3.1.46",
+    "gitpython>=3.1.50",
     "gunicorn>=22.0.0",
     "idna>=2.8",
     "isodate>=0.6.1",
@@ -52,8 +52,8 @@ dependencies = [
     "sparqlwrapper>=2.0.0",
     "toml>=0.10.2",
     "typing-extensions>=4.14.1",
-    "ujson>=5.11.0",
-    "urllib3>=1.26.5",
+    "ujson>=5.12.1",
+    "urllib3>=2.7.0",
     "web-py>=0.62",
     "wrapt>=2.1.2",
     "yapf>=0.43.0",
