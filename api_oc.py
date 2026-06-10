@@ -388,7 +388,7 @@ class Api:
                 op = man.get_op(operation_url)
 
                 if type(op) is Operation:
-                    status_code, res, c_type = op.exec(
+                    status_code, res, c_type, extra_headers = op.exec(
                         content_type=content_type)
                     if status_code == 200:
                         # remember to remove the slash at the end
@@ -404,6 +404,8 @@ class Api:
                         web.header('Access-Control-Allow-Methods', '*')
                         web.header('Access-Control-Allow-Headers',
                                    'Authorization')
+                        for header_name, header_value in extra_headers.items():
+                            web.header(header_name, header_value)
                         #web_logger.mes()
                         return res
                     else:

@@ -296,6 +296,18 @@ wheels = [
 ]
 
 [[package]]
+name = "flask-swagger-ui"
+version = "5.32.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "flask" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c8/db/06cd2b77fff6c115c37dc8ec4db04ee6e5119799a27c7e19410f0f303c0e/flask_swagger_ui-5.32.6.tar.gz", hash = "sha256:38730cb566e5f1d70deb8bb1035ef1565b35dc50cdfd2a9e507779a751d46930", size = 613730, upload-time = "2026-05-18T10:31:09.328Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/10/9f/a0510e3c648f2e6b58bbf5dc7db23668ec0ad5db90e1d84afb466a1f778f/flask_swagger_ui-5.32.6-py3-none-any.whl", hash = "sha256:83ec82f2b1da3628d89bc2eaa4836fdba7194353ff09d3d5c7d1e6892f345336", size = 618735, upload-time = "2026-05-18T10:31:07.034Z" },
+]
+
+[[package]]
 name = "gevent"
 version = "25.9.1"
 source = { registry = "https://pypi.org/simple" }
@@ -849,7 +861,7 @@ requires-dist = [
     { name = "python-lsp-jsonrpc", specifier = ">=1.1.2" },
     { name = "python-lsp-server", specifier = ">=1.12.2" },
     { name = "pytz", specifier = ">=2026.1.post1" },
-    { name = "ramose", specifier = ">=2.0.0" },
+    { name = "ramose", specifier = ">=2.4.1" },
     { name = "rdflib", specifier = ">=6.1.1" },
     { name = "rdflib-jsonld", specifier = ">=0.6.2" },
     { name = "redis", specifier = ">=7.0.1" },
@@ -1208,19 +1220,18 @@ wheels = [
 
 [[package]]
 name = "ramose"
-version = "2.0.0"
+version = "2.4.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "flask" },
-    { name = "isodate" },
+    { name = "flask-swagger-ui" },
     { name = "markdown" },
-    { name = "python-dateutil" },
-    { name = "rdflib" },
+    { name = "pyyaml" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7b/d2/43cf51dbf4ff6f7e8c94fe6bea18628bc697b346b37722dd82a20730c3ab/ramose-2.0.0.tar.gz", hash = "sha256:627cf089d52356233ae641e12aac0c938fd9f60f2192c0b4af496d4eeb3cb861", size = 863387, upload-time = "2026-04-03T10:44:47.169Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/0b/fd/0e73aa95150d970156c94620b260329934104366f6a53c6ab4355ad18105/ramose-2.4.1.tar.gz", hash = "sha256:5f943bd9e44da387fd5787d27907849c1ee949fb3a2af4c88ff1baaa692ace58", size = 1065135, upload-time = "2026-06-10T10:09:35.934Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0a/ec/296dac763ac1508f045814e45b876bd12b44dadca10dc0865ae235263ec6/ramose-2.0.0-py3-none-any.whl", hash = "sha256:156f5d5768ed5c922030d6099281bbb65e996f3d3356a6623fe300f321cfba8a", size = 20896, upload-time = "2026-04-03T10:44:45.764Z" },
+    { url = "https://files.pythonhosted.org/packages/bb/de/6bc0e17e9e18514348aa1ac37a081de3843434ecb1a07e8620079faba74e/ramose-2.4.1-py3-none-any.whl", hash = "sha256:2d236fdcb2c09a4a3133fa0f6db87ec68fbf748babbb22373036de6077df9b70", size = 59552, upload-time = "2026-06-10T10:09:37.183Z" },
 ]
 
 [[package]]
