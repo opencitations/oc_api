@@ -159,7 +159,7 @@ def process_ordered_list(items):
         role_to_name[current_role] = name
 
     ordered_items = []
-    start_role = next(iter(role for role, next_role in items_dict.items() if not role in items_dict.values()))
+    start_role = next(iter(role for role, next_role in items_dict.items() if role not in items_dict.values()))
 
     current_role = start_role
     while current_role:

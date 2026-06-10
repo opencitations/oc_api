@@ -64,9 +64,11 @@ urls = (
     "/sparql/meta", "SparqlMeta",
     "/index/?", "RedirectIndex",
     "/meta/?", "RedirectMeta",
+    "/skgif/?", "RedirectSkgif",
     "/(index)(/v[1-2].*)", "Api",
-    "/(meta)(/v1.*)", "Api"
-    
+    "/(meta)(/v1.*)", "Api",
+    "/(skgif)(/v1.*)", "Api"
+
 )
 
 # API Managers
@@ -76,6 +78,13 @@ index_api_manager = APIManager(c["api_index"], endpoint_override=env_config["spa
 index_doc_manager = HTMLDocumentationHandler(index_api_manager)
 index_api_manager_v2 = APIManager(c["api_index_v2"], endpoint_override=env_config["sparql_endpoint_index"])
 index_doc_manager_v2 = HTMLDocumentationHandler(index_api_manager_v2)
+skgif_api_manager = APIManager(c["api_skgif"], endpoint_override=env_config["sparql_endpoint_meta"])
+for config in skgif_api_manager.all_conf.values():
+    config["sources_map"] = {
+        "meta": env_config["sparql_endpoint_meta"],
+        "index": env_config["sparql_endpoint_index"],
+    }
+skgif_doc_manager = HTMLDocumentationHandler(skgif_api_manager)
 
 
 render = web.template.render(c["html"], globals={
@@ -175,9 +184,16 @@ class RedirectMeta:
     def GET(self):
         # Redirect from /index to /index/v2
         raise web.seeother('/meta/v1')
-    
+
     def POST(self):
         raise web.seeother('/meta/v1')
+
+class RedirectSkgif:
+    def GET(self):
+        raise web.seeother('/skgif/v1')
+
+    def POST(self):
+        raise web.seeother('/skgif/v1')
 
 class Header:
     def GET(self):
@@ -358,6 +374,9 @@ class Api:
         elif dataset == "meta":
             man = meta_api_manager
             doc = meta_doc_manager
+        elif dataset == "skgif":
+            man = skgif_api_manager
+            doc = skgif_doc_manager
 
         if man is None or doc is None:
             raise web.notfound()
@@ -384,6 +403,9 @@ class Api:
                 else:
                     content_type = "application/json"
 
+                if dataset == "skgif":
+                    # needed for pagination
+                    call = "/skgif" + call
                 operation_url = call + unquote(web.ctx.query)
                 op = man.get_op(operation_url)
 

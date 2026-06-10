@@ -101,6 +101,17 @@ def virtuoso_endpoint():
     subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)
 
 
+@pytest.fixture(scope="session")
+def skgif_api_manager(virtuoso_endpoint, qlever_endpoint):
+    manager = APIManager(
+        [os.path.join(TEST_DIR, "..", "src", "api", "skgif_v1.hf")],
+        endpoint_override=virtuoso_endpoint,
+    )
+    for config in manager.all_conf.values():
+        config["sources_map"] = {"meta": virtuoso_endpoint, "index": qlever_endpoint}
+    return manager
+
+
 def normalize_citation(citation: dict[str, str]) -> dict[str, str]:
     return {k: " ".join(sorted(v.split())) if k in ("citing", "cited") else v for k, v in citation.items()}
 

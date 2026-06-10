@@ -6,7 +6,7 @@ import tempfile
 import argparse
 import json
 import hashlib
-from typing import Dict, List, Tuple, Set
+from typing import List, Set
 
 # Load the configuration file
 with open("conf.json") as f:
