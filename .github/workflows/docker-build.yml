@@ -2,9 +2,9 @@ name: Docker Build and Push
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, feat/skg-if ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master, feat/skg-if ]
 
 env:
   SERVIZIO_OC: oc_api
