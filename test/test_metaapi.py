@@ -34,7 +34,7 @@ def assert_api_output(api_manager: APIManager, url: str, expected_output: list[d
 
 
 def test_metadata_retrieval(api_manager):
-    assert_api_output(api_manager, "/v1/metadata/doi:10.1002/(sici)1096-9926(199910)60:4<177::aid-tera1>3.0.co;2-z", [
+    assert_api_output(api_manager, "/meta/v1/metadata/doi:10.1002/(sici)1096-9926(199910)60:4<177::aid-tera1>3.0.co;2-z", [
         {
             "id": "doi:10.1002/(sici)1096-9926(199910)60:4<177::aid-tera1>3.0.co;2-z omid:br/0601",
             "title": "Response To The Letter Of Hanley Et Al. ([1999] Teratology 59:323-324), Concerning The Article By Roy Et Al. ([1998] Teratology 58:62-68)",
@@ -53,7 +53,7 @@ def test_metadata_retrieval(api_manager):
 
 def test_metadata_retrieval_editor_inbook(api_manager):
     # https://github.com/opencitations/api/issues/16
-    assert_api_output(api_manager, "/v1/metadata/omid:br/061702784433", [
+    assert_api_output(api_manager, "/meta/v1/metadata/omid:br/061702784433", [
         {
             "id": "doi:10.1007/978-3-642-30859-8_14 openalex:W1555136325 omid:br/061702784433",
             "title": "Analysing Students' Use Of Recorded Lectures Through Methodological Triangulation",
@@ -187,7 +187,7 @@ EXPECTED_EDITOR_WORKS = [
     "0000-0002-8420-0696",
 ])
 def test_author_works_retrieval(api_manager, identifier):
-    assert_api_output(api_manager, f"/v1/author/{identifier}", EXPECTED_AUTHOR_WORKS)
+    assert_api_output(api_manager, f"/meta/v1/author/{identifier}", EXPECTED_AUTHOR_WORKS)
 
 
 @pytest.mark.parametrize("identifier", [
@@ -196,12 +196,12 @@ def test_author_works_retrieval(api_manager, identifier):
     "0000-0003-2098-4759",
 ])
 def test_editor_works_retrieval(api_manager, identifier):
-    assert_api_output(api_manager, f"/v1/editor/{identifier}", EXPECTED_EDITOR_WORKS)
+    assert_api_output(api_manager, f"/meta/v1/editor/{identifier}", EXPECTED_EDITOR_WORKS)
 
 
 def test_venue_without_external_id(api_manager):
     # https://github.com/opencitations/api/issues/15
-    normalized_output = assert_api_output(api_manager, "/v1/metadata/omid:br/061903571196", [
+    normalized_output = assert_api_output(api_manager, "/meta/v1/metadata/omid:br/061903571196", [
         {
             "id": "doi:10.36106/gjra/9300981 openalex:W4306682982 omid:br/061903571196",
             "title": "Lung Cavitation: An Unwanted Complication Of Covid-19 Lung Disease",
@@ -221,9 +221,9 @@ def test_venue_without_external_id(api_manager):
 
 def test_metadata_retrieval_with_different_ids(api_manager):
     # https://github.com/opencitations/api/issues/14
-    output_omid = execute_operation(api_manager, "/v1/metadata/omid:br/06603870331")
-    output_isbn = execute_operation(api_manager, "/v1/metadata/isbn:9789264960114")
-    output_doi = execute_operation(api_manager, "/v1/metadata/doi:10.1787/b0e499cf-en")
+    output_omid = execute_operation(api_manager, "/meta/v1/metadata/omid:br/06603870331")
+    output_isbn = execute_operation(api_manager, "/meta/v1/metadata/isbn:9789264960114")
+    output_doi = execute_operation(api_manager, "/meta/v1/metadata/doi:10.1787/b0e499cf-en")
 
     normalized_omid = normalize_result(json.loads(output_omid))
     normalized_isbn = normalize_result(json.loads(output_isbn))
@@ -274,7 +274,7 @@ def test_metadata_retrieval_with_different_ids(api_manager):
 
 def test_author_order_in_metadata(api_manager):
     # https://github.com/opencitations/api/issues/13
-    normalized_output = assert_api_output(api_manager, "/v1/metadata/omid:br/0680773548", [
+    normalized_output = assert_api_output(api_manager, "/meta/v1/metadata/omid:br/0680773548", [
         {
             "author": "Bilgin, H\u00fclya [orcid:0000-0001-6639-5533 omid:ra/0622032021]; Bozkurt, Merlin [omid:ra/06802276621]; Yilmazlar, Sel\u00e7uk [omid:ra/06802276622]; Korfali, G\u00fclsen [omid:ra/06802276623]",
             "issue": "3",

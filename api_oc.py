@@ -403,9 +403,7 @@ class Api:
                 else:
                     content_type = "application/json"
 
-                if dataset == "skgif":
-                    # needed for pagination
-                    call = "/skgif" + call
+                call = f"/{dataset}{call}"
                 operation_url = call + unquote(web.ctx.query)
                 op = man.get_op(operation_url)
 
