@@ -7,9 +7,9 @@
 #version 1.0.0
 #contacts [contact@opencitations.net](mailto:contact@opencitations.net)
 #license [ISC](https://opensource.org/licenses/ISC)
-#endpoint https://sparql.opencitations.net/meta
+#endpoint http://virtuoso-service.default.svc.cluster.local:8890/sparql
 #method post
-#sources meta=https://sparql.opencitations.net/meta;index=https://sparql.opencitations.net/index
+#sources meta=http://virtuoso-service.default.svc.cluster.local:8890/sparql;index=http://qlever-service.default.svc.cluster.local:7011
 #addon ramose.skgif_addon
 #disable_params require,filter,sort,format,json
 
