@@ -247,3 +247,10 @@ class TestSkgifSchemaConformance:
     def test_book_shacl(self, skgif_api_manager: APIManager) -> None:
         response = _execute_skgif(skgif_api_manager, "https://w3id.org/oc/meta/br/0612058700")
         _validate_skgif_shacl(response)
+
+
+class TestMergedSlashLocalIdentifier:
+    def test_call_with_merged_scheme_slash_returns_same_product(self, skgif_api_manager: APIManager) -> None:
+        canonical = _execute_skgif(skgif_api_manager, "https://w3id.org/oc/meta/br/0601")
+        merged = _execute_skgif(skgif_api_manager, "https:/w3id.org/oc/meta/br/0601")
+        assert merged["@graph"] == canonical["@graph"]

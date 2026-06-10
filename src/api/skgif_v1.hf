@@ -77,8 +77,9 @@ ORDER BY STR(?title) STR(?local_identifier)
 
 #url /products/{local_identifier}
 #type operation
-#local_identifier str(https://w3id\.org/oc/meta/.+)
+#local_identifier str(https:/{1,2}w3id\.org/oc/meta/.+)
 #method get
+#preprocess normalize_local_identifier_url(local_identifier)
 #description Returns a single research product identified by its OpenCitations Meta identifier (OMID). The response includes bibliographic metadata from OpenCitations Meta and citation data from OpenCitations Index.
 #call /products/https://w3id.org/oc/meta/br/062104388184
 #output_json {
