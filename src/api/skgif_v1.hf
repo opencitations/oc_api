@@ -1,4 +1,4 @@
-#url /skgif/v1
+#url /skg-if/v1
 #type api
 #base https://w3id.org/skg-if/sandbox/opencitations
 #title SKG-IF API for OpenCitations
@@ -91,18 +91,18 @@ ORDER BY STR(?title) STR(?local_identifier)
         }
     ],
     "meta": {
-        "local_identifier": "/skgif/v1/products/https://w3id.org/oc/meta/br/062104388184?page=1&page_size=1",
+        "local_identifier": "/skg-if/v1/products/https://w3id.org/oc/meta/br/062104388184?page=1&page_size=1",
         "entity_type": "search_result_page",
         "part_of": {
-            "local_identifier": "/skgif/v1/products/https://w3id.org/oc/meta/br/062104388184",
+            "local_identifier": "/skg-if/v1/products/https://w3id.org/oc/meta/br/062104388184",
             "entity_type": "search_result",
             "total_items": 1,
             "first_page": {
-                "local_identifier": "/skgif/v1/products/https://w3id.org/oc/meta/br/062104388184?page=1&page_size=1",
+                "local_identifier": "/skg-if/v1/products/https://w3id.org/oc/meta/br/062104388184?page=1&page_size=1",
                 "entity_type": "search_result_page"
             },
             "last_page": {
-                "local_identifier": "/skgif/v1/products/https://w3id.org/oc/meta/br/062104388184?page=1&page_size=1",
+                "local_identifier": "/skg-if/v1/products/https://w3id.org/oc/meta/br/062104388184?page=1&page_size=1",
                 "entity_type": "search_result_page"
             }
         }
@@ -491,18 +491,18 @@ Format: comma-separated `filter_name:filter_value` pairs (AND logic).
         }
     ],
     "meta": {
-        "local_identifier": "/skgif/v1/grants?filter=grant_number%3A12345&page=1&page_size=1",
+        "local_identifier": "/skg-if/v1/grants?filter=grant_number%3A12345&page=1&page_size=1",
         "entity_type": "search_result_page",
         "part_of": {
-            "local_identifier": "/skgif/v1/grants?filter=grant_number%3A12345",
+            "local_identifier": "/skg-if/v1/grants?filter=grant_number%3A12345",
             "entity_type": "search_result",
             "total_items": 0,
             "first_page": {
-                "local_identifier": "/skgif/v1/grants?filter=grant_number%3A12345&page=1&page_size=1",
+                "local_identifier": "/skg-if/v1/grants?filter=grant_number%3A12345&page=1&page_size=1",
                 "entity_type": "search_result_page"
             },
             "last_page": {
-                "local_identifier": "/skgif/v1/grants?filter=grant_number%3A12345&page=1&page_size=1",
+                "local_identifier": "/skg-if/v1/grants?filter=grant_number%3A12345&page=1&page_size=1",
                 "entity_type": "search_result_page"
             }
         }
@@ -547,18 +547,18 @@ Format: comma-separated `filter_name:filter_value` pairs (AND logic).
         }
     ],
     "meta": {
-        "local_identifier": "/skgif/v1/topics?filter=cf.search.labels%3Abiology&page=1&page_size=1",
+        "local_identifier": "/skg-if/v1/topics?filter=cf.search.labels%3Abiology&page=1&page_size=1",
         "entity_type": "search_result_page",
         "part_of": {
-            "local_identifier": "/skgif/v1/topics?filter=cf.search.labels%3Abiology",
+            "local_identifier": "/skg-if/v1/topics?filter=cf.search.labels%3Abiology",
             "entity_type": "search_result",
             "total_items": 0,
             "first_page": {
-                "local_identifier": "/skgif/v1/topics?filter=cf.search.labels%3Abiology&page=1&page_size=1",
+                "local_identifier": "/skg-if/v1/topics?filter=cf.search.labels%3Abiology&page=1&page_size=1",
                 "entity_type": "search_result_page"
             },
             "last_page": {
-                "local_identifier": "/skgif/v1/topics?filter=cf.search.labels%3Abiology&page=1&page_size=1",
+                "local_identifier": "/skg-if/v1/topics?filter=cf.search.labels%3Abiology&page=1&page_size=1",
                 "entity_type": "search_result_page"
             }
         }
@@ -605,18 +605,18 @@ Format: comma-separated `filter_name:filter_value` pairs (AND logic).
         }
     ],
     "meta": {
-        "local_identifier": "/skgif/v1/datasources?filter=research_product_type%3Aliterature&page=1&page_size=1",
+        "local_identifier": "/skg-if/v1/datasources?filter=research_product_type%3Aliterature&page=1&page_size=1",
         "entity_type": "search_result_page",
         "part_of": {
-            "local_identifier": "/skgif/v1/datasources?filter=research_product_type%3Aliterature",
+            "local_identifier": "/skg-if/v1/datasources?filter=research_product_type%3Aliterature",
             "entity_type": "search_result",
             "total_items": 0,
             "first_page": {
-                "local_identifier": "/skgif/v1/datasources?filter=research_product_type%3Aliterature&page=1&page_size=1",
+                "local_identifier": "/skg-if/v1/datasources?filter=research_product_type%3Aliterature&page=1&page_size=1",
                 "entity_type": "search_result_page"
             },
             "last_page": {
-                "local_identifier": "/skgif/v1/datasources?filter=research_product_type%3Aliterature&page=1&page_size=1",
+                "local_identifier": "/skg-if/v1/datasources?filter=research_product_type%3Aliterature&page=1&page_size=1",
                 "entity_type": "search_result_page"
             }
         }

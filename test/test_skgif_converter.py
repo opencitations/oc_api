@@ -64,7 +64,7 @@ SKGIF_SHACL_SHAPES = _load_shacl_shapes()
 
 
 def _execute_skgif(skgif_api_manager: APIManager, local_identifier: str) -> dict:
-    operation = skgif_api_manager.get_op(f"/skgif/v1/products/{local_identifier}")
+    operation = skgif_api_manager.get_op(f"/skg-if/v1/products/{local_identifier}")
     if isinstance(operation, tuple):
         msg = f"Operation not found: {local_identifier}"
         raise TypeError(msg)

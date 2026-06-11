@@ -12,7 +12,7 @@ The service provides three main API endpoints:
 
 - **Index endpoint** (`/index/v2`): For querying the OpenCitations Index database
 - **Meta endpoint** (`/meta/v1`): For querying the OpenCitations Meta database
-- **SKG-IF endpoint** (`/skgif/v1`): For accessing OpenCitations data as JSON-LD compliant with the [Scientific Knowledge Graph Interoperability Framework](https://skg-if.github.io/interoperability-framework/); it combines bibliographic metadata from Meta with citation data from Index
+- **SKG-IF endpoint** (`/skg-if/v1`): For accessing OpenCitations data as JSON-LD compliant with the [Scientific Knowledge Graph Interoperability Framework](https://skg-if.github.io/interoperability-framework/); it combines bibliographic metadata from Meta with citation data from Index
 
 ## Configuration
 

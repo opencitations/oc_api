@@ -10,7 +10,7 @@ from rdflib.plugins.sparql.parser import parseUpdate
 import subprocess
 import sys
 import argparse
-from ramose import APIManager, Operation, HTMLDocumentationHandler
+from ramose import APIManager, Operation, HTMLDocumentationHandler, OpenAPIDocumentationHandler
 from io import StringIO
 from redis import Redis
 
@@ -64,20 +64,23 @@ urls = (
     "/sparql/meta", "SparqlMeta",
     "/index/?", "RedirectIndex",
     "/meta/?", "RedirectMeta",
-    "/skgif/?", "RedirectSkgif",
+    "/skg-if/?", "RedirectSkgif",
     "/(index)(/v[1-2].*)", "Api",
     "/(meta)(/v1.*)", "Api",
-    "/(skgif)(/v1.*)", "Api"
+    "/(skg-if)(/v1.*)", "Api"
 
 )
 
 # API Managers
 meta_api_manager = APIManager(c["api_meta"], endpoint_override=env_config["sparql_endpoint_meta"])
 meta_doc_manager = HTMLDocumentationHandler(meta_api_manager)
+meta_openapi_manager = OpenAPIDocumentationHandler(meta_api_manager)
 index_api_manager = APIManager(c["api_index"], endpoint_override=env_config["sparql_endpoint_index"])
 index_doc_manager = HTMLDocumentationHandler(index_api_manager)
+index_openapi_manager = OpenAPIDocumentationHandler(index_api_manager)
 index_api_manager_v2 = APIManager(c["api_index_v2"], endpoint_override=env_config["sparql_endpoint_index"])
 index_doc_manager_v2 = HTMLDocumentationHandler(index_api_manager_v2)
+index_openapi_manager_v2 = OpenAPIDocumentationHandler(index_api_manager_v2)
 skgif_api_manager = APIManager(c["api_skgif"], endpoint_override=env_config["sparql_endpoint_meta"])
 for config in skgif_api_manager.all_conf.values():
     config["sources_map"] = {
@@ -85,6 +88,7 @@ for config in skgif_api_manager.all_conf.values():
         "index": env_config["sparql_endpoint_index"],
     }
 skgif_doc_manager = HTMLDocumentationHandler(skgif_api_manager)
+skgif_openapi_manager = OpenAPIDocumentationHandler(skgif_api_manager)
 
 
 render = web.template.render(c["html"], globals={
@@ -190,10 +194,10 @@ class RedirectMeta:
 
 class RedirectSkgif:
     def GET(self):
-        raise web.seeother('/skgif/v1')
+        raise web.seeother('/skg-if/v1')
 
     def POST(self):
-        raise web.seeother('/skgif/v1')
+        raise web.seeother('/skg-if/v1')
 
 class Header:
     def GET(self):
@@ -361,6 +365,7 @@ class Api:
         validateAccessToken()
         man = None
         doc = None
+        openapi = None
 
         if dataset == "":
             raise web.redirect("/")
@@ -368,19 +373,31 @@ class Api:
         elif dataset == "index":
             man = index_api_manager
             doc = index_doc_manager
+            openapi = index_openapi_manager
             if "v2" in call:
                 man = index_api_manager_v2
                 doc = index_doc_manager_v2
+                openapi = index_openapi_manager_v2
         elif dataset == "meta":
             man = meta_api_manager
             doc = meta_doc_manager
-        elif dataset == "skgif":
+            openapi = meta_openapi_manager
+        elif dataset == "skg-if":
             man = skgif_api_manager
             doc = skgif_doc_manager
+            openapi = skgif_openapi_manager
 
-        if man is None or doc is None:
+        if man is None or doc is None or openapi is None:
             raise web.notfound()
         else:
+            docs_match = re.match(r"^(/v[1-9]\d*)/docs/?$", call)
+            spec_match = re.match(r"^(/v[1-9]\d*)/openapi\.ya?ml$", call)
+            if docs_match:
+                web.header('Content-Type', "text/html")
+                return openapi.get_swagger_ui(f"/{dataset}{docs_match.group(1)}")[1]
+            if spec_match:
+                web.header('Content-Type', "application/yaml")
+                return openapi.get_documentation(f"/{dataset}{spec_match.group(1)}")[1]
             if re.match("^/v[1-9]*/?$", call):
                 # remember to remove the slash at the end
                 org_ref = web.ctx.env.get('HTTP_REFERER')
