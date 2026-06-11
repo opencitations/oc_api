@@ -73,7 +73,7 @@ WHERE {
   OPTIONAL { ?local_identifier a ?_type_class . FILTER(?_type_class != fabio:Expression) }
   BIND(IF(!BOUND(?_type_class), "literature", IF(?_type_class IN (<http://purl.org/spar/fabio/DataFile>, <http://purl.org/spar/fabio/DataManagementPlan>), "research data", IF(?_type_class = <http://purl.org/spar/fabio/ComputerProgram>, "research software", "literature"))) AS ?product_type)
 }
-ORDER BY STR(?title) STR(?local_identifier)
+ORDER BY SUBSTR(STR(?title), 1, 64) STR(?local_identifier)
 
 #url /products/{local_identifier}
 #type operation
