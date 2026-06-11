@@ -10,14 +10,14 @@
 #endpoint http://virtuoso-service.default.svc.cluster.local:8890/sparql
 #method post
 #sources meta=http://virtuoso-service.default.svc.cluster.local:8890/sparql;index=http://qlever-service.default.svc.cluster.local:7011
-#addon ramose.skgif_addon
+#addon ramose.skg_if.virtuoso
 #disable_params require,filter,sort,format,json
 
 #url /products
 #type operation
 #method get
 #description Returns a list of research products matching the given filters.
-#custom_params filter,handle_skgif_product_filter,preprocess,Search filter.
+#custom_params filter,handle_skg_if_product_filter,preprocess,Search filter.
 Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 
 **Filters with data:**
@@ -52,7 +52,7 @@ Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 - `funding.identifiers.id`
 - `funding.identifiers.scheme`
 - `funding.local_identifier`
-#format skgif,to_skgif,application/ld+json
+#format skgif,to_skg_if,application/ld+json
 #default_format skgif
 #call /products?filter=cf.search.title:adaptive
 #output_json [{"local_identifier": "https://w3id.org/oc/meta/br/0612058700", "title": "Adaptive Environmental Management", "entity_type": "product", "product_type": "literature"}]
@@ -69,9 +69,9 @@ SELECT DISTINCT ?local_identifier ?title ?product_type
 WHERE {
   ?local_identifier a fabio:Expression ;
           dcterm:title ?title .
+  [[filter]]
   OPTIONAL { ?local_identifier a ?_type_class . FILTER(?_type_class != fabio:Expression) }
   BIND(IF(!BOUND(?_type_class), "literature", IF(?_type_class IN (<http://purl.org/spar/fabio/DataFile>, <http://purl.org/spar/fabio/DataManagementPlan>), "research data", IF(?_type_class = <http://purl.org/spar/fabio/ComputerProgram>, "research software", "literature"))) AS ?product_type)
-  [[filter]]
 }
 ORDER BY STR(?title) STR(?local_identifier)
 
@@ -310,7 +310,7 @@ ORDER BY STR(?title) STR(?local_identifier)
         }
     ]
 }
-#format skgif,to_skgif,application/ld+json
+#format skgif,to_skg_if,application/ld+json
 #default_format skgif
 #sparql PREFIX fabio: <http://purl.org/spar/fabio/>
 PREFIX dcterm: <http://purl.org/dc/terms/>
@@ -433,7 +433,7 @@ WHERE {
 #type operation
 #method get
 #description Returns a list of grants matching the given filters. Note: OpenCitations does not currently hold grant data; this endpoint always returns an empty result.
-#custom_params filter,handle_skgif_grant_filter,preprocess,Search filter.
+#custom_params filter,handle_skg_if_grant_filter,preprocess,Search filter.
 Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 
 **Accepted but always empty (OpenCitations does not hold grant data):**
@@ -480,7 +480,7 @@ Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 - `website`
 
 #call /grants?filter=grant_number:12345
-#format skgif,to_skgif,application/ld+json
+#format skgif,to_skg_if,application/ld+json
 #default_format skgif
 #output_json {
     "@context": [
@@ -516,7 +516,7 @@ Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 #method get
 #description Returns a single grant. Note: OpenCitations does not currently hold grant data; this endpoint always returns 404.
 #call /grants/example-grant-id
-#format skgif,to_skgif,application/ld+json
+#format skgif,to_skg_if,application/ld+json
 #default_format skgif
 #output_json HTTP status code 404: entity not found
 #sparql SELECT ?dummy WHERE { FILTER(false) }
@@ -525,7 +525,7 @@ Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 #type operation
 #method get
 #description Returns a list of topics matching the given filters. Note: OpenCitations does not currently hold topic data; this endpoint always returns an empty result.
-#custom_params filter,handle_skgif_topic_filter,preprocess,Search filter.
+#custom_params filter,handle_skg_if_topic_filter,preprocess,Search filter.
 Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 
 **Accepted but always empty (OpenCitations does not hold topic data):**
@@ -536,7 +536,7 @@ Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 - `identifiers.value`
 
 #call /topics?filter=cf.search.labels:biology
-#format skgif,to_skgif,application/ld+json
+#format skgif,to_skg_if,application/ld+json
 #default_format skgif
 #output_json {
     "@context": [
@@ -572,7 +572,7 @@ Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 #method get
 #description Returns a single topic. Note: OpenCitations does not currently hold topic data; this endpoint always returns 404.
 #call /topics/example-topic-id
-#format skgif,to_skgif,application/ld+json
+#format skgif,to_skg_if,application/ld+json
 #default_format skgif
 #output_json HTTP status code 404: entity not found
 #sparql SELECT ?dummy WHERE { FILTER(false) }
@@ -581,7 +581,7 @@ Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 #type operation
 #method get
 #description Returns a list of data sources matching the given filters. Note: OpenCitations does not currently hold data source records; this endpoint always returns an empty result.
-#custom_params filter,handle_skgif_datasource_filter,preprocess,Search filter.
+#custom_params filter,handle_skg_if_datasource_filter,preprocess,Search filter.
 Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 
 **Accepted but always empty (OpenCitations does not hold data source records):**
@@ -594,7 +594,7 @@ Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 - `research_product_type`
 
 #call /datasources?filter=research_product_type:literature
-#format skgif,to_skgif,application/ld+json
+#format skgif,to_skg_if,application/ld+json
 #default_format skgif
 #output_json {
     "@context": [
@@ -630,7 +630,7 @@ Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 #method get
 #description Returns a single data source. Note: OpenCitations does not currently hold data source records; this endpoint always returns 404.
 #call /datasources/example-datasource-id
-#format skgif,to_skgif,application/ld+json
+#format skgif,to_skg_if,application/ld+json
 #default_format skgif
 #output_json HTTP status code 404: entity not found
 #sparql SELECT ?dummy WHERE { FILTER(false) }

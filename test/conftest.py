@@ -53,6 +53,19 @@ def _wait_for_virtuoso(container: str, timeout: int = 60) -> None:
     raise TimeoutError(f"Virtuoso did not become ready within {timeout}s")
 
 
+def _enable_virtuoso_rdf_freetext(container: str) -> None:
+    commands = (
+        "DB.DBA.RDF_OBJ_FT_RULE_ADD(null, null, 'All');"
+        "DB.DBA.VT_INC_INDEX_DB_DBA_RDF_OBJ();"
+        "checkpoint;"
+    )
+    subprocess.run(
+        ["docker", "exec", container, "isql", "1111", "dba", "dba", f"exec={commands}"],
+        check=True,
+        capture_output=True,
+    )
+
+
 @pytest.fixture(scope="session")
 def qlever_endpoint():
     subprocess.run(["docker", "rm", "-f", QLEVER_CONTAINER], capture_output=True)
@@ -96,6 +109,7 @@ def virtuoso_endpoint():
         capture_output=True,
     )
     _wait_for_virtuoso(VIRTUOSO_CONTAINER)
+    _enable_virtuoso_rdf_freetext(VIRTUOSO_CONTAINER)
     yield f"http://127.0.0.1:{VIRTUOSO_HTTP_PORT}/sparql"
     subprocess.run(["docker", "stop", VIRTUOSO_CONTAINER], capture_output=True)
     subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)
