@@ -10,14 +10,18 @@ from ramose import APIManager
 
 @pytest.fixture(scope="session")
 def api_manager(qlever_endpoint: str, virtuoso_endpoint: str) -> APIManager:
-    return create_api_manager("src/api/index_v1.hf", {
-        "#base https://api.opencitations.net/index": f"#base {qlever_endpoint}",
-        "#endpoint http://qlever-service.default.svc.cluster.local:7011": f"#endpoint {qlever_endpoint}",
-        "#addon indexapi_v1": "#addon ../src/api/indexapi_v1",
-    }, env_vars={
-        "SPARQL_ENDPOINT_INDEX": qlever_endpoint,
-        "SPARQL_ENDPOINT_META": virtuoso_endpoint,
-    })
+    return create_api_manager(
+        "src/api/index_v1.hf",
+        {
+            "#base https://api.opencitations.net/index": f"#base {qlever_endpoint}",
+            "#endpoint http://qlever-service.default.svc.cluster.local:7011": f"#endpoint {qlever_endpoint}",
+            "#addon indexapi_v1": "#addon ../src/api/indexapi_v1",
+        },
+        env_vars={
+            "SPARQL_ENDPOINT_INDEX": qlever_endpoint,
+            "SPARQL_ENDPOINT_META": virtuoso_endpoint,
+        },
+    )
 
 
 DOI_ERRORS_DOI = "10.1007/s11192-022-04367-w"
@@ -90,77 +94,115 @@ EXPECTED_ZENODO_DMP_CITATIONS = [
 
 
 def test_citation_by_oci(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, "/index/v1/citation/062104388184-062501777134"))
-    assert normalize_citations(result) == normalize_citations([EXPECTED_QSS_ARTICLE_CITATIONS[1]])
+    result = json.loads(
+        execute_operation(api_manager, "/index/v1/citation/062104388184-062501777134")
+    )
+    assert normalize_citations(result) == normalize_citations(
+        [EXPECTED_QSS_ARTICLE_CITATIONS[1]]
+    )
 
 
 def test_citations_by_doi(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, f"/index/v1/citations/{QSS_ARTICLE_DOI}"))
-    assert normalize_citations(result) == normalize_citations(EXPECTED_QSS_ARTICLE_CITATIONS)
+    result = json.loads(
+        execute_operation(api_manager, f"/index/v1/citations/{QSS_ARTICLE_DOI}")
+    )
+    assert normalize_citations(result) == normalize_citations(
+        EXPECTED_QSS_ARTICLE_CITATIONS
+    )
 
 
 def test_citations_negative_timespan(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, f"/index/v1/citations/{ZENODO_DMP_DOI}"))
-    assert normalize_citations(result) == normalize_citations(EXPECTED_ZENODO_DMP_CITATIONS)
+    result = json.loads(
+        execute_operation(api_manager, f"/index/v1/citations/{ZENODO_DMP_DOI}")
+    )
+    assert normalize_citations(result) == normalize_citations(
+        EXPECTED_ZENODO_DMP_CITATIONS
+    )
 
 
 def test_citations_no_incoming(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, "/index/v1/citations/10.5281/zenodo.4734512"))
+    result = json.loads(
+        execute_operation(api_manager, "/index/v1/citations/10.5281/zenodo.4734512")
+    )
     assert result == []
 
 
 def test_citation_count(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, f"/index/v1/citation-count/{QSS_ARTICLE_DOI}"))
+    result = json.loads(
+        execute_operation(api_manager, f"/index/v1/citation-count/{QSS_ARTICLE_DOI}")
+    )
     assert result == [{"count": "2"}]
 
 
 def test_citation_count_zenodo(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, f"/index/v1/citation-count/{ZENODO_DMP_DOI}"))
+    result = json.loads(
+        execute_operation(api_manager, f"/index/v1/citation-count/{ZENODO_DMP_DOI}")
+    )
     assert result == [{"count": "2"}]
 
 
 def test_citation_count_zero(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, f"/index/v1/citation-count/{DOI_ERRORS_DOI}"))
+    result = json.loads(
+        execute_operation(api_manager, f"/index/v1/citation-count/{DOI_ERRORS_DOI}")
+    )
     assert result == [{"count": "0"}]
 
 
 def test_citation_count_nonexistent(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, "/index/v1/citation-count/10.9999/nonexistent"))
+    result = json.loads(
+        execute_operation(api_manager, "/index/v1/citation-count/10.9999/nonexistent")
+    )
     assert result == [{"count": "0"}]
 
 
 def test_references(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, f"/index/v1/references/{DOI_ERRORS_DOI}"))
-    assert normalize_citations(result) == normalize_citations(EXPECTED_DOI_ERRORS_REFERENCES)
+    result = json.loads(
+        execute_operation(api_manager, f"/index/v1/references/{DOI_ERRORS_DOI}")
+    )
+    assert normalize_citations(result) == normalize_citations(
+        EXPECTED_DOI_ERRORS_REFERENCES
+    )
 
 
 def test_references_no_outgoing(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, "/index/v1/references/10.3233/sw-210434"))
+    result = json.loads(
+        execute_operation(api_manager, "/index/v1/references/10.3233/sw-210434")
+    )
     assert result == []
 
 
 def test_reference_count(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, f"/index/v1/reference-count/{DOI_ERRORS_DOI}"))
+    result = json.loads(
+        execute_operation(api_manager, f"/index/v1/reference-count/{DOI_ERRORS_DOI}")
+    )
     assert result == [{"count": "2"}]
 
 
 def test_reference_count_zero(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, "/index/v1/reference-count/10.3233/sw-210434"))
+    result = json.loads(
+        execute_operation(api_manager, "/index/v1/reference-count/10.3233/sw-210434")
+    )
     assert result == [{"count": "0"}]
 
 
 def test_citation_count_meta_sparql_failure(api_manager: APIManager) -> None:
-    with patch("indexapi_v1.post", side_effect=RequestException), \
-         patch("indexapi_common.post", side_effect=RequestException):
+    with (
+        patch("indexapi_v1.post", side_effect=RequestException),
+        patch("indexapi_common.post", side_effect=RequestException),
+    ):
         result = json.loads(
-            execute_operation(api_manager, f"/index/v1/citation-count/{QSS_ARTICLE_DOI}")
+            execute_operation(
+                api_manager, f"/index/v1/citation-count/{QSS_ARTICLE_DOI}"
+            )
         )
     assert result == [{"count": "0"}]
 
 
 def test_citations_meta_sparql_failure(api_manager: APIManager) -> None:
-    with patch("indexapi_v1.post", side_effect=RequestException), \
-         patch("indexapi_common.post", side_effect=RequestException):
+    with (
+        patch("indexapi_v1.post", side_effect=RequestException),
+        patch("indexapi_common.post", side_effect=RequestException),
+    ):
         result = json.loads(
             execute_operation(api_manager, f"/index/v1/citations/{QSS_ARTICLE_DOI}")
         )

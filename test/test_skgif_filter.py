@@ -1,11 +1,22 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import yaml
 
-from ramose import APIManager, HTMLDocumentationHandler, OpenAPIDocumentationHandler, Operation
+from ramose import (
+    APIManager,
+    HTMLDocumentationHandler,
+    OpenAPIDocumentationHandler,
+    Operation,
+)
 from ramose.hash_format import BUILTIN_PARAMS
+
+with (Path(__file__).parent / "data" / "expected_search_products.json").open(
+    encoding="utf8"
+) as _f:
+    EXPECTED_SEARCH: dict[str, list[dict]] = json.load(_f)
 
 
 def _exec(skgif_api_manager: APIManager, url: str) -> list[dict]:
@@ -40,219 +51,106 @@ class TestNoFilter:
 
 class TestTitleFilter:
     def test_title_search_matches_content(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=cf.search.title:adaptive")
-        assert results == [
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/0612058700",
-                "titles": {"none": ["Adaptive Environmental Management"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/0615065546",
-                "titles": {"none": ["Adaptive System: The Study Of Information, Pattern, And Behavior"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/0615066104",
-                "titles": {
-                    "none": [
-                        (
-                            "Boon Or Bust? Access To Electronic Publishing "
-                            "By Individuals Using Adaptive Computer Technology"
-                        ),
-                    ],
-                },
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-        ]
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/products?filter=cf.search.title:OpenCitations",
+        )
+        assert results == EXPECTED_SEARCH["cf.search.title:OpenCitations"]
 
     def test_title_search_no_match(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=cf.search.title:xyznonexistent999")
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/products?filter=cf.search.title:xyznonexistent999",
+        )
         assert results == []
 
 
 class TestIdentifierFilter:
     def test_filter_by_identifier_scheme(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=identifiers.scheme:isbn")
-        assert results == [
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/0612058700",
-                "titles": {"none": ["Adaptive Environmental Management"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/061702785338",
-                "titles": {"none": ["Advances In Intelligent Systems And Computing"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/06302611905",
-                "titles": {"none": ["Communications In Computer And Information Science"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/06402611083",
-                "titles": {"none": ["Lecture Notes In Computer Science"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/06603870331",
-                "titles": {"none": ["OECD Economic Surveys: China 2022"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/0611064823",
-                "titles": {"none": ["The Semantic Web"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/0611064985",
-                "titles": {"none": ["The Semantic Web"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/06401297735",
-                "titles": {"none": ["The Semantic Web"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/0612056541",
-                "titles": {"none": ["The Semantic Web: ESWC 2014 Satellite Events"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-        ]
+        results = _exec(
+            skgif_api_manager, "/skg-if/v1/products?filter=identifiers.scheme:isbn"
+        )
+        assert results == EXPECTED_SEARCH["identifiers.scheme:isbn"]
 
     def test_filter_by_identifier_value(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=identifiers.id:9781402096327")
-        assert results == [
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/0612058700",
-                "titles": {"none": ["Adaptive Environmental Management"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-        ]
+        results = _exec(
+            skgif_api_manager, "/skg-if/v1/products?filter=identifiers.id:9781402096327"
+        )
+        assert results == EXPECTED_SEARCH["identifiers.id:9781402096327"]
 
 
 class TestCombinedFilters:
     def test_title_and_scheme_combined(self, skgif_api_manager: APIManager) -> None:
         results = _exec(
             skgif_api_manager,
-            "/skg-if/v1/products?filter=cf.search.title:adaptive,identifiers.scheme:isbn",
+            "/skg-if/v1/products?filter=cf.search.title:OpenCitations,identifiers.scheme:doi",
         )
-        assert results == [
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/0612058700",
-                "titles": {"none": ["Adaptive Environmental Management"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-        ]
+        assert (
+            results
+            == EXPECTED_SEARCH["cf.search.title:OpenCitations,identifiers.scheme:doi"]
+        )
 
 
 class TestProductTypeFilter:
     def test_literature_returns_all(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=product_type:literature")
+        results = _exec(
+            skgif_api_manager, "/skg-if/v1/products?filter=product_type:literature"
+        )
         assert len(results) == 1098
 
     def test_research_data_returns_empty(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=product_type:research data")
+        results = _exec(
+            skgif_api_manager, "/skg-if/v1/products?filter=product_type:research data"
+        )
         assert results == []
 
-    def test_research_software_returns_empty(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=product_type:research software")
+    def test_research_software_returns_empty(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/products?filter=product_type:research software",
+        )
         assert results == []
 
     def test_other_returns_empty(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=product_type:other")
+        results = _exec(
+            skgif_api_manager, "/skg-if/v1/products?filter=product_type:other"
+        )
         assert results == []
 
     def test_invalid_type_returns_error(self, skgif_api_manager: APIManager) -> None:
-        status, result = _exec_raw(skgif_api_manager, "/skg-if/v1/products?filter=product_type:nonexistent")
+        status, result = _exec_raw(
+            skgif_api_manager, "/skg-if/v1/products?filter=product_type:nonexistent"
+        )
         assert status == 400
         assert "The product type 'nonexistent' is not valid" in result
 
 
 class TestContributorFamilyNameFilter:
     def test_family_name_match(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=contributions.by.family_name:Slotkin")
-        assert results == [
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/0601",
-                "titles": {
-                    "none": [
-                        "Response To The Letter Of Hanley Et Al. "
-                        "([1999] Teratology 59:323-324), Concerning The Article By Roy Et Al. "
-                        "([1998] Teratology 58:62-68)",
-                    ],
-                },
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-        ]
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/products?filter=contributions.by.family_name:Slotkin",
+        )
+        assert results == EXPECTED_SEARCH["contributions.by.family_name:Slotkin"]
 
 
 class TestContributorGivenNameFilter:
     def test_given_name_match(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=contributions.by.given_name:Theodore A.")
-        assert results == [
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/0601",
-                "titles": {
-                    "none": [
-                        "Response To The Letter Of Hanley Et Al. "
-                        "([1999] Teratology 59:323-324), Concerning The Article By Roy Et Al. "
-                        "([1998] Teratology 58:62-68)",
-                    ],
-                },
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-        ]
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/products?filter=contributions.by.given_name:Theodore A.",
+        )
+        assert results == EXPECTED_SEARCH["contributions.by.given_name:Theodore A."]
 
 
 class TestContributorNameFilter:
     def test_org_name_match(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=contributions.by.name:Zenodo")
-        assert results == [
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/060504627",
-                "titles": {"none": ["Classes Of Errors In DOI Names (Data Management Plan)"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/060504628",
-                "titles": {"none": ["Classes Of Errors In DOI Names (Data Management Plan)"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/060504675",
-                "titles": {
-                    "none": [
-                        (
-                            "Cleaning Different Types Of DOI Errors Found In Cited "
-                            "References On Crossref Using Automated Methods"
-                        ),
-                    ],
-                },
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-        ]
+        results = _exec(
+            skgif_api_manager, "/skg-if/v1/products?filter=contributions.by.name:Zenodo"
+        )
+        assert results == EXPECTED_SEARCH["contributions.by.name:Zenodo"]
 
 
 class TestContributorLocalIdentifierFilter:
@@ -261,25 +159,20 @@ class TestContributorLocalIdentifierFilter:
             skgif_api_manager,
             "/skg-if/v1/products?filter=contributions.by.local_identifier:https://w3id.org/oc/meta/ra/0601",
         )
-        assert results == [
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/0601",
-                "titles": {
-                    "none": [
-                        "Response To The Letter Of Hanley Et Al. "
-                        "([1999] Teratology 59:323-324), Concerning The Article By Roy Et Al. "
-                        "([1998] Teratology 58:62-68)",
-                    ],
-                },
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-        ]
+        assert (
+            results
+            == EXPECTED_SEARCH[
+                "contributions.by.local_identifier:https://w3id.org/oc/meta/ra/0601"
+            ]
+        )
 
 
 class TestContributorIdentifierSchemeFilter:
     def test_orcid_scheme_match(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=contributions.by.identifiers.scheme:orcid")
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/products?filter=contributions.by.identifiers.scheme:orcid",
+        )
         assert len(results) == 73
 
 
@@ -289,41 +182,23 @@ class TestContributionsOrcidFilter:
             skgif_api_manager,
             "/skg-if/v1/products?filter=cf.contributions_orcid:0000-0003-4747-4708",
         )
-        assert results == [
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/06035",
-                "titles": {
-                    "none": [
-                        "H-ras, But Not N-ras, Induces An Invasive Phenotype In Human Breast Epithelial Cells: "
-                        "A Role For MMP-2 In The H-Ras-Induced Invasive Phenotype",
-                    ],
-                },
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-        ]
+        assert results == EXPECTED_SEARCH["cf.contributions_orcid:0000-0003-4747-4708"]
 
 
 class TestCombinedContributorFilters:
-    def test_family_and_given_name_same_agent(self, skgif_api_manager: APIManager) -> None:
+    def test_family_and_given_name_same_agent(
+        self, skgif_api_manager: APIManager
+    ) -> None:
         results = _exec(
             skgif_api_manager,
             "/skg-if/v1/products?filter=contributions.by.family_name:Slotkin,contributions.by.given_name:Theodore A.",
         )
-        assert results == [
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/0601",
-                "titles": {
-                    "none": [
-                        "Response To The Letter Of Hanley Et Al. "
-                        "([1999] Teratology 59:323-324), Concerning The Article By Roy Et Al. "
-                        "([1998] Teratology 58:62-68)",
-                    ],
-                },
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-        ]
+        assert (
+            results
+            == EXPECTED_SEARCH[
+                "contributions.by.family_name:Slotkin,contributions.by.given_name:Theodore A."
+            ]
+        )
 
 
 class TestUnsupportedFilter:
@@ -354,28 +229,36 @@ class TestUnsupportedFilter:
         )
         assert result.startswith(expected_prefix)
 
-    def test_unsupported_affiliation_filter_returns_empty(self, skgif_api_manager: APIManager) -> None:
+    def test_unsupported_affiliation_filter_returns_empty(
+        self, skgif_api_manager: APIManager
+    ) -> None:
         results = _exec(
             skgif_api_manager,
             "/skg-if/v1/products?filter=contributions.declared_affiliations.name:MIT",
         )
         assert results == []
 
-    def test_unsupported_title_abstract_returns_empty(self, skgif_api_manager: APIManager) -> None:
+    def test_unsupported_title_abstract_returns_empty(
+        self, skgif_api_manager: APIManager
+    ) -> None:
         results = _exec(
             skgif_api_manager,
-            "/skg-if/v1/products?filter=cf.search.title_abstract:adaptive",
+            "/skg-if/v1/products?filter=cf.search.title_abstract:OpenCitations",
         )
         assert results == []
 
-    def test_unsupported_combined_with_supported_returns_empty(self, skgif_api_manager: APIManager) -> None:
+    def test_unsupported_combined_with_supported_returns_empty(
+        self, skgif_api_manager: APIManager
+    ) -> None:
         results = _exec(
             skgif_api_manager,
-            "/skg-if/v1/products?filter=cf.search.title:adaptive,cf.search.title_abstract:test",
+            "/skg-if/v1/products?filter=cf.search.title:OpenCitations,cf.search.title_abstract:test",
         )
         assert results == []
 
-    def test_unsupported_funding_filter_returns_empty(self, skgif_api_manager: APIManager) -> None:
+    def test_unsupported_funding_filter_returns_empty(
+        self, skgif_api_manager: APIManager
+    ) -> None:
         results = _exec(
             skgif_api_manager,
             "/skg-if/v1/products?filter=funding.local_identifier:some-grant",
@@ -385,28 +268,44 @@ class TestUnsupportedFilter:
 
 class TestCitesFilter:
     def test_cites_returns_citing_products(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=cf.cites:https://w3id.org/oc/meta/br/06035")
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/products?filter=cf.cites:https://w3id.org/oc/meta/br/06035",
+        )
         local_identifiers = [r["local_identifier"] for r in results]
         assert local_identifiers == ["https://w3id.org/oc/meta/br/0601"]
 
     def test_cites_no_match(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=cf.cites:https://w3id.org/oc/meta/br/9999999")
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/products?filter=cf.cites:https://w3id.org/oc/meta/br/9999999",
+        )
         assert results == []
 
 
 class TestCitedByFilter:
-    def test_cited_by_returns_cited_products(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=cf.cited_by:https://w3id.org/oc/meta/br/0601")
+    def test_cited_by_returns_cited_products(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/products?filter=cf.cited_by:https://w3id.org/oc/meta/br/0601",
+        )
         local_identifiers = [r["local_identifier"] for r in results]
         assert local_identifiers == ["https://w3id.org/oc/meta/br/06035"]
 
     def test_cited_by_no_match(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=cf.cited_by:https://w3id.org/oc/meta/br/9999999")
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/products?filter=cf.cited_by:https://w3id.org/oc/meta/br/9999999",
+        )
         assert results == []
 
 
 class TestCitesDoiFilter:
-    def test_cites_doi_resolves_and_returns(self, skgif_api_manager: APIManager) -> None:
+    def test_cites_doi_resolves_and_returns(
+        self, skgif_api_manager: APIManager
+    ) -> None:
         results = _exec(
             skgif_api_manager,
             "/skg-if/v1/products?filter=cf.cites_doi:10.1002/(sici)1097-0215(20000115)85:2<176::aid-ijc5>3.0.co;2-e",
@@ -415,12 +314,17 @@ class TestCitesDoiFilter:
         assert local_identifiers == ["https://w3id.org/oc/meta/br/0601"]
 
     def test_cites_doi_no_match(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=cf.cites_doi:10.9999/nonexistent")
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/products?filter=cf.cites_doi:10.9999/nonexistent",
+        )
         assert results == []
 
 
 class TestCitedByDoiFilter:
-    def test_cited_by_doi_resolves_and_returns(self, skgif_api_manager: APIManager) -> None:
+    def test_cited_by_doi_resolves_and_returns(
+        self, skgif_api_manager: APIManager
+    ) -> None:
         results = _exec(
             skgif_api_manager,
             "/skg-if/v1/products?filter=cf.cited_by_doi:10.1002/(sici)1096-9926(199910)60:4<177::aid-tera1>3.0.co;2-z",
@@ -429,7 +333,10 @@ class TestCitedByDoiFilter:
         assert local_identifiers == ["https://w3id.org/oc/meta/br/06035"]
 
     def test_cited_by_doi_no_match(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=cf.cited_by_doi:10.9999/nonexistent")
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/products?filter=cf.cited_by_doi:10.9999/nonexistent",
+        )
         assert results == []
 
 
@@ -451,35 +358,14 @@ class TestMixedCitationAndRegularFilter:
 
 
 class TestBuiltinFilterOverride:
-    def test_skgif_filter_overrides_builtin(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/products?filter=cf.search.title:adaptive")
-        assert results == [
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/0612058700",
-                "titles": {"none": ["Adaptive Environmental Management"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/0615065546",
-                "titles": {"none": ["Adaptive System: The Study Of Information, Pattern, And Behavior"]},
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-            {
-                "local_identifier": "https://w3id.org/oc/meta/br/0615066104",
-                "titles": {
-                    "none": [
-                        (
-                            "Boon Or Bust? Access To Electronic Publishing "
-                            "By Individuals Using Adaptive Computer Technology"
-                        ),
-                    ],
-                },
-                "entity_type": "product",
-                "product_type": "literature",
-            },
-        ]
+    def test_skgif_filter_overrides_builtin(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/products?filter=cf.search.title:OpenCitations",
+        )
+        assert results == EXPECTED_SEARCH["cf.search.title:OpenCitations"]
 
 
 class TestCustomParamsInDocumentation:
@@ -488,30 +374,42 @@ class TestCustomParamsInDocumentation:
         _, yml = handler.get_documentation()
         spec = yaml.safe_load(yml)
         products_op = spec["paths"]["/products"]["get"]
-        inline_params = [p for p in products_op["parameters"] if isinstance(p, dict) and "name" in p]
+        inline_params = [
+            p for p in products_op["parameters"] if isinstance(p, dict) and "name" in p
+        ]
         filter_param = next(p for p in inline_params if p["name"] == "filter")
         assert filter_param["in"] == "query"
         assert filter_param["required"] is False
         assert "cf.search.title" in filter_param["description"]
 
-    def test_builtin_params_absent_from_openapi(self, skgif_api_manager: APIManager) -> None:
+    def test_builtin_params_absent_from_openapi(
+        self, skgif_api_manager: APIManager
+    ) -> None:
         handler = OpenAPIDocumentationHandler(skgif_api_manager)
         _, yml = handler.get_documentation()
         spec = yaml.safe_load(yml)
         for path_ops in spec["paths"].values():
             for op in path_ops.values():
-                ref_names = {p["$ref"].rsplit("/", 1)[-1] for p in op["parameters"] if "$ref" in p}
+                ref_names = {
+                    p["$ref"].rsplit("/", 1)[-1]
+                    for p in op["parameters"]
+                    if "$ref" in p
+                }
                 for builtin in BUILTIN_PARAMS:
                     assert builtin not in ref_names
 
-    def test_builtin_params_absent_from_html(self, skgif_api_manager: APIManager) -> None:
+    def test_builtin_params_absent_from_html(
+        self, skgif_api_manager: APIManager
+    ) -> None:
         handler = HTMLDocumentationHandler(skgif_api_manager)
         _, html = handler.get_documentation()
         assert "require=" not in html
         assert "sort=" not in html
         assert 'id="parameters"' not in html
 
-    def test_result_fields_type_hidden_with_custom_default_format(self, skgif_api_manager: APIManager) -> None:
+    def test_result_fields_type_hidden_with_custom_default_format(
+        self, skgif_api_manager: APIManager
+    ) -> None:
         handler = HTMLDocumentationHandler(skgif_api_manager)
         _, html = handler.get_documentation()
         assert "Result fields type" not in html
@@ -524,13 +422,19 @@ class TestCustomParamsInDocumentation:
             assert f"/{entity}" in spec["paths"]
             assert f"/{entity}/{{local_identifier}}" in spec["paths"]
 
-    def test_mock_list_endpoints_have_filter_param(self, skgif_api_manager: APIManager) -> None:
+    def test_mock_list_endpoints_have_filter_param(
+        self, skgif_api_manager: APIManager
+    ) -> None:
         handler = OpenAPIDocumentationHandler(skgif_api_manager)
         _, yml = handler.get_documentation()
         spec = yaml.safe_load(yml)
         for entity in ["grants", "topics", "datasources"]:
             op_spec = spec["paths"][f"/{entity}"]["get"]
-            inline_params = [p for p in op_spec["parameters"] if isinstance(p, dict) and p.get("name") == "filter"]
+            inline_params = [
+                p
+                for p in op_spec["parameters"]
+                if isinstance(p, dict) and p.get("name") == "filter"
+            ]
             assert len(inline_params) == 1
 
 
@@ -539,12 +443,20 @@ class TestGrantsEndpoints:
         results = _exec(skgif_api_manager, "/skg-if/v1/grants")
         assert results == []
 
-    def test_list_with_filter_returns_empty(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/grants?filter=grant_number:12345")
+    def test_list_with_filter_returns_empty(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        results = _exec(
+            skgif_api_manager, "/skg-if/v1/grants?filter=grant_number:12345"
+        )
         assert results == []
 
-    def test_list_invalid_filter_returns_error(self, skgif_api_manager: APIManager) -> None:
-        status, _ = _exec_raw(skgif_api_manager, "/skg-if/v1/grants?filter=invalid_field:value")
+    def test_list_invalid_filter_returns_error(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        status, _ = _exec_raw(
+            skgif_api_manager, "/skg-if/v1/grants?filter=invalid_field:value"
+        )
         assert status == 400
 
     def test_single_returns_404(self, skgif_api_manager: APIManager) -> None:
@@ -557,12 +469,20 @@ class TestTopicsEndpoints:
         results = _exec(skgif_api_manager, "/skg-if/v1/topics")
         assert results == []
 
-    def test_list_with_filter_returns_empty(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/topics?filter=cf.search.labels:biology")
+    def test_list_with_filter_returns_empty(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        results = _exec(
+            skgif_api_manager, "/skg-if/v1/topics?filter=cf.search.labels:biology"
+        )
         assert results == []
 
-    def test_list_invalid_filter_returns_error(self, skgif_api_manager: APIManager) -> None:
-        status, _ = _exec_raw(skgif_api_manager, "/skg-if/v1/topics?filter=invalid_field:value")
+    def test_list_invalid_filter_returns_error(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        status, _ = _exec_raw(
+            skgif_api_manager, "/skg-if/v1/topics?filter=invalid_field:value"
+        )
         assert status == 400
 
     def test_single_returns_404(self, skgif_api_manager: APIManager) -> None:
@@ -575,12 +495,21 @@ class TestDatasourcesEndpoints:
         results = _exec(skgif_api_manager, "/skg-if/v1/datasources")
         assert results == []
 
-    def test_list_with_filter_returns_empty(self, skgif_api_manager: APIManager) -> None:
-        results = _exec(skgif_api_manager, "/skg-if/v1/datasources?filter=research_product_type:literature")
+    def test_list_with_filter_returns_empty(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/datasources?filter=research_product_type:literature",
+        )
         assert results == []
 
-    def test_list_invalid_filter_returns_error(self, skgif_api_manager: APIManager) -> None:
-        status, _ = _exec_raw(skgif_api_manager, "/skg-if/v1/datasources?filter=invalid_field:value")
+    def test_list_invalid_filter_returns_error(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        status, _ = _exec_raw(
+            skgif_api_manager, "/skg-if/v1/datasources?filter=invalid_field:value"
+        )
         assert status == 400
 
     def test_single_returns_404(self, skgif_api_manager: APIManager) -> None:
@@ -607,26 +536,29 @@ def _envelope(skgif_api_manager: APIManager, url: str) -> dict:
 
 class TestSkgifEnvelope:
     def test_envelope_without_pagination(self, skgif_api_manager: APIManager) -> None:
-        result = _envelope(skgif_api_manager, "/skg-if/v1/products?filter=cf.search.title:adaptive")
+        result = _envelope(
+            skgif_api_manager,
+            "/skg-if/v1/products?filter=cf.search.title:OpenCitations",
+        )
         assert result["@context"] == SKGIF_CONTEXT
         assert result["meta"] == {
-            "local_identifier": "/skg-if/v1/products?filter=cf.search.title%3Aadaptive&page=1&page_size=3",
+            "local_identifier": "/skg-if/v1/products?filter=cf.search.title%3AOpenCitations&page=1&page_size=7",
             "entity_type": "search_result_page",
             "part_of": {
-                "local_identifier": "/skg-if/v1/products?filter=cf.search.title%3Aadaptive",
+                "local_identifier": "/skg-if/v1/products?filter=cf.search.title%3AOpenCitations",
                 "entity_type": "search_result",
-                "total_items": 3,
+                "total_items": 7,
                 "first_page": {
-                    "local_identifier": "/skg-if/v1/products?filter=cf.search.title%3Aadaptive&page=1&page_size=3",
+                    "local_identifier": "/skg-if/v1/products?filter=cf.search.title%3AOpenCitations&page=1&page_size=7",
                     "entity_type": "search_result_page",
                 },
                 "last_page": {
-                    "local_identifier": "/skg-if/v1/products?filter=cf.search.title%3Aadaptive&page=1&page_size=3",
+                    "local_identifier": "/skg-if/v1/products?filter=cf.search.title%3AOpenCitations&page=1&page_size=7",
                     "entity_type": "search_result_page",
                 },
             },
         }
-        assert len(result["@graph"]) == 3
+        assert len(result["@graph"]) == 7
 
     def test_envelope_first_page(self, skgif_api_manager: APIManager) -> None:
         result = _envelope(skgif_api_manager, "/skg-if/v1/products?page_size=10")
@@ -657,39 +589,64 @@ class TestSkgifEnvelope:
         result = _envelope(skgif_api_manager, "/skg-if/v1/products?page=2&page_size=10")
         meta = result["meta"]
         assert meta["local_identifier"] == "/skg-if/v1/products?page=2&page_size=10"
-        assert meta["next_page"]["local_identifier"] == "/skg-if/v1/products?page=3&page_size=10"
-        assert meta["prev_page"]["local_identifier"] == "/skg-if/v1/products?page=1&page_size=10"
+        assert (
+            meta["next_page"]["local_identifier"]
+            == "/skg-if/v1/products?page=3&page_size=10"
+        )
+        assert (
+            meta["prev_page"]["local_identifier"]
+            == "/skg-if/v1/products?page=1&page_size=10"
+        )
         assert len(result["@graph"]) == 10
 
     def test_envelope_last_page(self, skgif_api_manager: APIManager) -> None:
         last_page = -(-TOTAL_PRODUCTS // 10)
-        result = _envelope(skgif_api_manager, f"/skg-if/v1/products?page={last_page}&page_size=10")
+        result = _envelope(
+            skgif_api_manager, f"/skg-if/v1/products?page={last_page}&page_size=10"
+        )
         meta = result["meta"]
         assert "next_page" not in meta
-        assert meta["prev_page"]["local_identifier"] == f"/skg-if/v1/products?page={last_page - 1}&page_size=10"
+        assert (
+            meta["prev_page"]["local_identifier"]
+            == f"/skg-if/v1/products?page={last_page - 1}&page_size=10"
+        )
         assert meta["part_of"]["total_items"] == TOTAL_PRODUCTS
 
-    def test_envelope_with_filter_and_pagination(self, skgif_api_manager: APIManager) -> None:
+    def test_envelope_with_filter_and_pagination(
+        self, skgif_api_manager: APIManager
+    ) -> None:
         result = _envelope(
             skgif_api_manager,
             "/skg-if/v1/products?filter=identifiers.scheme:isbn&page=1&page_size=5",
         )
         meta = result["meta"]
-        assert meta["local_identifier"] == "/skg-if/v1/products?filter=identifiers.scheme%3Aisbn&page=1&page_size=5"
-        assert meta["part_of"]["local_identifier"] == "/skg-if/v1/products?filter=identifiers.scheme%3Aisbn"
+        assert (
+            meta["local_identifier"]
+            == "/skg-if/v1/products?filter=identifiers.scheme%3Aisbn&page=1&page_size=5"
+        )
+        assert (
+            meta["part_of"]["local_identifier"]
+            == "/skg-if/v1/products?filter=identifiers.scheme%3Aisbn"
+        )
         assert len(result["@graph"]) == 5
 
-    def test_envelope_page_beyond_total_returns_400(self, skgif_api_manager: APIManager) -> None:
+    def test_envelope_page_beyond_total_returns_400(
+        self, skgif_api_manager: APIManager
+    ) -> None:
         op = skgif_api_manager.get_op("/skg-if/v1/products?page=9999&page_size=10")
         assert isinstance(op, Operation)
         status, _, ctype, _ = op.exec(method="get", content_type="application/json")
         assert status == 400
         assert ctype == "text/plain"
 
-    def test_single_product_with_pagination_counts_entities_not_rows(self, skgif_api_manager: APIManager) -> None:
+    def test_single_product_with_pagination_counts_entities_not_rows(
+        self, skgif_api_manager: APIManager
+    ) -> None:
         base_url = "/skg-if/v1/products/https://w3id.org/oc/meta/br/0612058700"
         without_pagination = _envelope(skgif_api_manager, base_url)
-        with_pagination = _envelope(skgif_api_manager, f"{base_url}?page_size=10&page=1")
+        with_pagination = _envelope(
+            skgif_api_manager, f"{base_url}?page_size=10&page=1"
+        )
         assert with_pagination["meta"]["part_of"]["total_items"] == 1
         assert "next_page" not in with_pagination["meta"]
         assert with_pagination["@graph"] == without_pagination["@graph"]

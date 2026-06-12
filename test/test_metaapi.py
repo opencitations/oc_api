@@ -9,23 +9,28 @@ from ramose import APIManager
 @pytest.fixture(scope="session")
 def api_manager(virtuoso_endpoint: str) -> APIManager:
     virtuoso_base = virtuoso_endpoint.rsplit("/", 1)[0]
-    return create_api_manager("src/api/meta_v1.hf", {
-        "#base https://api.opencitations.net/meta": f"#base {virtuoso_base}",
-        "#endpoint http://virtuoso-service.default.svc.cluster.local:8890/sparql": f"#endpoint {virtuoso_endpoint}",
-        "#addon metaapi": "#addon ../src/api/metaapi",
-    })
+    return create_api_manager(
+        "src/api/meta_v1.hf",
+        {
+            "#base https://api.opencitations.net/meta": f"#base {virtuoso_base}",
+            "#endpoint http://virtuoso-service.default.svc.cluster.local:8890/sparql": f"#endpoint {virtuoso_endpoint}",
+            "#addon metaapi": "#addon ../src/api/metaapi",
+        },
+    )
 
 
 def normalize_string(s: str) -> str:
-    return s.replace('\u2018', "'").replace('\u2019', "'").replace('\u201c', '"')
+    return s.replace("\u2018", "'").replace("\u2019", "'").replace("\u201c", '"')
 
 
 def normalize_result(results: list[dict[str, str]]) -> list[dict[str, str]]:
     normalized = [{k: normalize_string(v) for k, v in item.items()} for item in results]
-    return sorted(normalized, key=lambda x: x['id'])
+    return sorted(normalized, key=lambda x: x["id"])
 
 
-def assert_api_output(api_manager: APIManager, url: str, expected_output: list[dict[str, str]]) -> list[dict[str, str]]:
+def assert_api_output(
+    api_manager: APIManager, url: str, expected_output: list[dict[str, str]]
+) -> list[dict[str, str]]:
     output = execute_operation(api_manager, url)
     normalized_output = normalize_result(json.loads(output))
     normalized_expected = normalize_result(expected_output)
@@ -34,40 +39,48 @@ def assert_api_output(api_manager: APIManager, url: str, expected_output: list[d
 
 
 def test_metadata_retrieval(api_manager):
-    assert_api_output(api_manager, "/meta/v1/metadata/doi:10.1002/(sici)1096-9926(199910)60:4<177::aid-tera1>3.0.co;2-z", [
-        {
-            "id": "doi:10.1002/(sici)1096-9926(199910)60:4<177::aid-tera1>3.0.co;2-z omid:br/0601",
-            "title": "Response To The Letter Of Hanley Et Al. ([1999] Teratology 59:323-324), Concerning The Article By Roy Et Al. ([1998] Teratology 58:62-68)",
-            "author": "Slotkin, Theodore A. [omid:ra/0601]; Andrews, James E. [omid:ra/0602]",
-            "pub_date": "1999-10",
-            "issue": "4",
-            "volume": "60",
-            "venue": "Teratology [doi:10.1002/(issn)1096-9926 issn:0040-3709 issn:1096-9926 omid:br/06101018]",
-            "type": "journal article",
-            "page": "177-178",
-            "publisher": "Wiley [crossref:311 omid:ra/0610116001]",
-            "editor": ""
-        }
-    ])
+    assert_api_output(
+        api_manager,
+        "/meta/v1/metadata/doi:10.1002/(sici)1096-9926(199910)60:4<177::aid-tera1>3.0.co;2-z",
+        [
+            {
+                "id": "doi:10.1002/(sici)1096-9926(199910)60:4<177::aid-tera1>3.0.co;2-z omid:br/0601",
+                "title": "Response To The Letter Of Hanley Et Al. ([1999] Teratology 59:323-324), Concerning The Article By Roy Et Al. ([1998] Teratology 58:62-68)",
+                "author": "Slotkin, Theodore A. [omid:ra/0601]; Andrews, James E. [omid:ra/0602]",
+                "pub_date": "1999-10",
+                "issue": "4",
+                "volume": "60",
+                "venue": "Teratology [doi:10.1002/(issn)1096-9926 issn:0040-3709 issn:1096-9926 omid:br/06101018]",
+                "type": "journal article",
+                "page": "177-178",
+                "publisher": "Wiley [crossref:311 omid:ra/0610116001]",
+                "editor": "",
+            }
+        ],
+    )
 
 
 def test_metadata_retrieval_editor_inbook(api_manager):
     # https://github.com/opencitations/api/issues/16
-    assert_api_output(api_manager, "/meta/v1/metadata/omid:br/061702784433", [
-        {
-            "id": "doi:10.1007/978-3-642-30859-8_14 openalex:W1555136325 omid:br/061702784433",
-            "title": "Analysing Students' Use Of Recorded Lectures Through Methodological Triangulation",
-            "author": "Gorissen, Pierre [omid:ra/061707839728]; Van Bruggen, Jan [omid:ra/061707839729]; Jochems, Wim [omid:ra/061707839730]",
-            "pub_date": "2012",
-            "issue": "",
-            "volume": "",
-            "venue": "Advances In Intelligent Systems And Computing [doi:10.1007/978-3-642-30859-8 isbn:9783642308581 isbn:9783642308598 openalex:W2221102889 omid:br/061702785338]",
-            "type": "book chapter",
-            "page": "145-156",
-            "publisher": "Springer Science And Business Media Llc [crossref:297 omid:ra/0610116006]",
-            "editor": "Uden, Lorna [omid:ra/062409604521]; Corchado, Juan Manuel [orcid:0000-0002-2829-1829 omid:ra/0619011562087]; De Paz Santana, Juan F. [omid:ra/062409604522]; Prieta, Fernando De La [orcid:0000-0002-8239-5020 omid:ra/0611011366962]"
-        }
-    ])
+    assert_api_output(
+        api_manager,
+        "/meta/v1/metadata/omid:br/061702784433",
+        [
+            {
+                "id": "doi:10.1007/978-3-642-30859-8_14 openalex:W1555136325 omid:br/061702784433",
+                "title": "Analysing Students' Use Of Recorded Lectures Through Methodological Triangulation",
+                "author": "Gorissen, Pierre [omid:ra/061707839728]; Van Bruggen, Jan [omid:ra/061707839729]; Jochems, Wim [omid:ra/061707839730]",
+                "pub_date": "2012",
+                "issue": "",
+                "volume": "",
+                "venue": "Advances In Intelligent Systems And Computing [doi:10.1007/978-3-642-30859-8 isbn:9783642308581 isbn:9783642308598 openalex:W2221102889 omid:br/061702785338]",
+                "type": "book chapter",
+                "page": "145-156",
+                "publisher": "Springer Science And Business Media Llc [crossref:297 omid:ra/0610116006]",
+                "editor": "Uden, Lorna [omid:ra/062409604521]; Corchado, Juan Manuel [orcid:0000-0002-2829-1829 omid:ra/0619011562087]; De Paz Santana, Juan F. [omid:ra/062409604522]; Prieta, Fernando De La [orcid:0000-0002-8239-5020 omid:ra/0611011366962]",
+            }
+        ],
+    )
 
 
 EXPECTED_AUTHOR_WORKS = [
@@ -82,7 +95,7 @@ EXPECTED_AUTHOR_WORKS = [
         "type": "journal article",
         "page": "50-75",
         "publisher": "Mit Press [crossref:281 omid:ra/0610116105]",
-        "editor": ""
+        "editor": "",
     },
     {
         "id": "doi:10.5334/johd.178 omid:br/06404693975",
@@ -95,7 +108,7 @@ EXPECTED_AUTHOR_WORKS = [
         "type": "journal article",
         "page": "",
         "publisher": "Ubiquity Press, Ltd. [crossref:3285 omid:ra/0610116010]",
-        "editor": ""
+        "editor": "",
     },
     {
         "id": "doi:10.1007/s11192-022-04367-w openalex:W3214893238 omid:br/061202127149",
@@ -108,11 +121,11 @@ EXPECTED_AUTHOR_WORKS = [
         "type": "journal article",
         "page": "3593-3612",
         "publisher": "Springer Science And Business Media Llc [crossref:297 omid:ra/0610116006]",
-        "editor": ""
+        "editor": "",
     },
     {
         "id": "doi:10.32388/x2dx81 openalex:W3153150899 omid:br/062203845802",
-        "title": "Review Of: \"Investigating Invalid DOIs In COCI\"",
+        "title": 'Review Of: "Investigating Invalid DOIs In COCI"',
         "author": "Massari, Arcangelo [orcid:0000-0002-8420-0696 omid:ra/06250110138]",
         "pub_date": "2021-04-19",
         "issue": "",
@@ -121,7 +134,7 @@ EXPECTED_AUTHOR_WORKS = [
         "type": "journal article",
         "page": "",
         "publisher": "Qeios Ltd [crossref:17262 omid:ra/0640115413]",
-        "editor": ""
+        "editor": "",
     },
     {
         "id": "doi:10.5281/zenodo.4733919 omid:br/060504627",
@@ -134,7 +147,7 @@ EXPECTED_AUTHOR_WORKS = [
         "type": "",
         "page": "",
         "publisher": "Zenodo [omid:ra/0601747331]",
-        "editor": ""
+        "editor": "",
     },
     {
         "id": "doi:10.5281/zenodo.4733920 omid:br/060504628",
@@ -147,7 +160,7 @@ EXPECTED_AUTHOR_WORKS = [
         "type": "",
         "page": "",
         "publisher": "Zenodo [omid:ra/0601747332]",
-        "editor": ""
+        "editor": "",
     },
     {
         "id": "doi:10.5281/zenodo.4734512 omid:br/060504675",
@@ -160,8 +173,8 @@ EXPECTED_AUTHOR_WORKS = [
         "type": "report",
         "page": "",
         "publisher": "Zenodo [omid:ra/0601747492]",
-        "editor": ""
-    }
+        "editor": "",
+    },
 ]
 
 EXPECTED_EDITOR_WORKS = [
@@ -176,54 +189,72 @@ EXPECTED_EDITOR_WORKS = [
         "type": "book",
         "page": "",
         "publisher": "Springer Science And Business Media Llc [crossref:297 omid:ra/0610116006]",
-        "editor": "Allan, Catherine [orcid:0000-0003-2098-4759 omid:ra/069012996]; Stankey, George H. [omid:ra/061808486861]"
+        "editor": "Allan, Catherine [orcid:0000-0003-2098-4759 omid:ra/069012996]; Stankey, George H. [omid:ra/061808486861]",
     }
 ]
 
 
-@pytest.mark.parametrize("identifier", [
-    "orcid:0000-0002-8420-0696",
-    "omid:ra/06250110138",
-    "0000-0002-8420-0696",
-])
+@pytest.mark.parametrize(
+    "identifier",
+    [
+        "orcid:0000-0002-8420-0696",
+        "omid:ra/06250110138",
+        "0000-0002-8420-0696",
+    ],
+)
 def test_author_works_retrieval(api_manager, identifier):
-    assert_api_output(api_manager, f"/meta/v1/author/{identifier}", EXPECTED_AUTHOR_WORKS)
+    assert_api_output(
+        api_manager, f"/meta/v1/author/{identifier}", EXPECTED_AUTHOR_WORKS
+    )
 
 
-@pytest.mark.parametrize("identifier", [
-    "orcid:0000-0003-2098-4759",
-    "omid:ra/069012996",
-    "0000-0003-2098-4759",
-])
+@pytest.mark.parametrize(
+    "identifier",
+    [
+        "orcid:0000-0003-2098-4759",
+        "omid:ra/069012996",
+        "0000-0003-2098-4759",
+    ],
+)
 def test_editor_works_retrieval(api_manager, identifier):
-    assert_api_output(api_manager, f"/meta/v1/editor/{identifier}", EXPECTED_EDITOR_WORKS)
+    assert_api_output(
+        api_manager, f"/meta/v1/editor/{identifier}", EXPECTED_EDITOR_WORKS
+    )
 
 
 def test_venue_without_external_id(api_manager):
     # https://github.com/opencitations/api/issues/15
-    normalized_output = assert_api_output(api_manager, "/meta/v1/metadata/omid:br/061903571196", [
-        {
-            "id": "doi:10.36106/gjra/9300981 openalex:W4306682982 omid:br/061903571196",
-            "title": "Lung Cavitation: An Unwanted Complication Of Covid-19 Lung Disease",
-            "author": "A Dosi, Ravi [omid:ra/061909585847]; Shivhare, Shailendra [omid:ra/061909585848]; Agrawal, Ankur [omid:ra/061909585849]; Jaiswal, Neha [omid:ra/061909585850]; Patidar, Ravindra [omid:ra/061909585851]",
-            "pub_date": "2022-09-15",
-            "issue": "",
-            "volume": "",
-            "venue": "Global Journal For Research Analysis [omid:br/061903571793]",
-            "type": "journal article",
-            "page": "31-33",
-            "publisher": "World Wide Journals [crossref:21849 omid:ra/0640115418]",
-            "editor": ""
-        }
-    ])
+    normalized_output = assert_api_output(
+        api_manager,
+        "/meta/v1/metadata/omid:br/061903571196",
+        [
+            {
+                "id": "doi:10.36106/gjra/9300981 openalex:W4306682982 omid:br/061903571196",
+                "title": "Lung Cavitation: An Unwanted Complication Of Covid-19 Lung Disease",
+                "author": "A Dosi, Ravi [omid:ra/061909585847]; Shivhare, Shailendra [omid:ra/061909585848]; Agrawal, Ankur [omid:ra/061909585849]; Jaiswal, Neha [omid:ra/061909585850]; Patidar, Ravindra [omid:ra/061909585851]",
+                "pub_date": "2022-09-15",
+                "issue": "",
+                "volume": "",
+                "venue": "Global Journal For Research Analysis [omid:br/061903571793]",
+                "type": "journal article",
+                "page": "31-33",
+                "publisher": "World Wide Journals [crossref:21849 omid:ra/0640115418]",
+                "editor": "",
+            }
+        ],
+    )
     assert "omid:" in normalized_output[0]["venue"]
 
 
 def test_metadata_retrieval_with_different_ids(api_manager):
     # https://github.com/opencitations/api/issues/14
-    output_omid = execute_operation(api_manager, "/meta/v1/metadata/omid:br/06603870331")
+    output_omid = execute_operation(
+        api_manager, "/meta/v1/metadata/omid:br/06603870331"
+    )
     output_isbn = execute_operation(api_manager, "/meta/v1/metadata/isbn:9789264960114")
-    output_doi = execute_operation(api_manager, "/meta/v1/metadata/doi:10.1787/b0e499cf-en")
+    output_doi = execute_operation(
+        api_manager, "/meta/v1/metadata/doi:10.1787/b0e499cf-en"
+    )
 
     normalized_omid = normalize_result(json.loads(output_omid))
     normalized_isbn = normalize_result(json.loads(output_isbn))
@@ -234,24 +265,24 @@ def test_metadata_retrieval_with_different_ids(api_manager):
     assert len(normalized_doi) == 1
 
     expected_ids = [
-        'doi:10.1787/b0e499cf-en',
-        'isbn:9789264597587',
-        'isbn:9789264759596',
-        'isbn:9789264799318',
-        'isbn:9789264960114',
-        'openalex:W4221051054',
-        'omid:br/06603870331'
+        "doi:10.1787/b0e499cf-en",
+        "isbn:9789264597587",
+        "isbn:9789264759596",
+        "isbn:9789264799318",
+        "isbn:9789264960114",
+        "openalex:W4221051054",
+        "omid:br/06603870331",
     ]
 
-    omid_ids = normalized_omid[0]['id'].split()
+    omid_ids = normalized_omid[0]["id"].split()
     for expected_id in expected_ids:
         assert expected_id in omid_ids
 
-    isbn_ids = normalized_isbn[0]['id'].split()
+    isbn_ids = normalized_isbn[0]["id"].split()
     for expected_id in expected_ids:
         assert expected_id in isbn_ids
 
-    doi_ids = normalized_doi[0]['id'].split()
+    doi_ids = normalized_doi[0]["id"].split()
     for expected_id in expected_ids:
         assert expected_id in doi_ids
 
@@ -259,39 +290,60 @@ def test_metadata_retrieval_with_different_ids(api_manager):
     assert len(isbn_ids) == len(expected_ids)
     assert len(doi_ids) == len(expected_ids)
 
-    fields_to_check = ['title', 'author', 'pub_date', 'venue', 'publisher', 'type', 'issue', 'volume', 'page', 'editor']
+    fields_to_check = [
+        "title",
+        "author",
+        "pub_date",
+        "venue",
+        "publisher",
+        "type",
+        "issue",
+        "volume",
+        "page",
+        "editor",
+    ]
     for field in fields_to_check:
         assert normalized_omid[0][field] == normalized_isbn[0][field]
         assert normalized_omid[0][field] == normalized_doi[0][field]
 
-    assert normalized_omid[0]['title'] == "OECD Economic Surveys: China 2022"
-    assert normalized_omid[0]['author'] == "Oecd [omid:ra/066010636485]"
-    assert normalized_omid[0]['pub_date'] == "2022-03-18"
-    assert normalized_omid[0]['venue'] == "OECD Economic Surveys: China [issn:2072-5027 openalex:S4210223649 omid:br/061402215286]"
-    assert normalized_omid[0]['type'] == "book"
-    assert normalized_omid[0]['publisher'] == "Organisation For Economic Co-Operation And Development (Oecd) [crossref:1963 omid:ra/0610116167]"
+    assert normalized_omid[0]["title"] == "OECD Economic Surveys: China 2022"
+    assert normalized_omid[0]["author"] == "Oecd [omid:ra/066010636485]"
+    assert normalized_omid[0]["pub_date"] == "2022-03-18"
+    assert (
+        normalized_omid[0]["venue"]
+        == "OECD Economic Surveys: China [issn:2072-5027 openalex:S4210223649 omid:br/061402215286]"
+    )
+    assert normalized_omid[0]["type"] == "book"
+    assert (
+        normalized_omid[0]["publisher"]
+        == "Organisation For Economic Co-Operation And Development (Oecd) [crossref:1963 omid:ra/0610116167]"
+    )
 
 
 def test_author_order_in_metadata(api_manager):
     # https://github.com/opencitations/api/issues/13
-    normalized_output = assert_api_output(api_manager, "/meta/v1/metadata/omid:br/0680773548", [
-        {
-            "author": "Bilgin, H\u00fclya [orcid:0000-0001-6639-5533 omid:ra/0622032021]; Bozkurt, Merlin [omid:ra/06802276621]; Yilmazlar, Sel\u00e7uk [omid:ra/06802276622]; Korfali, G\u00fclsen [omid:ra/06802276623]",
-            "issue": "3",
-            "editor": "",
-            "pub_date": "2006-05",
-            "title": "Sudden Asystole Without Any Alerting Signs During Cerebellopontine Angle Surgery",
-            "volume": "18",
-            "page": "243-244",
-            "id": "doi:10.1016/j.jclinane.2005.12.014 openalex:W2127410217 pmid:16731339 omid:br/0680773548",
-            "publisher": "Elsevier Bv [crossref:78 omid:ra/0610116009]",
-            "type": "journal article",
-            "venue": "Journal Of Clinical Anesthesia [issn:0952-8180 openalex:S155967237 omid:br/0621013884]"
-        }
-    ])
-    assert normalized_output[0]['author'].split('; ') == [
+    normalized_output = assert_api_output(
+        api_manager,
+        "/meta/v1/metadata/omid:br/0680773548",
+        [
+            {
+                "author": "Bilgin, H\u00fclya [orcid:0000-0001-6639-5533 omid:ra/0622032021]; Bozkurt, Merlin [omid:ra/06802276621]; Yilmazlar, Sel\u00e7uk [omid:ra/06802276622]; Korfali, G\u00fclsen [omid:ra/06802276623]",
+                "issue": "3",
+                "editor": "",
+                "pub_date": "2006-05",
+                "title": "Sudden Asystole Without Any Alerting Signs During Cerebellopontine Angle Surgery",
+                "volume": "18",
+                "page": "243-244",
+                "id": "doi:10.1016/j.jclinane.2005.12.014 openalex:W2127410217 pmid:16731339 omid:br/0680773548",
+                "publisher": "Elsevier Bv [crossref:78 omid:ra/0610116009]",
+                "type": "journal article",
+                "venue": "Journal Of Clinical Anesthesia [issn:0952-8180 openalex:S155967237 omid:br/0621013884]",
+            }
+        ],
+    )
+    assert normalized_output[0]["author"].split("; ") == [
         "Bilgin, H\u00fclya [orcid:0000-0001-6639-5533 omid:ra/0622032021]",
         "Bozkurt, Merlin [omid:ra/06802276621]",
         "Yilmazlar, Sel\u00e7uk [omid:ra/06802276622]",
-        "Korfali, G\u00fclsen [omid:ra/06802276623]"
+        "Korfali, G\u00fclsen [omid:ra/06802276623]",
     ]

@@ -18,7 +18,7 @@ DOCKER_USER = f"{os.getuid()}:{os.getgid()}"
 # v7.2.16
 VIRTUOSO_IMAGE = "openlink/virtuoso-opensource-7@sha256:e7a5cd1915569d70d8363503dc62f6bf818b485f1501b230c7608cde8528c72d"
 VIRTUOSO_CONTAINER = "oc-api-test-virtuoso"
-VIRTUOSO_HTTP_PORT = 8891
+VIRTUOSO_HTTP_PORT = 8893
 VIRTUOSO_ISQL_PORT = 1112
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -44,7 +44,16 @@ def _wait_for_virtuoso(container: str, timeout: int = 60) -> None:
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         result = subprocess.run(
-            ["docker", "exec", container, "isql", "1111", "dba", "dba", "exec=SELECT 1;"],
+            [
+                "docker",
+                "exec",
+                container,
+                "isql",
+                "1111",
+                "dba",
+                "dba",
+                "exec=SELECT 1;",
+            ],
             capture_output=True,
         )
         if result.returncode == 0:
@@ -71,13 +80,21 @@ def qlever_endpoint():
     subprocess.run(["docker", "rm", "-f", QLEVER_CONTAINER], capture_output=True)
     subprocess.run(
         [
-            "docker", "run", "-d",
-            "--name", QLEVER_CONTAINER,
-            "--entrypoint", "bash",
-            "-u", DOCKER_USER,
-            "-v", f"{QLEVER_DATA_DIR}:/index:ro",
-            "-w", "/index",
-            "-p", f"{QLEVER_PORT}:{QLEVER_PORT}",
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            QLEVER_CONTAINER,
+            "--entrypoint",
+            "bash",
+            "-u",
+            DOCKER_USER,
+            "-v",
+            f"{QLEVER_DATA_DIR}:/index:ro",
+            "-w",
+            "/index",
+            "-p",
+            f"{QLEVER_PORT}:{QLEVER_PORT}",
             "--init",
             QLEVER_IMAGE,
             "-c",
@@ -97,12 +114,19 @@ def virtuoso_endpoint():
     subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)
     subprocess.run(
         [
-            "docker", "run", "-d",
-            "--name", VIRTUOSO_CONTAINER,
-            "-p", f"{VIRTUOSO_HTTP_PORT}:8890",
-            "-p", f"{VIRTUOSO_ISQL_PORT}:1111",
-            "-e", "DBA_PASSWORD=dba",
-            "-v", f"{VIRTUOSO_DB_DIR}:/opt/virtuoso-opensource/database",
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            VIRTUOSO_CONTAINER,
+            "-p",
+            f"{VIRTUOSO_HTTP_PORT}:8890",
+            "-p",
+            f"{VIRTUOSO_ISQL_PORT}:1111",
+            "-e",
+            "DBA_PASSWORD=dba",
+            "-v",
+            f"{VIRTUOSO_DB_DIR}:/opt/virtuoso-opensource/database",
             VIRTUOSO_IMAGE,
         ],
         check=True,
@@ -127,7 +151,10 @@ def skgif_api_manager(virtuoso_endpoint, qlever_endpoint):
 
 
 def normalize_citation(citation: dict[str, str]) -> dict[str, str]:
-    return {k: " ".join(sorted(v.split())) if k in ("citing", "cited") else v for k, v in citation.items()}
+    return {
+        k: " ".join(sorted(v.split())) if k in ("citing", "cited") else v
+        for k, v in citation.items()
+    }
 
 
 def normalize_citations(citations: list[dict[str, str]]) -> list[dict[str, str]]:

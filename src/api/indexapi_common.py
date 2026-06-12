@@ -10,20 +10,25 @@ with open("conf.json") as f:
 
 env_config = {
     "base_url": os.getenv("BASE_URL", c["base_url"]),
-    "sparql_endpoint_index": os.getenv("SPARQL_ENDPOINT_INDEX", c["sparql_endpoint_index"]),
-    "sparql_endpoint_meta": os.getenv("SPARQL_ENDPOINT_META", c["sparql_endpoint_meta"]),
-    "sync_enabled": os.getenv("SYNC_ENABLED", "false").lower() == "true"
+    "sparql_endpoint_index": os.getenv(
+        "SPARQL_ENDPOINT_INDEX", c["sparql_endpoint_index"]
+    ),
+    "sparql_endpoint_meta": os.getenv(
+        "SPARQL_ENDPOINT_META", c["sparql_endpoint_meta"]
+    ),
+    "sync_enabled": os.getenv("SYNC_ENABLED", "false").lower() == "true",
 }
 
 
 def lower(s):
-    return s.lower(),
+    return (s.lower(),)
 
 
 def br_meta_metadata(values):
     sparql_endpoint = env_config["sparql_endpoint_meta"]
 
-    sparql_query = """
+    sparql_query = (
+        """
     PREFIX pro: <http://purl.org/spar/pro/>
     PREFIX frbr: <http://purl.org/vocab/frbr/core#>
     PREFIX fabio: <http://purl.org/spar/fabio/>
@@ -32,7 +37,9 @@ def br_meta_metadata(values):
     PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
     SELECT DISTINCT ?val ?pubDate (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=' __ ') AS ?ids) (GROUP_CONCAT(?venue; separator="; ") as ?source) (GROUP_CONCAT(?raAuthor; separator="; ") as ?author)
     WHERE {
-    	  VALUES ?val { """ + " ".join(values) + """ }
+          VALUES ?val { """
+        + " ".join(values)
+        + """ }
           OPTIONAL { ?val prism:publicationDate ?pubDate. }
           OPTIONAL {
               ?val datacite:hasIdentifier ?identifier.
@@ -55,8 +62,12 @@ def br_meta_metadata(values):
           }
      } GROUP BY ?val ?pubDate
     """
+    )
 
-    headers = {"Accept": "application/sparql-results+json", "Content-Type": "application/sparql-query"}
+    headers = {
+        "Accept": "application/sparql-results+json",
+        "Content-Type": "application/sparql-query",
+    }
 
     try:
         response = post(sparql_endpoint, headers=headers, data=sparql_query)
@@ -72,12 +83,15 @@ def br_meta_metadata(values):
 def br_meta_anyids(values):
     sparql_endpoint = env_config["sparql_endpoint_meta"]
 
-    sparql_query = """
+    sparql_query = (
+        """
     PREFIX datacite: <http://purl.org/spar/datacite/>
     PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
     SELECT DISTINCT ?val (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=' __ ') AS ?ids)
     WHERE {
-          VALUES ?val { """ + " ".join(values) + """ }
+          VALUES ?val { """
+        + " ".join(values)
+        + """ }
           OPTIONAL {
               ?val datacite:hasIdentifier ?identifier.
               ?identifier datacite:usesIdentifierScheme ?scheme;
@@ -86,8 +100,12 @@ def br_meta_anyids(values):
           }
      } GROUP BY ?val
     """
+    )
 
-    headers = {"Accept": "application/sparql-results+json", "Content-Type": "application/sparql-query"}
+    headers = {
+        "Accept": "application/sparql-results+json",
+        "Content-Type": "application/sparql-query",
+    }
 
     try:
         response = post(sparql_endpoint, headers=headers, data=sparql_query)
@@ -109,7 +127,7 @@ def get_unique_brs_metadata(l_url_brs, ids_only=False):
     chunk_size = 3000
     brs_meta: dict[str, dict[str, dict[str, str]]] = {}
     while i < len(l_brs):
-        chunk = l_brs[i:i + chunk_size]
+        chunk = l_brs[i : i + chunk_size]
         m_br = fetch(chunk)
         brs_meta.update(m_br[0])
         if i == 0:
@@ -175,14 +193,24 @@ def cit_duration(citing_complete_pub_date, cited_complete_pub_date):
     def _contains_days(date):
         return date is not None and len(date) >= 10
 
-    consider_years = _contains_years(citing_complete_pub_date) and _contains_years(cited_complete_pub_date)
-    consider_months = _contains_months(citing_complete_pub_date) and _contains_months(cited_complete_pub_date)
-    consider_days = _contains_days(citing_complete_pub_date) and _contains_days(cited_complete_pub_date)
+    consider_years = _contains_years(citing_complete_pub_date) and _contains_years(
+        cited_complete_pub_date
+    )
+    consider_months = _contains_months(citing_complete_pub_date) and _contains_months(
+        cited_complete_pub_date
+    )
+    consider_days = _contains_days(citing_complete_pub_date) and _contains_days(
+        cited_complete_pub_date
+    )
 
     if not consider_years:
         return ""
-    citing_pub_datetime = datetime.strptime((citing_complete_pub_date + "-01-01")[:10], "%Y-%m-%d")
-    cited_pub_datetime = datetime.strptime((cited_complete_pub_date + "-01-01")[:10], "%Y-%m-%d")
+    citing_pub_datetime = datetime.strptime(
+        (citing_complete_pub_date + "-01-01")[:10], "%Y-%m-%d"
+    )
+    cited_pub_datetime = datetime.strptime(
+        (cited_complete_pub_date + "-01-01")[:10], "%Y-%m-%d"
+    )
 
     delta = relativedelta(citing_pub_datetime, cited_pub_datetime)
 
@@ -190,12 +218,7 @@ def cit_duration(citing_complete_pub_date, cited_complete_pub_date):
     if (
         delta.years < 0
         or (delta.years == 0 and delta.months < 0 and consider_months)
-        or (
-            delta.years == 0
-            and delta.months == 0
-            and delta.days < 0
-            and consider_days
-        )
+        or (delta.years == 0 and delta.months == 0 and delta.days < 0 and consider_days)
     ):
         result += "-"
     result += "P%sY" % abs(delta.years)
