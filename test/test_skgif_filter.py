@@ -542,18 +542,18 @@ class TestSkgifEnvelope:
         )
         assert result["@context"] == SKGIF_CONTEXT
         assert result["meta"] == {
-            "local_identifier": "/skg-if/v1/products?filter=cf.search.title%3AOpenCitations&page=1&page_size=7",
+            "local_identifier": "/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=1&page_size=7",
             "entity_type": "search_result_page",
             "part_of": {
-                "local_identifier": "/skg-if/v1/products?filter=cf.search.title%3AOpenCitations",
+                "local_identifier": "/skg-if/v1/products?filter=cf.search.title:OpenCitations",
                 "entity_type": "search_result",
                 "total_items": 7,
                 "first_page": {
-                    "local_identifier": "/skg-if/v1/products?filter=cf.search.title%3AOpenCitations&page=1&page_size=7",
+                    "local_identifier": "/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=1&page_size=7",
                     "entity_type": "search_result_page",
                 },
                 "last_page": {
-                    "local_identifier": "/skg-if/v1/products?filter=cf.search.title%3AOpenCitations&page=1&page_size=7",
+                    "local_identifier": "/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=1&page_size=7",
                     "entity_type": "search_result_page",
                 },
             },
@@ -622,11 +622,11 @@ class TestSkgifEnvelope:
         meta = result["meta"]
         assert (
             meta["local_identifier"]
-            == "/skg-if/v1/products?filter=identifiers.scheme%3Aisbn&page=1&page_size=5"
+            == "/skg-if/v1/products?filter=identifiers.scheme:isbn&page=1&page_size=5"
         )
         assert (
             meta["part_of"]["local_identifier"]
-            == "/skg-if/v1/products?filter=identifiers.scheme%3Aisbn"
+            == "/skg-if/v1/products?filter=identifiers.scheme:isbn"
         )
         assert len(result["@graph"]) == 5
 
