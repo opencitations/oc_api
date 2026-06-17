@@ -20,18 +20,25 @@ with (Path(__file__).parent / "data" / "expected_search_products.json").open(
 
 
 def _exec(skgif_api_manager: APIManager, url: str) -> list[dict]:
-    op = skgif_api_manager.get_op(url)
-    if isinstance(op, tuple):
-        msg = f"Operation not found: {url}"
-        raise TypeError(msg)
-    status, result, _, _ = op.exec(method="get", content_type="application/json")
-    if status != 200:
-        msg = f"API returned status {status}: {result}"
-        raise RuntimeError(msg)
-    parsed = json.loads(result)
-    if isinstance(parsed, dict) and "@graph" in parsed:
-        return list(parsed["@graph"])
-    return list(parsed)
+    sep = "&" if "?" in url else "?"
+    collected: list[dict] = []
+    page = 1
+    while True:
+        op = skgif_api_manager.get_op(f"{url}{sep}page={page}&page_size=100")
+        if isinstance(op, tuple):
+            msg = f"Operation not found: {url}"
+            raise TypeError(msg)
+        status, result, _, _ = op.exec(method="get", content_type="application/json")
+        if status != 200:
+            msg = f"API returned status {status}: {result}"
+            raise RuntimeError(msg)
+        parsed = json.loads(result)
+        if not (isinstance(parsed, dict) and "@graph" in parsed):
+            return list(parsed)
+        collected.extend(parsed["@graph"])
+        if "next_page" not in parsed["meta"]:
+            return collected
+        page += 1
 
 
 def _exec_raw(skgif_api_manager: APIManager, url: str) -> tuple[int, str]:
@@ -46,10 +53,26 @@ def _exec_raw(skgif_api_manager: APIManager, url: str) -> tuple[int, str]:
 class TestNoFilter:
     def test_returns_all_products(self, skgif_api_manager: APIManager) -> None:
         results = _exec(skgif_api_manager, "/skg-if/v1/products")
-        assert len(results) == 1098
+        assert len(results) == 1349
 
 
 class TestTitleFilter:
+    def test_title_search_uses_virtuoso_text_index(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        op = skgif_api_manager.get_op(
+            "/skg-if/v1/products?filter=cf.search.title:Covid-19"
+        )
+        assert isinstance(op, Operation)
+        params = op._prepare_params()
+        filter_param = params["filter"]
+        assert isinstance(filter_param, str)
+        assert (
+            filter_param
+            == "?local_identifier dcterm:title ?title .\n?title bif:contains \"'Covid-19'\" ."
+        )
+        assert "CONTAINS" not in filter_param
+
     def test_title_search_matches_content(self, skgif_api_manager: APIManager) -> None:
         results = _exec(
             skgif_api_manager,
@@ -96,7 +119,7 @@ class TestProductTypeFilter:
         results = _exec(
             skgif_api_manager, "/skg-if/v1/products?filter=product_type:literature"
         )
-        assert len(results) == 1098
+        assert len(results) == 1349
 
     def test_research_data_returns_empty(self, skgif_api_manager: APIManager) -> None:
         results = _exec(
@@ -124,7 +147,9 @@ class TestProductTypeFilter:
             skgif_api_manager, "/skg-if/v1/products?filter=product_type:nonexistent"
         )
         assert status == 400
-        assert "The product type 'nonexistent' is not valid" in result
+        assert (
+            "The value 'nonexistent' is not valid for filter 'product_type'" in result
+        )
 
 
 class TestContributorFamilyNameFilter:
@@ -210,8 +235,8 @@ class TestUnsupportedFilter:
         assert status == 400
         expected_prefix = (
             "HTTP status code 400: parameter in the request not compliant with the type specified - ValueError: "
-            "The filter unsupported_field is not supported, "
-            "valid filters are "
+            "The filter 'unsupported_field' is not configured, "
+            "configured filters are "
             "cf.cited_by, cf.cited_by_doi, cf.cites, cf.cites_doi, "
             "cf.contributions_aff_country, cf.contributions_aff_ror, cf.contributions_orcid, "
             "cf.search.title, cf.search.title_abstract, "
@@ -523,7 +548,7 @@ SKGIF_CONTEXT = [
     {"@base": "https://w3id.org/skg-if/sandbox/"},
 ]
 
-TOTAL_PRODUCTS = 1098
+TOTAL_PRODUCTS = 1349
 
 
 def _envelope(skgif_api_manager: APIManager, url: str) -> dict:
@@ -542,18 +567,18 @@ class TestSkgifEnvelope:
         )
         assert result["@context"] == SKGIF_CONTEXT
         assert result["meta"] == {
-            "local_identifier": "/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=1&page_size=7",
+            "local_identifier": "/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=1&page_size=10",
             "entity_type": "search_result_page",
             "part_of": {
                 "local_identifier": "/skg-if/v1/products?filter=cf.search.title:OpenCitations",
                 "entity_type": "search_result",
                 "total_items": 7,
                 "first_page": {
-                    "local_identifier": "/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=1&page_size=7",
+                    "local_identifier": "/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=1&page_size=10",
                     "entity_type": "search_result_page",
                 },
                 "last_page": {
-                    "local_identifier": "/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=1&page_size=7",
+                    "local_identifier": "/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=1&page_size=10",
                     "entity_type": "search_result_page",
                 },
             },
@@ -655,3 +680,92 @@ class TestSkgifEnvelope:
     def test_envelope_context_structure(self, skgif_api_manager: APIManager) -> None:
         result = _envelope(skgif_api_manager, "/skg-if/v1/products?page_size=5")
         assert result["@context"] == SKGIF_CONTEXT
+
+    def test_default_page_size_applied(self, skgif_api_manager: APIManager) -> None:
+        result = _envelope(skgif_api_manager, "/skg-if/v1/products")
+        assert len(result["@graph"]) == 10
+        assert result["meta"] == {
+            "local_identifier": "/skg-if/v1/products?page=1&page_size=10",
+            "entity_type": "search_result_page",
+            "next_page": {
+                "local_identifier": "/skg-if/v1/products?page=2&page_size=10",
+                "entity_type": "search_result_page",
+            },
+            "part_of": {
+                "local_identifier": "/skg-if/v1/products",
+                "entity_type": "search_result",
+                "total_items": TOTAL_PRODUCTS,
+                "first_page": {
+                    "local_identifier": "/skg-if/v1/products?page=1&page_size=10",
+                    "entity_type": "search_result_page",
+                },
+                "last_page": {
+                    "local_identifier": f"/skg-if/v1/products?page={-(-TOTAL_PRODUCTS // 10)}&page_size=10",
+                    "entity_type": "search_result_page",
+                },
+            },
+        }
+
+    def test_sparql_pagination_is_stable_and_disjoint(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        page1 = _envelope(skgif_api_manager, "/skg-if/v1/products?page=1&page_size=5")
+        page2 = _envelope(skgif_api_manager, "/skg-if/v1/products?page=2&page_size=5")
+        first_ten = _envelope(
+            skgif_api_manager, "/skg-if/v1/products?page=1&page_size=10"
+        )
+        ids1 = [entity["local_identifier"] for entity in page1["@graph"]]
+        ids2 = [entity["local_identifier"] for entity in page2["@graph"]]
+        ids_ref = [entity["local_identifier"] for entity in first_ten["@graph"]]
+        assert ids1 + ids2 == ids_ref
+        assert sorted(set(ids1) & set(ids2)) == []
+
+    def test_total_items_reflects_full_match_count_not_page(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        result = _envelope(
+            skgif_api_manager,
+            "/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=2&page_size=3",
+        )
+        assert len(result["@graph"]) == 3
+        meta = result["meta"]
+        assert meta["part_of"]["total_items"] == 7
+        prev_id = "/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=1&page_size=3"
+        next_id = "/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=3&page_size=3"
+        assert meta["prev_page"]["local_identifier"] == prev_id
+        assert meta["next_page"]["local_identifier"] == next_id
+
+    def test_explicit_page_size_capped_at_max(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        result = _envelope(skgif_api_manager, "/skg-if/v1/products?page_size=100000")
+        assert len(result["@graph"]) == 100
+        meta = result["meta"]
+        assert meta["local_identifier"] == "/skg-if/v1/products?page=1&page_size=100"
+        assert meta["part_of"]["total_items"] == TOTAL_PRODUCTS
+
+    def test_empty_result_set_is_paginated_with_zero_total(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        result = _envelope(
+            skgif_api_manager,
+            "/skg-if/v1/products?filter=cf.search.title:xyznonexistent999",
+        )
+        assert result["@graph"] == []
+        assert result["meta"] == {
+            "local_identifier": "/skg-if/v1/products?filter=cf.search.title:xyznonexistent999&page=1&page_size=10",
+            "entity_type": "search_result_page",
+            "part_of": {
+                "local_identifier": "/skg-if/v1/products?filter=cf.search.title:xyznonexistent999",
+                "entity_type": "search_result",
+                "total_items": 0,
+                "first_page": {
+                    "local_identifier": "/skg-if/v1/products?filter=cf.search.title:xyznonexistent999&page=1&page_size=10",
+                    "entity_type": "search_result_page",
+                },
+                "last_page": {
+                    "local_identifier": "/skg-if/v1/products?filter=cf.search.title:xyznonexistent999&page=1&page_size=10",
+                    "entity_type": "search_result_page",
+                },
+            },
+        }
