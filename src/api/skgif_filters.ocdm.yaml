@@ -3,7 +3,13 @@
 # SPDX-License-Identifier: CC0-1.0
 
 identifiers.id:
-  filter: '?local_identifier datacite:hasIdentifier [ literal:hasLiteralValue "{{value}}"^^<http://www.w3.org/2001/XMLSchema#string> ] .'
+  filter: |-
+    ?local_identifier datacite:hasIdentifier ?_filter_identifier .
+    {
+      ?_filter_identifier literal:hasLiteralValue "{{value}}" .
+    } UNION {
+      ?_filter_identifier literal:hasLiteralValue "{{value}}"^^<http://www.w3.org/2001/XMLSchema#string> .
+    }
 identifiers.scheme:
   filter: "?local_identifier datacite:hasIdentifier [ datacite:usesIdentifierScheme datacite:{{value}} ] ."
 contributions.by.local_identifier:
@@ -27,7 +33,12 @@ contributions.by.name:
 contributions.by.identifiers.id:
   filter: |-
     ?local_identifier pro:isDocumentContextFor [ pro:isHeldBy ?_filter_agent ] .
-    ?_filter_agent datacite:hasIdentifier [ literal:hasLiteralValue "{{value}}"^^<http://www.w3.org/2001/XMLSchema#string> ] .
+    ?_filter_agent datacite:hasIdentifier ?_filter_agent_identifier .
+    {
+      ?_filter_agent_identifier literal:hasLiteralValue "{{value}}" .
+    } UNION {
+      ?_filter_agent_identifier literal:hasLiteralValue "{{value}}"^^<http://www.w3.org/2001/XMLSchema#string> .
+    }
 contributions.by.identifiers.scheme:
   filter: |-
     ?local_identifier pro:isDocumentContextFor [ pro:isHeldBy ?_filter_agent ] .
@@ -35,7 +46,13 @@ contributions.by.identifiers.scheme:
 cf.contributions_orcid:
   filter: |-
     ?local_identifier pro:isDocumentContextFor [ pro:isHeldBy ?_filter_agent ] .
-    ?_filter_agent datacite:hasIdentifier [ literal:hasLiteralValue "{{value}}"^^<http://www.w3.org/2001/XMLSchema#string> ; datacite:usesIdentifierScheme datacite:orcid ] .
+    ?_filter_agent datacite:hasIdentifier ?_filter_agent_identifier .
+    ?_filter_agent_identifier datacite:usesIdentifierScheme datacite:orcid .
+    {
+      ?_filter_agent_identifier literal:hasLiteralValue "{{value}}" .
+    } UNION {
+      ?_filter_agent_identifier literal:hasLiteralValue "{{value}}"^^<http://www.w3.org/2001/XMLSchema#string> .
+    }
 product_type:
   filter:
     literature: |-
@@ -71,9 +88,14 @@ cf.cites_doi:
   filter_preamble: |-
     PREFIX datacite: <http://purl.org/spar/datacite/>
     PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
-    SELECT ?_target WHERE {
+    SELECT DISTINCT ?_target WHERE {
       ?_target datacite:hasIdentifier ?_id_node .
-      ?_id_node datacite:usesIdentifierScheme datacite:doi ; literal:hasLiteralValue "{{value}}"^^<http://www.w3.org/2001/XMLSchema#string> .
+      ?_id_node datacite:usesIdentifierScheme datacite:doi .
+      {
+        ?_id_node literal:hasLiteralValue "{{value}}" .
+      } UNION {
+        ?_id_node literal:hasLiteralValue "{{value}}"^^<http://www.w3.org/2001/XMLSchema#string> .
+      }
     }
     @@values ?_target
     @@join ?_target ?_target type=inner
@@ -89,9 +111,14 @@ cf.cited_by_doi:
   filter_preamble: |-
     PREFIX datacite: <http://purl.org/spar/datacite/>
     PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
-    SELECT ?_target WHERE {
+    SELECT DISTINCT ?_target WHERE {
       ?_target datacite:hasIdentifier ?_id_node .
-      ?_id_node datacite:usesIdentifierScheme datacite:doi ; literal:hasLiteralValue "{{value}}"^^<http://www.w3.org/2001/XMLSchema#string> .
+      ?_id_node datacite:usesIdentifierScheme datacite:doi .
+      {
+        ?_id_node literal:hasLiteralValue "{{value}}" .
+      } UNION {
+        ?_id_node literal:hasLiteralValue "{{value}}"^^<http://www.w3.org/2001/XMLSchema#string> .
+      }
     }
     @@values ?_target
     @@join ?_target ?_target type=inner
