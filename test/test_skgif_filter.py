@@ -547,7 +547,7 @@ SKGIF_CONTEXT = [
     "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
     {"@base": "https://w3id.org/skg-if/sandbox/"},
 ]
-SKGIF_PUBLIC_BASE_URL = "https://stg-api.opencitations.net"
+SKGIF_PUBLIC_BASE_URL = "https://api-stg.opencitations.net"
 
 TOTAL_PRODUCTS = 1349
 
