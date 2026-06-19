@@ -1463,7 +1463,7 @@ WHERE {
 #type operation
 #method get
 #description Coming soon. Returns a single person when implemented; this placeholder currently returns 404.
-#call /persons/example-person-id
+#call /persons/https://w3id.org/oc/meta/ra/0621012370564
 #format skgif,to_skg_if,application/ld+json
 #default_format skgif
 #output_json HTTP status code 404: entity not found
@@ -1494,7 +1494,7 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
 - `cf.search.given_name`
 - `cf.search.name`
 
-#call /persons?filter=cf.search.name:Carberry
+#call /persons?filter=cf.search.given_name:Silvio,cf.search.family_name:Peroni
 #format skgif,to_skg_if,application/ld+json
 #default_format skgif
 #output_json {
@@ -1506,18 +1506,18 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
         }
     ],
     "meta": {
-        "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/persons?filter=cf.search.name:Carberry&page=1&page_size=1",
+        "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/persons?filter=cf.search.given_name:Silvio,cf.search.family_name:Peroni&page=1&page_size=1",
         "entity_type": "search_result_page",
         "part_of": {
-            "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/persons?filter=cf.search.name:Carberry",
+            "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/persons?filter=cf.search.given_name:Silvio,cf.search.family_name:Peroni",
             "entity_type": "search_result",
             "total_items": 0,
             "first_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/persons?filter=cf.search.name:Carberry&page=1&page_size=1",
+                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/persons?filter=cf.search.given_name:Silvio,cf.search.family_name:Peroni&page=1&page_size=1",
                 "entity_type": "search_result_page"
             },
             "last_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/persons?filter=cf.search.name:Carberry&page=1&page_size=1",
+                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/persons?filter=cf.search.given_name:Silvio,cf.search.family_name:Peroni&page=1&page_size=1",
                 "entity_type": "search_result_page"
             }
         }
@@ -1529,7 +1529,7 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
 #type operation
 #method get
 #description Coming soon. Returns a single organisation when implemented; this placeholder currently returns 404.
-#call /organisations/example-organisation-id
+#call /organisations/https://w3id.org/oc/meta/ra/0610116105
 #format skgif,to_skg_if,application/ld+json
 #default_format skgif
 #output_json HTTP status code 404: entity not found
@@ -1555,7 +1555,7 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
 
 - `cf.search.name`
 
-#call /organisations?filter=cf.search.name:Brown
+#call /organisations?filter=cf.search.name:Mit Press
 #format skgif,to_skg_if,application/ld+json
 #default_format skgif
 #output_json {
@@ -1567,18 +1567,18 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
         }
     ],
     "meta": {
-        "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/organisations?filter=cf.search.name:Brown&page=1&page_size=1",
+        "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/organisations?filter=cf.search.name:Mit Press&page=1&page_size=1",
         "entity_type": "search_result_page",
         "part_of": {
-            "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/organisations?filter=cf.search.name:Brown",
+            "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/organisations?filter=cf.search.name:Mit Press",
             "entity_type": "search_result",
             "total_items": 0,
             "first_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/organisations?filter=cf.search.name:Brown&page=1&page_size=1",
+                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/organisations?filter=cf.search.name:Mit Press&page=1&page_size=1",
                 "entity_type": "search_result_page"
             },
             "last_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/organisations?filter=cf.search.name:Brown&page=1&page_size=1",
+                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/organisations?filter=cf.search.name:Mit Press&page=1&page_size=1",
                 "entity_type": "search_result_page"
             }
         }
@@ -1591,7 +1591,7 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
 #type operation
 #method get
 #description Coming soon. Returns a single venue when implemented; this placeholder currently returns 404.
-#call /venues/example-venue-id
+#call /venues/https://w3id.org/oc/meta/br/062501778099
 #format skgif,to_skg_if,application/ld+json
 #default_format skgif
 #output_json HTTP status code 404: entity not found
@@ -1616,7 +1616,7 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
 
 - `cf.search.name`
 
-#call /venues?filter=cf.search.name:Psychoceramics
+#call /venues?filter=cf.search.name:Quantitative Science Studies
 #format skgif,to_skg_if,application/ld+json
 #default_format skgif
 #output_json {
@@ -1628,18 +1628,18 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
         }
     ],
     "meta": {
-        "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/venues?filter=cf.search.name:Psychoceramics&page=1&page_size=1",
+        "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/venues?filter=cf.search.name:Quantitative Science Studies&page=1&page_size=1",
         "entity_type": "search_result_page",
         "part_of": {
-            "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/venues?filter=cf.search.name:Psychoceramics",
+            "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/venues?filter=cf.search.name:Quantitative Science Studies",
             "entity_type": "search_result",
             "total_items": 0,
             "first_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/venues?filter=cf.search.name:Psychoceramics&page=1&page_size=1",
+                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/venues?filter=cf.search.name:Quantitative Science Studies&page=1&page_size=1",
                 "entity_type": "search_result_page"
             },
             "last_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/venues?filter=cf.search.name:Psychoceramics&page=1&page_size=1",
+                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/venues?filter=cf.search.name:Quantitative Science Studies&page=1&page_size=1",
                 "entity_type": "search_result_page"
             }
         }
