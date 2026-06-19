@@ -14,6 +14,10 @@ if TYPE_CHECKING:
     from ramose import APIManager
 
 SKGIF_OPENAPI_URL = "https://raw.githubusercontent.com/skg-if/api/main/openapi/ver/current/skg-if-openapi.yaml"
+SKGIF_CONTEXT = [
+    "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
+    "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
+]
 
 
 @overload
@@ -44,7 +48,9 @@ def _load_product_response_schema() -> dict:
     response_schema = openapi_spec["paths"]["/products/{local_identifier}"]["get"][
         "responses"
     ]["200"]["content"]["application/json"]["schema"]
-    return _resolve_refs(copy.deepcopy(response_schema), components)
+    resolved_schema = _resolve_refs(copy.deepcopy(response_schema), components)
+    resolved_schema["properties"]["@context"]["minItems"] = len(SKGIF_CONTEXT)
+    return resolved_schema
 
 
 SKGIF_PRODUCT_RESPONSE_SCHEMA = _load_product_response_schema()
@@ -88,13 +94,6 @@ def _validate_skgif_shacl(response: dict) -> None:
         data_graph, shacl_graph=SKGIF_SHACL_SHAPES
     )
     assert conforms, f"SHACL validation failed:\n{results_text}"
-
-
-SKGIF_CONTEXT = [
-    "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
-    "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
-    {"@base": "https://w3id.org/skg-if/sandbox/"},
-]
 
 
 class TestSkgifJournalArticle:

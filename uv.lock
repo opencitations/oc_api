@@ -525,7 +525,7 @@ wheels = [
 
 [[package]]
 name = "oc-api"
-version = "0.11.11"
+version = "0.11.12"
 source = { editable = "." }
 dependencies = [
     { name = "gevent" },
@@ -557,7 +557,7 @@ requires-dist = [
     { name = "gitpython", specifier = ">=3.1.50" },
     { name = "gunicorn", specifier = ">=22.0.0" },
     { name = "python-dateutil", specifier = ">=2.9.0.post0" },
-    { name = "ramose", specifier = ">=2.7.0" },
+    { name = "ramose", specifier = ">=2.7.1" },
     { name = "rdflib", specifier = ">=6.1.1" },
     { name = "redis", specifier = ">=7.0.1" },
     { name = "requests", specifier = ">=2.32.4" },
@@ -789,7 +789,7 @@ wheels = [
 
 [[package]]
 name = "ramose"
-version = "2.7.0"
+version = "2.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "flask" },
@@ -798,9 +798,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/df/7d/fa7ad64d469cdc3d3e190b1519a18ad59989552a959650e950b5a2facba7/ramose-2.7.0.tar.gz", hash = "sha256:02b502098b447ca2dbf8f920aec2afc91efc5baddc5c562393eea588e0ae390b", size = 1083948, upload-time = "2026-06-19T10:32:53.502Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/23/cd/e50f50ced7646369bcd05e83c3c2fc440b48c1694d11905be3bb9d6950d6/ramose-2.7.1.tar.gz", hash = "sha256:af71853e79f3b2e71ce4fb227c0f476ac70acdcf5d9fedabc93f889a00835509", size = 1087312, upload-time = "2026-06-19T15:11:14.307Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f7/4b/dfa32d75c4855c0919b6c5bc325ae1debe91ac319e93f0a588a3a9fb866c/ramose-2.7.0-py3-none-any.whl", hash = "sha256:d1a8d654adc7f7bbe5964aa3561e30fa21d6161014683e54ff61c5df2f27de5d", size = 62368, upload-time = "2026-06-19T10:32:52.545Z" },
+    { url = "https://files.pythonhosted.org/packages/66/1d/48bba2f1d5b9f99eb793a74800278a7ceffcfe3db0c5213d76026e33ed0f/ramose-2.7.1-py3-none-any.whl", hash = "sha256:ceb0ee2630ab8a117255332ea8852e018d6496d8e20077ca6348d97e687fecd0", size = 62347, upload-time = "2026-06-19T15:11:12.947Z" },
 ]
 
 [[package]]
