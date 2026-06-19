@@ -2,9 +2,9 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-acronym: {}
-cf.search.name: {}
 data_source_classification: {}
+research_product_type: {}
 identifiers.scheme: {}
 identifiers.value: {}
-research_product_type: {}
+acronym: {}
+cf.search.name: {}

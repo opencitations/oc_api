@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: NONE
+#
+# SPDX-License-Identifier: CC0-1.0
+
+identifiers.id: {}
+identifiers.scheme: {}
+given_name: {}
+family_name: {}
+name: {}
+affiliations.affiliation.local_identifier: {}
+affiliations.affiliation.name: {}
+affiliations.affiliation.short_name: {}
+affiliations.role: {}
+cf.search.family_name: {}
+cf.search.given_name: {}
+cf.search.name: {}
