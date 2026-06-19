@@ -484,19 +484,22 @@ class Api:
                 # web_logger.mes()
                 return doc.get_documentation()[1]
             else:
-                content_type = web.ctx.env.get("HTTP_ACCEPT")
-                if content_type is not None and "text/csv" in content_type:
-                    content_type = "text/csv"
+                requested_content_type = web.ctx.env.get("HTTP_ACCEPT")
+                if (
+                    requested_content_type is not None
+                    and "text/csv" in requested_content_type
+                ):
+                    requested_content_type = "text/csv"
                 else:
-                    content_type = "application/json"
+                    requested_content_type = "application/json"
 
                 call = f"/{dataset}{call}"
                 operation_url = call + unquote(web.ctx.query)
                 op = man.get_op(operation_url)
 
                 if type(op) is Operation:
-                    status_code, res, c_type, extra_headers = op.exec(
-                        content_type=content_type
+                    status_code, res, response_content_type, extra_headers = op.exec(
+                        content_type=requested_content_type
                     )
                     if status_code == 200:
                         # remember to remove the slash at the end
@@ -508,7 +511,7 @@ class Api:
 
                         web.header("Access-Control-Allow-Origin", org_ref)
                         web.header("Access-Control-Allow-Credentials", "true")
-                        web.header("Content-Type", c_type)
+                        web.header("Content-Type", response_content_type)
                         web.header("Access-Control-Allow-Methods", "*")
                         web.header("Access-Control-Allow-Headers", "Authorization")
                         for header_name, header_value in extra_headers.items():
@@ -518,7 +521,7 @@ class Api:
                     else:
                         try:
                             with StringIO(res) as f:
-                                if content_type == "text/csv":
+                                if requested_content_type == "text/csv":
                                     mes = next(csv.reader(f))[0]
                                 else:
                                     mes = json.dumps(
@@ -526,19 +529,19 @@ class Api:
                                     )
                             raise web.HTTPError(
                                 str(status_code) + " ",
-                                {"Content-Type": content_type},
+                                {"Content-Type": response_content_type},
                                 mes,
                             )
                         except Exception:
                             raise web.HTTPError(
                                 str(status_code) + " ",
-                                {"Content-Type": content_type},
+                                {"Content-Type": response_content_type},
                                 str(res),
                             )
                 else:
                     raise web.HTTPError(
                         "404 ",
-                        {"Content-Type": content_type},
+                        {"Content-Type": requested_content_type},
                         "No API operation found at URL '%s'" % call,
                     )
 
