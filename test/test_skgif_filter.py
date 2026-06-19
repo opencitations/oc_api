@@ -19,16 +19,32 @@ with (Path(__file__).parent / "data" / "expected_search_products.json").open(
     EXPECTED_SEARCH: dict[str, list[dict]] = json.load(_f)
 
 COMING_SOON_MOCK_ENDPOINTS = ("persons", "organisations", "venues")
-EMPTY_DATA_MOCK_ENDPOINTS = ("grants", "topics", "datasources")
+EMPTY_DATA_MOCK_ENDPOINTS = ("grants", "datasources", "topics")
 MOCK_ENDPOINTS = (*COMING_SOON_MOCK_ENDPOINTS, *EMPTY_DATA_MOCK_ENDPOINTS)
 MOCK_FILTER_EXAMPLES = {
     "persons": "cf.search.name:Carberry",
     "organisations": "cf.search.name:Brown",
     "venues": "cf.search.name:Psychoceramics",
     "grants": "grant_number:12345",
-    "topics": "cf.search.labels:biology",
     "datasources": "research_product_type:literature",
+    "topics": "cf.search.labels:biology",
 }
+OPERATION_PATH_ORDER = [
+    "/products/{local_identifier}",
+    "/products",
+    "/persons/{local_identifier}",
+    "/persons",
+    "/organisations/{local_identifier}",
+    "/organisations",
+    "/venues/{local_identifier}",
+    "/venues",
+    "/grants/{local_identifier}",
+    "/grants",
+    "/datasources/{local_identifier}",
+    "/datasources",
+    "/topics/{local_identifier}",
+    "/topics",
+]
 FILTER_DESCRIPTION_ORDER = {
     "products": (
         "product_type",
@@ -82,6 +98,14 @@ FILTER_DESCRIPTION_ORDER = {
         "country",
         "cf.search.name",
     ),
+    "venues": (
+        "acronym",
+        "type",
+        "identifiers.scheme",
+        "identifiers.value",
+        "name",
+        "cf.search.name",
+    ),
     "grants": (
         "identifiers.scheme",
         "identifiers.value",
@@ -124,20 +148,6 @@ FILTER_DESCRIPTION_ORDER = {
         "cf.duration.start.to",
         "cf.duration.end.from",
     ),
-    "venues": (
-        "acronym",
-        "type",
-        "identifiers.scheme",
-        "identifiers.value",
-        "name",
-        "cf.search.name",
-    ),
-    "topics": (
-        "identifiers.scheme",
-        "identifiers.value",
-        "cf.search.labels",
-        "cf.search.language",
-    ),
     "datasources": (
         "data_source_classification",
         "research_product_type",
@@ -145,6 +155,12 @@ FILTER_DESCRIPTION_ORDER = {
         "identifiers.value",
         "acronym",
         "cf.search.name",
+    ),
+    "topics": (
+        "identifiers.scheme",
+        "identifiers.value",
+        "cf.search.labels",
+        "cf.search.language",
     ),
 }
 
@@ -587,6 +603,14 @@ class TestCustomParamsInDocumentation:
         handler = HTMLDocumentationHandler(skgif_api_manager)
         _, html = handler.get_documentation()
         assert "Result fields type" not in html
+
+    def test_operation_paths_keep_expected_order(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        handler = OpenAPIDocumentationHandler(skgif_api_manager)
+        _, yml = handler.get_documentation()
+        spec = yaml.safe_load(yml)
+        assert list(spec["paths"]) == OPERATION_PATH_ORDER
 
     def test_mock_endpoints_in_openapi(self, skgif_api_manager: APIManager) -> None:
         handler = OpenAPIDocumentationHandler(skgif_api_manager)
