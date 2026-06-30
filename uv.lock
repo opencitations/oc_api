@@ -557,7 +557,7 @@ requires-dist = [
     { name = "gitpython", specifier = ">=3.1.50" },
     { name = "gunicorn", specifier = ">=22.0.0" },
     { name = "python-dateutil", specifier = ">=2.9.0.post0" },
-    { name = "ramose", specifier = ">=2.7.1" },
+    { name = "ramose", specifier = ">=2.8.1" },
     { name = "rdflib", specifier = ">=6.1.1" },
     { name = "redis", specifier = ">=7.0.1" },
     { name = "requests", specifier = ">=2.32.4" },
@@ -789,7 +789,7 @@ wheels = [
 
 [[package]]
 name = "ramose"
-version = "2.7.1"
+version = "2.8.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "flask" },
@@ -798,9 +798,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/23/cd/e50f50ced7646369bcd05e83c3c2fc440b48c1694d11905be3bb9d6950d6/ramose-2.7.1.tar.gz", hash = "sha256:af71853e79f3b2e71ce4fb227c0f476ac70acdcf5d9fedabc93f889a00835509", size = 1087312, upload-time = "2026-06-19T15:11:14.307Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/32/c0/d9fc7415c094c240e537431732fd38340e6b370a7d685bdc2b1e84935ffd/ramose-2.8.1.tar.gz", hash = "sha256:46f0837c248dbcf99cbde26a25c111250c7044459f76eb0914b7cb2c58932bfe", size = 1099799, upload-time = "2026-06-30T15:01:22.233Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/66/1d/48bba2f1d5b9f99eb793a74800278a7ceffcfe3db0c5213d76026e33ed0f/ramose-2.7.1-py3-none-any.whl", hash = "sha256:ceb0ee2630ab8a117255332ea8852e018d6496d8e20077ca6348d97e687fecd0", size = 62347, upload-time = "2026-06-19T15:11:12.947Z" },
+    { url = "https://files.pythonhosted.org/packages/35/b3/d01130181082d4a13cb1fc2fe2b0dd4ca637d677631d92b6c9a4ccd03de6/ramose-2.8.1-py3-none-any.whl", hash = "sha256:ecc9991e24dbd6df874ed77958bcea7c8211186ff53b9491d70d3a4d6508e2ae", size = 63756, upload-time = "2026-06-30T15:01:20.802Z" },
 ]
 
 [[package]]

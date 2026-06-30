@@ -17,6 +17,7 @@ SKGIF_OPENAPI_URL = "https://raw.githubusercontent.com/skg-if/api/main/openapi/v
 SKGIF_CONTEXT = [
     "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
     "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
+    {"@base": "https://w3id.org/skg-if/sandbox/acme/"},
 ]
 
 
@@ -48,9 +49,7 @@ def _load_product_response_schema() -> dict:
     response_schema = openapi_spec["paths"]["/products/{local_identifier}"]["get"][
         "responses"
     ]["200"]["content"]["application/json"]["schema"]
-    resolved_schema = _resolve_refs(copy.deepcopy(response_schema), components)
-    resolved_schema["properties"]["@context"]["minItems"] = len(SKGIF_CONTEXT)
-    return resolved_schema
+    return _resolve_refs(copy.deepcopy(response_schema), components)
 
 
 SKGIF_PRODUCT_RESPONSE_SCHEMA = _load_product_response_schema()
@@ -293,6 +292,9 @@ class TestSkgifBook:
 
 
 class TestSkgifSchemaConformance:
+    def test_schema_context_min_items_matches_upstream(self) -> None:
+        assert SKGIF_PRODUCT_RESPONSE_SCHEMA["properties"]["@context"]["minItems"] == 3
+
     def test_journal_article_conforms(self, skgif_api_manager: APIManager) -> None:
         response = _execute_skgif(skgif_api_manager, "https://w3id.org/oc/meta/br/0601")
         _validate_skgif_response(response)
