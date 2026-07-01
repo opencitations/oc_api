@@ -17,7 +17,7 @@ SKGIF_OPENAPI_URL = "https://raw.githubusercontent.com/skg-if/api/main/openapi/v
 SKGIF_CONTEXT = [
     "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
     "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
-    {"@base": "https://w3id.org/skg-if/sandbox/acme/"},
+    {"@base": "https://w3id.org/skg-if/sandbox/oc/"},
 ]
 
 
