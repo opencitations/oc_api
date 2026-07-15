@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 import tempfile
 import time
@@ -111,32 +112,39 @@ def qlever_endpoint():
 
 @pytest.fixture(scope="session")
 def virtuoso_endpoint():
-    subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)
-    subprocess.run(
-        [
-            "docker",
-            "run",
-            "-d",
-            "--name",
-            VIRTUOSO_CONTAINER,
-            "-p",
-            f"{VIRTUOSO_HTTP_PORT}:8890",
-            "-p",
-            f"{VIRTUOSO_ISQL_PORT}:1111",
-            "-e",
-            "DBA_PASSWORD=dba",
-            "-v",
-            f"{VIRTUOSO_DB_DIR}:/opt/virtuoso-opensource/database",
-            VIRTUOSO_IMAGE,
-        ],
-        check=True,
-        capture_output=True,
-    )
-    _wait_for_virtuoso(VIRTUOSO_CONTAINER)
-    _enable_virtuoso_rdf_freetext(VIRTUOSO_CONTAINER)
-    yield f"http://127.0.0.1:{VIRTUOSO_HTTP_PORT}/sparql"
-    subprocess.run(["docker", "stop", VIRTUOSO_CONTAINER], capture_output=True)
-    subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        database_dir = os.path.join(temp_dir, "database")
+        os.mkdir(database_dir)
+        for entry in os.scandir(VIRTUOSO_DB_DIR):
+            if entry.is_file() and entry.name != "virtuoso.log":
+                shutil.copy2(entry.path, database_dir)
+
+        subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)
+        subprocess.run(
+            [
+                "docker",
+                "run",
+                "-d",
+                "--name",
+                VIRTUOSO_CONTAINER,
+                "-p",
+                f"{VIRTUOSO_HTTP_PORT}:8890",
+                "-p",
+                f"{VIRTUOSO_ISQL_PORT}:1111",
+                "-e",
+                "DBA_PASSWORD=dba",
+                "-v",
+                f"{database_dir}:/opt/virtuoso-opensource/database",
+                VIRTUOSO_IMAGE,
+            ],
+            check=True,
+            capture_output=True,
+        )
+        _wait_for_virtuoso(VIRTUOSO_CONTAINER)
+        _enable_virtuoso_rdf_freetext(VIRTUOSO_CONTAINER)
+        yield f"http://127.0.0.1:{VIRTUOSO_HTTP_PORT}/sparql"
+        subprocess.run(["docker", "stop", VIRTUOSO_CONTAINER], capture_output=True)
+        subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)
 
 
 @pytest.fixture(scope="session")

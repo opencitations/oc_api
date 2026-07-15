@@ -1,0 +1,608 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+   xmlns:dcterms="http://purl.org/dc/terms/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:sd="http://www.w3.org/ns/sparql-service-description#"
+   xmlns:void="http://rdfs.org/ns/void#"
+>
+  <rdf:Description rdf:nodeID="N0ab50225f65943f0a5da12f74b702536">
+    <rdf:type rdf:resource="http://www.w3.org/ns/sparql-service-description#Graph"/>
+    <void:uriSpace>https://w3id.org/oc/meta/br/</void:uriSpace>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1520674565</void:triples>
+    <void:properties rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">8</void:properties>
+    <void:classes rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">26</void:classes>
+    <void:propertyPartition rdf:nodeID="N6256ed068e3a45a2915b9ae1fe0ee11a"/>
+    <void:propertyPartition rdf:nodeID="Nbd3363572b624ae7a560c7f291dd09ac"/>
+    <void:propertyPartition rdf:nodeID="N9816032c8ef74c25b5b040d8084fd77c"/>
+    <void:propertyPartition rdf:nodeID="N152ddadeffe346e4a512dcd034c0fa33"/>
+    <void:propertyPartition rdf:nodeID="N0033ccbd53e04cbd9377578036bbfa20"/>
+    <void:propertyPartition rdf:nodeID="N03cbf598d1444be8bad6ea1687e6478f"/>
+    <void:propertyPartition rdf:nodeID="Nca17fd5d163c4fde8d9f509b58d5e52a"/>
+    <void:propertyPartition rdf:nodeID="N87926e6ec646497487177a52b1f426b5"/>
+    <void:classPartition rdf:nodeID="Nf8bfd179cdae40bb9d1b838d52c4b2d5"/>
+    <void:classPartition rdf:nodeID="Nfec5f936bcb04c3d8104f53469c6e520"/>
+    <void:classPartition rdf:nodeID="Na6f06a12d1664df5b68b5a05ed02632b"/>
+    <void:classPartition rdf:nodeID="N6b270466c3f44adaabbf78512ea59fe0"/>
+    <void:classPartition rdf:nodeID="N6c5db689d50343aa8d09d62d3da11346"/>
+    <void:classPartition rdf:nodeID="Ne505d210d2854364b236b49cb305246c"/>
+    <void:classPartition rdf:nodeID="Nc6a73d90a375491ea97b58f6a41911f5"/>
+    <void:classPartition rdf:nodeID="N4e025c87b6d545a4b50dea6c189e5758"/>
+    <void:classPartition rdf:nodeID="N2912b1f1613546f4a5844fa0e833c6e6"/>
+    <void:classPartition rdf:nodeID="N74e349f552004e028a905f665bd0170f"/>
+    <void:classPartition rdf:nodeID="Nd0f6536b97e14a0d81fde2ae8475d789"/>
+    <void:classPartition rdf:nodeID="Nec8dadf797504e708f8db00a0a715664"/>
+    <void:classPartition rdf:nodeID="N3f3cffbfa1a64dd5a678f77ed2cce991"/>
+    <void:classPartition rdf:nodeID="N63d6d0d3185d4c6aa2f3b527b28d7ec1"/>
+    <void:classPartition rdf:nodeID="N51238e0504b34133a5cd02e957f6e554"/>
+    <void:classPartition rdf:nodeID="N51f8005555e44fd0a446558299eb5d39"/>
+    <void:classPartition rdf:nodeID="N5e01a2d743ce429dac8404a528f251d2"/>
+    <void:classPartition rdf:nodeID="N5092dea9f2a9476693e051b42c9bb973"/>
+    <void:classPartition rdf:nodeID="Ndfc3620f65ac44f5b7263f149638e5b2"/>
+    <void:classPartition rdf:nodeID="N1f681864296a409499cb2edb29459578"/>
+    <void:classPartition rdf:nodeID="Ndfd0c23d15384b15a39eb1743e673af9"/>
+    <void:classPartition rdf:nodeID="N87c6185d5a244f759e4f63856cf655f4"/>
+    <void:classPartition rdf:nodeID="Ne7d52d9a0a74458dbad3770982542851"/>
+    <void:classPartition rdf:nodeID="N17df5dab426e4af09f533d2c5648b31b"/>
+    <void:classPartition rdf:nodeID="N0a949fc98e034ed58ba62f3c2a1681c7"/>
+    <void:classPartition rdf:nodeID="Naf04ad521e8f4e12b83072d3eeac0d97"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N34aa32111094478a80db021d9213dfc5">
+    <rdf:type rdf:resource="http://www.w3.org/ns/sparql-service-description#Graph"/>
+    <void:uriSpace>https://w3id.org/oc/meta/ar/</void:uriSpace>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1941098898</void:triples>
+    <void:properties rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</void:properties>
+    <void:classes rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</void:classes>
+    <void:propertyPartition rdf:nodeID="Nc35db50661ac495bbe4e5e61b04b9dca"/>
+    <void:propertyPartition rdf:nodeID="Nef1d062563414042bf5e5a0fbf7fb589"/>
+    <void:propertyPartition rdf:nodeID="N910d9ac533ef41809d109d02ebb641c6"/>
+    <void:propertyPartition rdf:nodeID="Nf28f709b17a24efaa2433c5145608123"/>
+    <void:classPartition rdf:nodeID="Ncdc672ed6e974488b229e7baac16f44f"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N255fd6eabbe34aae8930dc1652d4302b">
+    <void:class rdf:resource="http://purl.org/spar/fabio/ReferenceEntry"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">203258</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N95eb8f6b0306452285b83a7a3c39ee63">
+    <rdf:type rdf:resource="http://www.w3.org/ns/sparql-service-description#Dataset"/>
+    <rdf:type rdf:resource="http://rdfs.org/ns/void#Dataset"/>
+    <dcterms:title xml:lang="en">OpenCitations Meta</dcterms:title>
+    <dcterms:description xml:lang="en">OpenCitations Meta entity data</dcterms:description>
+    <void:uriSpace>https://w3id.org/oc/meta/</void:uriSpace>
+    <void:sparqlEndpoint rdf:resource="https://sparql.opencitations.net/meta"/>
+    <sd:defaultGraph rdf:nodeID="N3aeb74b10bef44539e6752441661bae5"/>
+    <sd:namedGraph rdf:nodeID="N0cc07889d02a4cfea40c1abc2a9e7045"/>
+    <sd:namedGraph rdf:nodeID="Nf4fdb63443894544ab7a4401998e72b6"/>
+    <sd:namedGraph rdf:nodeID="N0e5987da60f84c579d98dcd383f0283e"/>
+    <sd:namedGraph rdf:nodeID="N9c5cf3d367f14273afedd970aca28bb9"/>
+    <sd:namedGraph rdf:nodeID="Nf83bd6ac0bda4b3ab90670ad17b2364f"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N3aeb74b10bef44539e6752441661bae5">
+    <rdf:type rdf:resource="http://www.w3.org/ns/sparql-service-description#Graph"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">5596056863</void:triples>
+    <void:properties rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">18</void:properties>
+    <void:distinctSubjects rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1413954824</void:distinctSubjects>
+    <void:distinctObjects rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1673125053</void:distinctObjects>
+    <void:classes rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">30</void:classes>
+    <void:propertyPartition rdf:nodeID="N47f395d2fd49411bb90ffdf7a91bc3af"/>
+    <void:propertyPartition rdf:nodeID="Nd5b06e5c854848e1ba7b354713dfd9bc"/>
+    <void:propertyPartition rdf:nodeID="Nab16b48ff98a46319f28d03672b9c434"/>
+    <void:propertyPartition rdf:nodeID="Ne902d6283f7e4e9a90811656bb1aad23"/>
+    <void:propertyPartition rdf:nodeID="N9d92fc5528a44bf6a66dc9f278cee4d9"/>
+    <void:propertyPartition rdf:nodeID="N0eec552b71134f1ebf9210c3a332081f"/>
+    <void:propertyPartition rdf:nodeID="Nc828079927724d7c9f21e3709a7997f5"/>
+    <void:propertyPartition rdf:nodeID="N97a6e3ba997e4208aef1710a9952cd31"/>
+    <void:propertyPartition rdf:nodeID="Nf223a38917b548afaf06ea87acba67b1"/>
+    <void:propertyPartition rdf:nodeID="N28bcb7facd21446191597d6fa6614af5"/>
+    <void:propertyPartition rdf:nodeID="Ne79abd641a8c4a5aa29f6b52fe49681c"/>
+    <void:propertyPartition rdf:nodeID="N6c260354fcd844cc8f667af26c00abf8"/>
+    <void:propertyPartition rdf:nodeID="Nf9cfdf5ae0164790b5e25df1f854ab47"/>
+    <void:propertyPartition rdf:nodeID="Neaa76cb410b44a5594089bf0e431defc"/>
+    <void:propertyPartition rdf:nodeID="N967067b8906e439e8626a6a182ac5ad5"/>
+    <void:propertyPartition rdf:nodeID="N2a5f84d074774066953f2527055a1d07"/>
+    <void:propertyPartition rdf:nodeID="N23d2647189f6467fbc8545f5af7f1909"/>
+    <void:propertyPartition rdf:nodeID="Naddcc520384a4781b0ff65cac3fe606a"/>
+    <void:classPartition rdf:nodeID="Nc2f850a2fa7a4bcb8e609299cd2dba11"/>
+    <void:classPartition rdf:nodeID="Nf5c916e013724dd28c6cd529ec35a965"/>
+    <void:classPartition rdf:nodeID="N4c5386663a4e457f8b9c887e995ca0e0"/>
+    <void:classPartition rdf:nodeID="N13735360bfc9484393fa0476114d066b"/>
+    <void:classPartition rdf:nodeID="Nbd2a1ceb30494ba2b87953ac0184888f"/>
+    <void:classPartition rdf:nodeID="N99e536dbd77142b59c717505742f7619"/>
+    <void:classPartition rdf:nodeID="N6ce9f98f7d674310b85b80c2fd855d71"/>
+    <void:classPartition rdf:nodeID="N5bc09772a2d844cc9dc3f917246b0a4e"/>
+    <void:classPartition rdf:nodeID="N845856c750ab4132859b0e9da46a17f0"/>
+    <void:classPartition rdf:nodeID="N48b037c3d43745c794e76bba84e6c773"/>
+    <void:classPartition rdf:nodeID="N699a87413b1e439baaed2568de2a8508"/>
+    <void:classPartition rdf:nodeID="N4a98fa01d91442af8200d78c6a8bfa2f"/>
+    <void:classPartition rdf:nodeID="N6e9928a9491c4c02a61958ca9ced0f68"/>
+    <void:classPartition rdf:nodeID="Na42f9323dd8f4ae99907d81a69648d85"/>
+    <void:classPartition rdf:nodeID="Na611ea64b2b44cef84d7c550bd4a3ef2"/>
+    <void:classPartition rdf:nodeID="N4b945d0502ed447d90bc6e3f37352197"/>
+    <void:classPartition rdf:nodeID="N8afb9928873c489eac74ca49ce094cf5"/>
+    <void:classPartition rdf:nodeID="Na842b6a629834dbaaa64af1b1df3546a"/>
+    <void:classPartition rdf:nodeID="N044cfcaf44844fa48f312cc7a7ea5b0d"/>
+    <void:classPartition rdf:nodeID="N113a058afaca472eb393d1809a06af75"/>
+    <void:classPartition rdf:nodeID="N136dd2dfe592496dabf0ad71650b55fe"/>
+    <void:classPartition rdf:nodeID="N255fd6eabbe34aae8930dc1652d4302b"/>
+    <void:classPartition rdf:nodeID="Nf73bc46ca2be4140945f7b4109a8a112"/>
+    <void:classPartition rdf:nodeID="N156d29c8e46043feb4be7c4d158d0524"/>
+    <void:classPartition rdf:nodeID="N60b11b9d22674ca4b0bf876d4e7643cf"/>
+    <void:classPartition rdf:nodeID="N0d65e151a2484c9ea67fc554e3504185"/>
+    <void:classPartition rdf:nodeID="N25efa7ea7b9340c78a167f20ca84fb0e"/>
+    <void:classPartition rdf:nodeID="N61247ef990094e2caa7fca5ee3170793"/>
+    <void:classPartition rdf:nodeID="N1b91d2933d454f8dbb3c29a1517a0b3d"/>
+    <void:classPartition rdf:nodeID="N7004fdc3671243fd9f60f58a10a154e5"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N5bc09772a2d844cc9dc3f917246b0a4e">
+    <void:class rdf:resource="http://purl.org/spar/fabio/ComputerProgram"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2330</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N74e349f552004e028a905f665bd0170f">
+    <void:class rdf:resource="http://purl.org/spar/fabio/Expression"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">147369096</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N0e5987da60f84c579d98dcd383f0283e">
+    <rdf:type rdf:resource="http://www.w3.org/ns/sparql-service-description#NamedGraph"/>
+    <sd:name rdf:resource="https://w3id.org/oc/meta/ra/"/>
+    <sd:graph rdf:nodeID="N35a5d48fefa54870b03ca00277446cb5"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N63d6d0d3185d4c6aa2f3b527b28d7ec1">
+    <void:class rdf:resource="http://purl.org/spar/fabio/JournalIssue"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">7614242</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N97a6e3ba997e4208aef1710a9952cd31">
+    <void:property rdf:resource="http://purl.org/spar/pro/isDocumentContextFor"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">534260004</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Na42f9323dd8f4ae99907d81a69648d85">
+    <void:class rdf:resource="http://purl.org/spar/fabio/JournalArticle"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">88373339</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nd5504ac79f214df5bca9656a48bf88c0">
+    <void:class rdf:resource="http://xmlns.com/foaf/0.1/Agent"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">390541078</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N443ead6576a74921a71fd666bac15e31">
+    <rdf:type rdf:resource="http://www.w3.org/ns/sparql-service-description#Graph"/>
+    <void:uriSpace>https://w3id.org/oc/meta/id/</void:uriSpace>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">755862352</void:triples>
+    <void:properties rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</void:properties>
+    <void:classes rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</void:classes>
+    <void:propertyPartition rdf:nodeID="N38633959bbfe4674954c0e070f55c833"/>
+    <void:propertyPartition rdf:nodeID="N02053cd256ab477393bc528a4088ad07"/>
+    <void:propertyPartition rdf:nodeID="Na254f9e2b8224483998f372dba5e9fda"/>
+    <void:classPartition rdf:nodeID="N87384a11a3744cda9ae057dd26fbea3d"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N557d85fd2ff0465686afbd250a97dacf">
+    <rdf:type rdf:resource="http://www.w3.org/ns/sparql-service-description#Service"/>
+    <sd:endpoint rdf:resource="https://sparql.opencitations.net/meta"/>
+    <sd:defaultDataset rdf:nodeID="N95eb8f6b0306452285b83a7a3c39ee63"/>
+    <sd:supportedLanguage rdf:resource="http://www.w3.org/ns/sparql-service-description#SPARQL11Query"/>
+    <sd:resultFormat rdf:resource="http://www.w3.org/ns/formats/SPARQL_Results_JSON"/>
+    <sd:resultFormat rdf:resource="http://www.w3.org/ns/formats/SPARQL_Results_XML"/>
+    <sd:resultFormat rdf:resource="http://www.w3.org/ns/formats/SPARQL_Results_CSV"/>
+    <sd:resultFormat rdf:resource="http://www.w3.org/ns/formats/SPARQL_Results_TSV"/>
+    <sd:resultFormat rdf:resource="http://www.w3.org/ns/formats/Turtle"/>
+    <sd:feature rdf:resource="http://www.w3.org/ns/sparql-service-description#BasicFederatedQuery"/>
+    <sd:feature rdf:resource="http://www.w3.org/ns/sparql-service-description#UnionDefaultGraph"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nd5b06e5c854848e1ba7b354713dfd9bc">
+    <void:property rdf:resource="http://prismstandard.org/namespaces/basic/2.0/publicationDate"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">112453159</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nab16b48ff98a46319f28d03672b9c434">
+    <void:property rdf:resource="http://prismstandard.org/namespaces/basic/2.0/startingPage"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">81134704</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nf223a38917b548afaf06ea87acba67b1">
+    <void:property rdf:resource="http://purl.org/spar/pro/isHeldBy"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">541543125</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nc277c1d33a9c4d2dacac9aeadd7d4aa4">
+    <rdf:type rdf:resource="http://www.w3.org/ns/sparql-service-description#Graph"/>
+    <void:uriSpace>https://w3id.org/oc/meta/re/</void:uriSpace>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">244815540</void:triples>
+    <void:properties rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</void:properties>
+    <void:classes rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</void:classes>
+    <void:propertyPartition rdf:nodeID="N56ccf26ea037462ca008a40d250e07f7"/>
+    <void:propertyPartition rdf:nodeID="Ne20cd4dae24348b2937f459f2c4f1094"/>
+    <void:propertyPartition rdf:nodeID="N56b90aa3f2c14b0f824b68ffcb2c61ec"/>
+    <void:classPartition rdf:nodeID="Nf5478368960a43c28f739055e191e874"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N51f8005555e44fd0a446558299eb5d39">
+    <void:class rdf:resource="http://purl.org/spar/fabio/Preprint"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">256957</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ne7d52d9a0a74458dbad3770982542851">
+    <void:class rdf:resource="http://purl.org/spar/fabio/SpecificationDocument"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">14901</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N35a5d48fefa54870b03ca00277446cb5">
+    <rdf:type rdf:resource="http://www.w3.org/ns/sparql-service-description#Graph"/>
+    <void:uriSpace>https://w3id.org/oc/meta/ra/</void:uriSpace>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1133605508</void:triples>
+    <void:properties rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">5</void:properties>
+    <void:classes rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</void:classes>
+    <void:propertyPartition rdf:nodeID="Nb049a793cd1e419291440c2a22e6d9cd"/>
+    <void:propertyPartition rdf:nodeID="N66cb0733992f43f7ab0ad8a5d9d63e58"/>
+    <void:propertyPartition rdf:nodeID="N732048c3c6ed4b229961d318de441798"/>
+    <void:propertyPartition rdf:nodeID="N1cb45ef8f50d42e0ad2fcaa58bb309f5"/>
+    <void:propertyPartition rdf:nodeID="N077a23db5ffc4babb849809be06a5a1b"/>
+    <void:classPartition rdf:nodeID="Nd5504ac79f214df5bca9656a48bf88c0"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N2a5f84d074774066953f2527055a1d07">
+    <void:property rdf:resource="http://xmlns.com/foaf/0.1/familyName"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">342844564</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N699a87413b1e439baaed2568de2a8508">
+    <void:class rdf:resource="http://purl.org/spar/fabio/Expression"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">147369096</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N0d65e151a2484c9ea67fc554e3504185">
+    <void:class rdf:resource="http://purl.org/spar/fabio/Thesis"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">65125</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N044cfcaf44844fa48f312cc7a7ea5b0d">
+    <void:class rdf:resource="http://purl.org/spar/fabio/Presentation"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nf8bfd179cdae40bb9d1b838d52c4b2d5">
+    <void:class rdf:resource="http://purl.org/spar/doco/Part"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4167</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ne79abd641a8c4a5aa29f6b52fe49681c">
+    <void:property rdf:resource="http://purl.org/vocab/frbr/core#embodiment"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">82507304</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N9816032c8ef74c25b5b040d8084fd77c">
+    <void:property rdf:resource="http://purl.org/spar/datacite/hasIdentifier"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">248310913</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N136dd2dfe592496dabf0ad71650b55fe">
+    <void:class rdf:resource="http://purl.org/spar/fabio/ReferenceBook"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">241168</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N8afb9928873c489eac74ca49ce094cf5">
+    <void:class rdf:resource="http://purl.org/spar/fabio/Manifestation"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">82546121</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nf5c916e013724dd28c6cd529ec35a965">
+    <void:class rdf:resource="http://purl.org/spar/doco/Part"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4167</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N87384a11a3744cda9ae057dd26fbea3d">
+    <void:class rdf:resource="http://purl.org/spar/datacite/Identifier"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">251954118</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ncdc672ed6e974488b229e7baac16f44f">
+    <void:class rdf:resource="http://purl.org/spar/pro/RoleInTime"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">541544410</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N5e01a2d743ce429dac8404a528f251d2">
+    <void:class rdf:resource="http://purl.org/spar/fabio/Presentation"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nbd3363572b624ae7a560c7f291dd09ac">
+    <void:property rdf:resource="http://purl.org/dc/terms/title"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">129215401</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N4e025c87b6d545a4b50dea6c189e5758">
+    <void:class rdf:resource="http://purl.org/spar/fabio/DataFile"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2860580</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N56b90aa3f2c14b0f824b68ffcb2c61ec">
+    <void:property rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">82546121</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N51238e0504b34133a5cd02e957f6e554">
+    <void:class rdf:resource="http://purl.org/spar/fabio/JournalVolume"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4336587</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nc6a73d90a375491ea97b58f6a41911f5">
+    <void:class rdf:resource="http://purl.org/spar/fabio/ComputerProgram"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2330</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N6e9928a9491c4c02a61958ca9ced0f68">
+    <void:class rdf:resource="http://purl.org/spar/fabio/Journal"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4755832</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N87c6185d5a244f759e4f63856cf655f4">
+    <void:class rdf:resource="http://purl.org/spar/fabio/Series"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">14088</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nd0f6536b97e14a0d81fde2ae8475d789">
+    <void:class rdf:resource="http://purl.org/spar/fabio/ExpressionCollection"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">23525</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Naf04ad521e8f4e12b83072d3eeac0d97">
+    <void:class rdf:resource="http://purl.org/spar/fr/ReviewVersion"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">5608</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nf4fdb63443894544ab7a4401998e72b6">
+    <rdf:type rdf:resource="http://www.w3.org/ns/sparql-service-description#NamedGraph"/>
+    <sd:name rdf:resource="https://w3id.org/oc/meta/id/"/>
+    <sd:graph rdf:nodeID="N443ead6576a74921a71fd666bac15e31"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N9c5cf3d367f14273afedd970aca28bb9">
+    <rdf:type rdf:resource="http://www.w3.org/ns/sparql-service-description#NamedGraph"/>
+    <sd:name rdf:resource="https://w3id.org/oc/meta/ar/"/>
+    <sd:graph rdf:nodeID="N34aa32111094478a80db021d9213dfc5"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N61247ef990094e2caa7fca5ee3170793">
+    <void:class rdf:resource="http://purl.org/spar/fr/ReviewVersion"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">5608</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nec8dadf797504e708f8db00a0a715664">
+    <void:class rdf:resource="http://purl.org/spar/fabio/Journal"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4755832</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Na254f9e2b8224483998f372dba5e9fda">
+    <void:property rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">251954118</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N48b037c3d43745c794e76bba84e6c773">
+    <void:class rdf:resource="http://purl.org/spar/fabio/DataManagementPlan"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nf9cfdf5ae0164790b5e25df1f854ab47">
+    <void:property rdf:resource="https://w3id.org/oc/ontology/hasNext"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">316466954</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nf28f709b17a24efaa2433c5145608123">
+    <void:property rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">541544410</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N0033ccbd53e04cbd9377578036bbfa20">
+    <void:property rdf:resource="http://purl.org/spar/pro/isDocumentContextFor"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">534260004</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nfec5f936bcb04c3d8104f53469c6e520">
+    <void:class rdf:resource="http://purl.org/spar/fabio/AcademicProceedings"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">6638384</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N03cbf598d1444be8bad6ea1687e6478f">
+    <void:property rdf:resource="http://purl.org/vocab/frbr/core#embodiment"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">82507304</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N910d9ac533ef41809d109d02ebb641c6">
+    <void:property rdf:resource="https://w3id.org/oc/ontology/hasNext"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">316466954</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ne20cd4dae24348b2937f459f2c4f1094">
+    <void:property rdf:resource="http://prismstandard.org/namespaces/basic/2.0/startingPage"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">81134704</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N9d92fc5528a44bf6a66dc9f278cee4d9">
+    <void:property rdf:resource="http://purl.org/spar/datacite/hasIdentifier"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">260711341</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ndfd0c23d15384b15a39eb1743e673af9">
+    <void:class rdf:resource="http://purl.org/spar/fabio/ReportDocument"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">411417</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nc828079927724d7c9f21e3709a7997f5">
+    <void:property rdf:resource="http://purl.org/spar/fabio/hasSequenceIdentifier"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">11948142</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ne902d6283f7e4e9a90811656bb1aad23">
+    <void:property rdf:resource="http://purl.org/dc/terms/title"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">129215401</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N845856c750ab4132859b0e9da46a17f0">
+    <void:class rdf:resource="http://purl.org/spar/fabio/DataFile"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2860580</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Na611ea64b2b44cef84d7c550bd4a3ef2">
+    <void:class rdf:resource="http://purl.org/spar/fabio/JournalIssue"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">7614242</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N99e536dbd77142b59c717505742f7619">
+    <void:class rdf:resource="http://purl.org/spar/fabio/BookSeries"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">144213</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Na6f06a12d1664df5b68b5a05ed02632b">
+    <void:class rdf:resource="http://purl.org/spar/fabio/Book"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">7649106</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ndfc3620f65ac44f5b7263f149638e5b2">
+    <void:class rdf:resource="http://purl.org/spar/fabio/ReferenceBook"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">241168</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N156d29c8e46043feb4be7c4d158d0524">
+    <void:class rdf:resource="http://purl.org/spar/fabio/Series"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">14088</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nc2f850a2fa7a4bcb8e609299cd2dba11">
+    <void:class rdf:resource="http://purl.org/spar/datacite/Identifier"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">251954118</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N7004fdc3671243fd9f60f58a10a154e5">
+    <void:class rdf:resource="http://xmlns.com/foaf/0.1/Agent"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">390541078</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N6c260354fcd844cc8f667af26c00abf8">
+    <void:property rdf:resource="http://purl.org/vocab/frbr/core#partOf"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">115198136</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Naddcc520384a4781b0ff65cac3fe606a">
+    <void:property rdf:resource="http://xmlns.com/foaf/0.1/name"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">47742692</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N87926e6ec646497487177a52b1f426b5">
+    <void:property rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">286781506</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N732048c3c6ed4b229961d318de441798">
+    <void:property rdf:resource="http://xmlns.com/foaf/0.1/familyName"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">342844564</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N0a949fc98e034ed58ba62f3c2a1681c7">
+    <void:class rdf:resource="http://purl.org/spar/fabio/WebContent"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">992645</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N38633959bbfe4674954c0e070f55c833">
+    <void:property rdf:resource="http://purl.org/spar/datacite/usesIdentifierScheme"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">251954117</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N17df5dab426e4af09f533d2c5648b31b">
+    <void:class rdf:resource="http://purl.org/spar/fabio/Thesis"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">65125</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N4b945d0502ed447d90bc6e3f37352197">
+    <void:class rdf:resource="http://purl.org/spar/fabio/JournalVolume"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4336587</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N077a23db5ffc4babb849809be06a5a1b">
+    <void:property rdf:resource="http://xmlns.com/foaf/0.1/name"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">47742692</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N967067b8906e439e8626a6a182ac5ad5">
+    <void:property rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1553367233</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N6ce9f98f7d674310b85b80c2fd855d71">
+    <void:class rdf:resource="http://purl.org/spar/fabio/BookSet"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">48</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Na842b6a629834dbaaa64af1b1df3546a">
+    <void:class rdf:resource="http://purl.org/spar/fabio/Preprint"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">256957</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N56ccf26ea037462ca008a40d250e07f7">
+    <void:property rdf:resource="http://prismstandard.org/namespaces/basic/2.0/endingPage"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">81134715</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N02053cd256ab477393bc528a4088ad07">
+    <void:property rdf:resource="http://www.essepuntato.it/2010/06/literalreification/hasLiteralValue"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">251954117</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N47f395d2fd49411bb90ffdf7a91bc3af">
+    <void:property rdf:resource="http://prismstandard.org/namespaces/basic/2.0/endingPage"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">81134715</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N1f681864296a409499cb2edb29459578">
+    <void:class rdf:resource="http://purl.org/spar/fabio/ReferenceEntry"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">203258</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N6c5db689d50343aa8d09d62d3da11346">
+    <void:class rdf:resource="http://purl.org/spar/fabio/BookSeries"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">144213</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ne505d210d2854364b236b49cb305246c">
+    <void:class rdf:resource="http://purl.org/spar/fabio/BookSet"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">48</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nc35db50661ac495bbe4e5e61b04b9dca">
+    <void:property rdf:resource="http://purl.org/spar/pro/isHeldBy"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">541543125</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nef1d062563414042bf5e5a0fbf7fb589">
+    <void:property rdf:resource="http://purl.org/spar/pro/withRole"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">541544409</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N1b91d2933d454f8dbb3c29a1517a0b3d">
+    <void:class rdf:resource="http://purl.org/spar/pro/RoleInTime"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">541544410</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N25efa7ea7b9340c78a167f20ca84fb0e">
+    <void:class rdf:resource="http://purl.org/spar/fabio/WebContent"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">992645</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N0cc07889d02a4cfea40c1abc2a9e7045">
+    <rdf:type rdf:resource="http://www.w3.org/ns/sparql-service-description#NamedGraph"/>
+    <sd:name rdf:resource="https://w3id.org/oc/meta/br/"/>
+    <sd:graph rdf:nodeID="N0ab50225f65943f0a5da12f74b702536"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N3f3cffbfa1a64dd5a678f77ed2cce991">
+    <void:class rdf:resource="http://purl.org/spar/fabio/JournalArticle"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">88373339</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nf83bd6ac0bda4b3ab90670ad17b2364f">
+    <rdf:type rdf:resource="http://www.w3.org/ns/sparql-service-description#NamedGraph"/>
+    <sd:name rdf:resource="https://w3id.org/oc/meta/re/"/>
+    <sd:graph rdf:nodeID="Nc277c1d33a9c4d2dacac9aeadd7d4aa4"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N66cb0733992f43f7ab0ad8a5d9d63e58">
+    <void:property rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">390541078</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N6b270466c3f44adaabbf78512ea59fe0">
+    <void:class rdf:resource="http://purl.org/spar/fabio/BookChapter"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">8300803</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N6256ed068e3a45a2915b9ae1fe0ee11a">
+    <void:property rdf:resource="http://prismstandard.org/namespaces/basic/2.0/publicationDate"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">112453159</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N4c5386663a4e457f8b9c887e995ca0e0">
+    <void:class rdf:resource="http://purl.org/spar/fabio/AcademicProceedings"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">6638384</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nf73bc46ca2be4140945f7b4109a8a112">
+    <void:class rdf:resource="http://purl.org/spar/fabio/ReportDocument"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">411417</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nbd2a1ceb30494ba2b87953ac0184888f">
+    <void:class rdf:resource="http://purl.org/spar/fabio/BookChapter"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">8300803</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nf5478368960a43c28f739055e191e874">
+    <void:class rdf:resource="http://purl.org/spar/fabio/Manifestation"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">82546121</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nb049a793cd1e419291440c2a22e6d9cd">
+    <void:property rdf:resource="http://purl.org/spar/datacite/hasIdentifier"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">12400428</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N1cb45ef8f50d42e0ad2fcaa58bb309f5">
+    <void:property rdf:resource="http://xmlns.com/foaf/0.1/givenName"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">340076746</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N113a058afaca472eb393d1809a06af75">
+    <void:class rdf:resource="http://purl.org/spar/fabio/ProceedingsPaper"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">6504081</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N60b11b9d22674ca4b0bf876d4e7643cf">
+    <void:class rdf:resource="http://purl.org/spar/fabio/SpecificationDocument"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">14901</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Neaa76cb410b44a5594089bf0e431defc">
+    <void:property rdf:resource="http://www.essepuntato.it/2010/06/literalreification/hasLiteralValue"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">251954117</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N5092dea9f2a9476693e051b42c9bb973">
+    <void:class rdf:resource="http://purl.org/spar/fabio/ProceedingsPaper"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">6504081</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N2912b1f1613546f4a5844fa0e833c6e6">
+    <void:class rdf:resource="http://purl.org/spar/fabio/DataManagementPlan"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N13735360bfc9484393fa0476114d066b">
+    <void:class rdf:resource="http://purl.org/spar/fabio/Book"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">7649106</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N23d2647189f6467fbc8545f5af7f1909">
+    <void:property rdf:resource="http://xmlns.com/foaf/0.1/givenName"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">340076746</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N4a98fa01d91442af8200d78c6a8bfa2f">
+    <void:class rdf:resource="http://purl.org/spar/fabio/ExpressionCollection"/>
+    <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">23525</void:entities>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nca17fd5d163c4fde8d9f509b58d5e52a">
+    <void:property rdf:resource="http://purl.org/vocab/frbr/core#partOf"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">115198136</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N28bcb7facd21446191597d6fa6614af5">
+    <void:property rdf:resource="http://purl.org/spar/pro/withRole"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">541544409</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N0eec552b71134f1ebf9210c3a332081f">
+    <void:property rdf:resource="http://purl.org/spar/datacite/usesIdentifierScheme"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">251954117</void:triples>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N152ddadeffe346e4a512dcd034c0fa33">
+    <void:property rdf:resource="http://purl.org/spar/fabio/hasSequenceIdentifier"/>
+    <void:triples rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">11948142</void:triples>
+  </rdf:Description>
+</rdf:RDF>

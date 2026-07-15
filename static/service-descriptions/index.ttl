@@ -1,0 +1,48 @@
+# SPDX-FileCopyrightText: 2026 Arcangelo Massari <arcangelo.massari@unibo.it>
+#
+# SPDX-License-Identifier: ISC
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix formats: <http://www.w3.org/ns/formats/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sd: <http://www.w3.org/ns/sparql-service-description#> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+[] a sd:Service ;
+    sd:defaultDataset [ a void:Dataset,
+                sd:Dataset ;
+            dcterms:description "OpenCitations Index data"@en ;
+            dcterms:title "OpenCitations Index"@en ;
+            void:sparqlEndpoint <https://sparql.opencitations.net/index> ;
+            void:uriSpace "https://w3id.org/oc/index/" ;
+            sd:defaultGraph [ a sd:Graph ;
+                    void:classPartition [ void:class <http://purl.org/spar/cito/JournalSelfCitation> ;
+                            void:entities 106690556 ],
+                        [ void:class <http://purl.org/spar/cito/Citation> ;
+                            void:entities 2315872191 ],
+                        [ void:class <http://purl.org/spar/cito/AuthorSelfCitation> ;
+                            void:entities 60230010 ] ;
+                    void:classes 3 ;
+                    void:distinctObjects 101077399 ;
+                    void:distinctSubjects 2315872191 ;
+                    void:properties 5 ;
+                    void:propertyPartition [ void:property <http://purl.org/spar/cito/hasCitationCreationDate> ;
+                            void:triples 2298554972 ],
+                        [ void:property <http://purl.org/spar/cito/hasCitingEntity> ;
+                            void:triples 2315872191 ],
+                        [ void:property <http://purl.org/spar/cito/hasCitationTimeSpan> ;
+                            void:triples 2038634405 ],
+                        [ void:property <http://purl.org/spar/cito/hasCitedEntity> ;
+                            void:triples 2315872191 ],
+                        [ void:property rdf:type ;
+                            void:triples 2482792757 ] ;
+                    void:triples 11451726516 ] ] ;
+    sd:endpoint <https://sparql.opencitations.net/index> ;
+    sd:feature sd:BasicFederatedQuery ;
+    sd:resultFormat formats:SPARQL_Results_CSV,
+        formats:SPARQL_Results_JSON,
+        formats:SPARQL_Results_TSV,
+        formats:SPARQL_Results_XML,
+        formats:Turtle ;
+    sd:supportedLanguage sd:SPARQL11Query .

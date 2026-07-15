@@ -21,15 +21,14 @@ from src.endpoint_metadata import (
     SERVICE_QUERY_PROBE,
     SPDX_TURTLE_HEADER,
     SPARQL_11_QUERY_PROBE,
-    STATISTIC_QUERIES,
+    DISTINCT_STATISTIC_QUERIES,
     VOID,
     DatasetMetadata,
     Partition,
     ScopeMetadata,
     ServiceCapabilities,
     build_service_description,
-    build_statistic_query,
-    collect_statistics,
+    collect_distinct_statistics,
     collect_scope_metadata,
     detect_features,
     detect_input_formats,
@@ -70,6 +69,22 @@ class FakeResponse:
 
 def _sparql_count(value: int) -> dict[str, dict[str, list[dict[str, dict[str, str]]]]]:
     return {"results": {"bindings": [{"value": {"value": str(value)}}]}}
+
+
+def _sparql_partitions(
+    *partitions: Partition,
+) -> dict[str, dict[str, list[dict[str, dict[str, str]]]]]:
+    return {
+        "results": {
+            "bindings": [
+                {
+                    "resource": {"value": str(partition.resource)},
+                    "count": {"value": str(partition.count)},
+                }
+                for partition in partitions
+            ]
+        }
+    }
 
 
 def _scope_metadata(triples: int) -> ScopeMetadata:
@@ -118,31 +133,24 @@ def _partition_rows(
     return sorted(rows, key=lambda row: str(row[0]))
 
 
-def test_collect_statistics_queries_endpoint() -> None:
+def test_collect_distinct_statistics_queries_endpoint() -> None:
     responses = [
-        _sparql_count(11),
-        _sparql_count(5),
         _sparql_count(7),
         _sparql_count(9),
-        _sparql_count(3),
     ]
-    graph_iri = "https://w3id.org/oc/meta/br/"
     with patch(
         "src.endpoint_metadata.execute_sparql",
         side_effect=responses,
     ) as execute_sparql_mock:
-        statistics = collect_statistics(QUERY_ENDPOINT, timeout=42, graph_iri=graph_iri)
+        statistics = collect_distinct_statistics(QUERY_ENDPOINT, timeout=42)
 
     assert statistics == {
-        VOID.triples: 11,
-        VOID.properties: 5,
         VOID.distinctSubjects: 7,
         VOID.distinctObjects: 9,
-        VOID.classes: 3,
     }
     assert execute_sparql_mock.call_args_list == [
-        call(QUERY_ENDPOINT, build_statistic_query(query, graph_iri), timeout=42)
-        for query in STATISTIC_QUERIES
+        call(QUERY_ENDPOINT, statistic.query, timeout=42)
+        for statistic in DISTINCT_STATISTIC_QUERIES
     ]
 
 
@@ -169,33 +177,13 @@ def test_execute_sparql_requests_json_results() -> None:
     ]
 
 
-def test_collect_scope_metadata_for_named_graph_avoids_distinct_counts() -> None:
+def test_collect_scope_metadata_for_named_graph_derives_statistics() -> None:
     responses = [
-        {
-            "results": {
-                "bindings": [
-                    {
-                        "resource": {"value": str(EXAMPLE_PROPERTY_A)},
-                        "count": {"value": "4"},
-                    },
-                    {
-                        "resource": {"value": str(EXAMPLE_PROPERTY_B)},
-                        "count": {"value": "5"},
-                    },
-                ]
-            }
-        },
-        {
-            "results": {
-                "bindings": [
-                    {
-                        "resource": {"value": str(EXAMPLE_CLASS)},
-                        "count": {"value": "6"},
-                    }
-                ]
-            }
-        },
-        _sparql_count(11),
+        _sparql_partitions(
+            Partition(EXAMPLE_PROPERTY_A, 4),
+            Partition(EXAMPLE_PROPERTY_B, 5),
+        ),
+        _sparql_partitions(Partition(EXAMPLE_CLASS, 6)),
     ]
     with patch(
         "src.endpoint_metadata.execute_sparql",
@@ -207,7 +195,7 @@ def test_collect_scope_metadata_for_named_graph_avoids_distinct_counts() -> None
 
     assert metadata == ScopeMetadata(
         statistics={
-            VOID.triples: 11,
+            VOID.triples: 9,
             VOID.properties: 2,
             VOID.classes: 1,
         },
@@ -233,10 +221,61 @@ def test_collect_scope_metadata_for_named_graph_avoids_distinct_counts() -> None
             "} } GROUP BY ?resource",
             timeout=42,
         ),
+    ]
+
+
+def test_collect_scope_metadata_for_default_graph_derives_statistics() -> None:
+    responses = [
+        _sparql_partitions(
+            Partition(EXAMPLE_PROPERTY_A, 4),
+            Partition(EXAMPLE_PROPERTY_B, 5),
+        ),
+        _sparql_partitions(Partition(EXAMPLE_CLASS, 6)),
+        _sparql_count(7),
+        _sparql_count(9),
+    ]
+    with patch(
+        "src.endpoint_metadata.execute_sparql",
+        side_effect=responses,
+    ) as execute_sparql:
+        metadata = collect_scope_metadata(QUERY_ENDPOINT, timeout=42)
+
+    assert metadata == ScopeMetadata(
+        statistics={
+            VOID.triples: 9,
+            VOID.properties: 2,
+            VOID.classes: 1,
+            VOID.distinctSubjects: 7,
+            VOID.distinctObjects: 9,
+        },
+        property_partitions=[
+            Partition(EXAMPLE_PROPERTY_A, 4),
+            Partition(EXAMPLE_PROPERTY_B, 5),
+        ],
+        class_partitions=[Partition(EXAMPLE_CLASS, 6)],
+    )
+    assert execute_sparql.call_args_list == [
         call(
             QUERY_ENDPOINT,
-            "SELECT (COUNT(*) AS ?value) WHERE { "
-            "GRAPH <https://w3id.org/oc/meta/br/> { ?s ?p ?o } }",
+            "SELECT ?resource (COUNT(*) AS ?count) WHERE { "
+            "?s ?resource ?o } GROUP BY ?resource",
+            timeout=42,
+        ),
+        call(
+            QUERY_ENDPOINT,
+            "SELECT ?resource (COUNT(*) AS ?count) WHERE { "
+            "?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?resource "
+            "} GROUP BY ?resource",
+            timeout=42,
+        ),
+        call(
+            QUERY_ENDPOINT,
+            "SELECT (COUNT(DISTINCT ?s) AS ?value) WHERE { ?s ?p ?o }",
+            timeout=42,
+        ),
+        call(
+            QUERY_ENDPOINT,
+            "SELECT (COUNT(DISTINCT ?o) AS ?value) WHERE { ?s ?p ?o }",
             timeout=42,
         ),
     ]
@@ -571,6 +610,9 @@ def test_write_service_descriptions_use_public_endpoint(tmp_path: Path) -> None:
         parsed_graph = Graph()
         parsed_graph.parse(output_path, format=serialization.rdflib_format)
         assert isomorphic(parsed_graph, expected_graph) is True
+        content = output_path.read_text(encoding="utf-8")
+        assert content.endswith("\n") is True
+        assert content.endswith("\n\n") is False
 
     graph = Graph()
     graph.parse(output, format="turtle")

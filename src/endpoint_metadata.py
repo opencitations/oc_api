@@ -38,8 +38,7 @@ class EndpointProfile:
 @dataclass(frozen=True)
 class StatisticQuery:
     predicate: URIRef
-    query_template: str
-    pattern_kind: str
+    query: str
 
 
 @dataclass(frozen=True)
@@ -129,31 +128,14 @@ SERVICE_DESCRIPTION_SERIALIZATIONS = (
     ServiceDescriptionSerialization(suffix=".nt", rdflib_format="nt"),
 )
 
-STATISTIC_QUERIES = (
-    StatisticQuery(
-        predicate=VOID.triples,
-        query_template="SELECT (COUNT(*) AS ?value) WHERE {{ {pattern} }}",
-        pattern_kind="triples",
-    ),
-    StatisticQuery(
-        predicate=VOID.properties,
-        query_template=("SELECT (COUNT(DISTINCT ?p) AS ?value) WHERE {{ {pattern} }}"),
-        pattern_kind="triples",
-    ),
+DISTINCT_STATISTIC_QUERIES = (
     StatisticQuery(
         predicate=VOID.distinctSubjects,
-        query_template=("SELECT (COUNT(DISTINCT ?s) AS ?value) WHERE {{ {pattern} }}"),
-        pattern_kind="triples",
+        query="SELECT (COUNT(DISTINCT ?s) AS ?value) WHERE { ?s ?p ?o }",
     ),
     StatisticQuery(
         predicate=VOID.distinctObjects,
-        query_template=("SELECT (COUNT(DISTINCT ?o) AS ?value) WHERE {{ {pattern} }}"),
-        pattern_kind="triples",
-    ),
-    StatisticQuery(
-        predicate=VOID.classes,
-        query_template="SELECT (COUNT(DISTINCT ?class) AS ?value) WHERE {{ {pattern} }}",
-        pattern_kind="classes",
+        query="SELECT (COUNT(DISTINCT ?o) AS ?value) WHERE { ?s ?p ?o }",
     ),
 )
 
@@ -259,18 +241,6 @@ INPUT_FORMAT_PROBES = (
 )
 
 
-def triple_pattern(graph_iri: str | None) -> str:
-    if graph_iri is None:
-        return "?s ?p ?o"
-    return f"GRAPH <{graph_iri}> {{ ?s ?p ?o }}"
-
-
-def class_pattern(graph_iri: str | None) -> str:
-    if graph_iri is None:
-        return f"?s <{RDF_TYPE}> ?class"
-    return f"GRAPH <{graph_iri}> {{ ?s <{RDF_TYPE}> ?class }}"
-
-
 def property_partition_pattern(graph_iri: str | None) -> str:
     if graph_iri is None:
         return "?s ?resource ?o"
@@ -281,14 +251,6 @@ def class_partition_pattern(graph_iri: str | None) -> str:
     if graph_iri is None:
         return f"?s <{RDF_TYPE}> ?resource"
     return f"GRAPH <{graph_iri}> {{ ?s <{RDF_TYPE}> ?resource }}"
-
-
-def build_statistic_query(statistic: StatisticQuery, graph_iri: str | None) -> str:
-    if statistic.pattern_kind == "classes":
-        pattern = class_pattern(graph_iri)
-    else:
-        pattern = triple_pattern(graph_iri)
-    return statistic.query_template.format(pattern=pattern)
 
 
 def execute_sparql(endpoint: str, query: str, timeout: int) -> SparqlSelectResult:
@@ -302,30 +264,13 @@ def execute_sparql(endpoint: str, query: str, timeout: int) -> SparqlSelectResul
     return cast(SparqlSelectResult, response.json())
 
 
-def collect_statistics(
-    endpoint: str, timeout: int, graph_iri: str | None = None
-) -> dict[URIRef, int]:
+def collect_distinct_statistics(endpoint: str, timeout: int) -> dict[URIRef, int]:
     statistics: dict[URIRef, int] = {}
-    for statistic in STATISTIC_QUERIES:
-        query = build_statistic_query(statistic, graph_iri)
-        result = execute_sparql(endpoint, query, timeout=timeout)
+    for statistic in DISTINCT_STATISTIC_QUERIES:
+        result = execute_sparql(endpoint, statistic.query, timeout=timeout)
         value = result["results"]["bindings"][0]["value"]["value"]
         statistics[statistic.predicate] = int(value)
     return statistics
-
-
-def collect_statistic(
-    endpoint: str,
-    timeout: int,
-    statistic: StatisticQuery,
-    graph_iri: str | None = None,
-) -> int:
-    result = execute_sparql(
-        endpoint,
-        build_statistic_query(statistic, graph_iri),
-        timeout=timeout,
-    )
-    return int(result["results"]["bindings"][0]["value"]["value"])
 
 
 def collect_partitions(
@@ -364,16 +309,13 @@ def collect_scope_metadata(
         ),
         timeout,
     )
+    statistics = {
+        VOID.triples: sum(partition.count for partition in property_partitions),
+        VOID.properties: len(property_partitions),
+        VOID.classes: len(class_partitions),
+    }
     if graph_iri is None:
-        statistics = collect_statistics(endpoint, timeout)
-    else:
-        statistics = {
-            VOID.triples: collect_statistic(
-                endpoint, timeout, STATISTIC_QUERIES[0], graph_iri
-            ),
-            VOID.properties: len(property_partitions),
-            VOID.classes: len(class_partitions),
-        }
+        statistics.update(collect_distinct_statistics(endpoint, timeout))
     return ScopeMetadata(
         statistics=statistics,
         property_partitions=property_partitions,
@@ -613,7 +555,7 @@ def write_service_descriptions(
         content = graph.serialize(format=serialization.rdflib_format)
         if serialization.rdflib_format == "turtle":
             content = f"{SPDX_TURTLE_HEADER}{content}"
-        output_path.write_text(content, encoding="utf-8")
+        output_path.write_text(f"{content.rstrip()}\n", encoding="utf-8")
         output_paths.append(output_path)
     return tuple(output_paths)
 
