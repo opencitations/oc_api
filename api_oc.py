@@ -72,6 +72,8 @@ urls = (
     "Static",
     "/favicon.ico",
     "Favicon",
+    "/.well-known/void",
+    "WellKnownVoid",
     "/sparql/index",
     "SparqlIndex",
     "/sparql/meta",
@@ -271,12 +273,94 @@ class Static:
             ".woff": "font/woff",
             ".woff2": "font/woff2",
             ".ttf": "font/ttf",
+            ".ttl": "text/turtle",
+            ".jsonld": "application/ld+json",
+            ".rdf": "application/rdf+xml",
+            ".nt": "application/n-triples",
         }
 
         web.header("Content-Type", content_types.get(ext, "application/octet-stream"))
 
         with open(file_path, "rb") as f:
             return f.read()
+
+
+_SD_TYPES = {
+    "text/turtle": (".ttl", "text/turtle; charset=utf-8"),
+    "application/ld+json": (".jsonld", "application/ld+json; charset=utf-8"),
+    "application/rdf+xml": (".rdf", "application/rdf+xml; charset=utf-8"),
+    "application/n-triples": (".nt", "application/n-triples; charset=utf-8"),
+    "text/html": (".html", "text/html; charset=utf-8"),
+}
+_SD_DEFAULT_EXT = ".ttl"
+_SD_DEFAULT_CT = "text/turtle; charset=utf-8"
+
+
+def _parse_accept(accept: str) -> list[tuple[str, str, float, int, int]]:
+    media_ranges: list[tuple[str, str, float, int, int]] = []
+    for position, value in enumerate(accept.split(",")):
+        media_type, *parameters = (part.strip() for part in value.split(";"))
+        quality = 1.0
+        for parameter in parameters:
+            name, parameter_value = parameter.split("=", 1)
+            if name.lower() == "q":
+                quality = float(parameter_value)
+        resource_type, resource_subtype = media_type.lower().split("/", 1)
+        specificity = int(resource_type != "*") + int(resource_subtype != "*")
+        media_ranges.append(
+            (resource_type, resource_subtype, quality, specificity, -position)
+        )
+    return media_ranges
+
+
+def _select_sd_type(accept: str | None) -> tuple[str, str]:
+    if accept is None or accept.strip() == "":
+        return _SD_DEFAULT_EXT, _SD_DEFAULT_CT
+
+    media_ranges = _parse_accept(accept)
+    representations: list[tuple[float, int, int, tuple[str, str]]] = []
+    for server_preference, (media_type, representation) in enumerate(_SD_TYPES.items()):
+        resource_type, resource_subtype = media_type.split("/", 1)
+        matches = [
+            (quality, specificity, client_preference)
+            for (
+                accepted_type,
+                accepted_subtype,
+                quality,
+                specificity,
+                client_preference,
+            ) in media_ranges
+            if accepted_type in ("*", resource_type)
+            and accepted_subtype in ("*", resource_subtype)
+        ]
+        if matches:
+            quality, specificity, _ = max(matches, key=lambda item: (item[1], item[2]))
+            if quality > 0:
+                representations.append(
+                    (quality, specificity, -server_preference, representation)
+                )
+
+    if not representations:
+        raise web.notacceptable()
+    return max(representations)[3]
+
+
+def _serve_sd_file(base_name: str) -> bytes:
+    accept = web.ctx.env.get("HTTP_ACCEPT")
+    ext, ct = _select_sd_type(accept)
+    file_path = os.path.join("static", "service-descriptions", f"{base_name}{ext}")
+    if not os.path.exists(file_path):
+        raise web.notfound()
+    web.header("Content-Type", ct)
+    web.header("Access-Control-Allow-Origin", "*")
+    web.header("Vary", "Accept")
+    with open(file_path, "rb") as f:
+        return f.read()
+
+
+class WellKnownVoid:
+    def GET(self):
+        return _serve_sd_file("void")
 
 
 class Sparql:
@@ -287,10 +371,12 @@ class Sparql:
         self.collparam = ["query"]
 
     def GET(self):
-        # web_logger.mes()
+        query_string = web.ctx.env.get("QUERY_STRING")
+        if not query_string or not query_string.strip():
+            return _serve_sd_file(self.sparql_endpoint_title)
         content_type = web.ctx.env.get("CONTENT_TYPE")
         return self.__run_query_string(
-            self.sparql_endpoint_title, web.ctx.env.get("QUERY_STRING"), content_type
+            self.sparql_endpoint_title, query_string, content_type
         )
 
     def POST(self):

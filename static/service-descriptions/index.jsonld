@@ -141,6 +141,48 @@
     ]
   },
   {
+    "@id": "_:Nea6970d042d64eaebfb4f1c5beeac78b",
+    "http://rdfs.org/ns/void#class": [
+      {
+        "@id": "http://purl.org/spar/cito/AuthorSelfCitation"
+      }
+    ],
+    "http://rdfs.org/ns/void#entities": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 60230010
+      }
+    ]
+  },
+  {
+    "@id": "_:N8b12df94568e41d7b0a5002bd8907540",
+    "http://rdfs.org/ns/void#class": [
+      {
+        "@id": "http://purl.org/spar/cito/Citation"
+      }
+    ],
+    "http://rdfs.org/ns/void#entities": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 2315872191
+      }
+    ]
+  },
+  {
+    "@id": "_:N7b61ba6afadc4d429e72da8184552da0",
+    "http://rdfs.org/ns/void#class": [
+      {
+        "@id": "http://purl.org/spar/cito/JournalSelfCitation"
+      }
+    ],
+    "http://rdfs.org/ns/void#entities": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 106690556
+      }
+    ]
+  },
+  {
     "@id": "_:N16d2e791cd9a42948e5baddac8bf8c8a",
     "http://rdfs.org/ns/void#property": [
       {
@@ -207,48 +249,6 @@
       {
         "@type": "http://www.w3.org/2001/XMLSchema#integer",
         "@value": 2482792757
-      }
-    ]
-  },
-  {
-    "@id": "_:Nea6970d042d64eaebfb4f1c5beeac78b",
-    "http://rdfs.org/ns/void#class": [
-      {
-        "@id": "http://purl.org/spar/cito/AuthorSelfCitation"
-      }
-    ],
-    "http://rdfs.org/ns/void#entities": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 60230010
-      }
-    ]
-  },
-  {
-    "@id": "_:N8b12df94568e41d7b0a5002bd8907540",
-    "http://rdfs.org/ns/void#class": [
-      {
-        "@id": "http://purl.org/spar/cito/Citation"
-      }
-    ],
-    "http://rdfs.org/ns/void#entities": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 2315872191
-      }
-    ]
-  },
-  {
-    "@id": "_:N7b61ba6afadc4d429e72da8184552da0",
-    "http://rdfs.org/ns/void#class": [
-      {
-        "@id": "http://purl.org/spar/cito/JournalSelfCitation"
-      }
-    ],
-    "http://rdfs.org/ns/void#entities": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 106690556
       }
     ]
   }

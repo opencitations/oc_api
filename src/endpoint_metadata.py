@@ -6,12 +6,13 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import dataclass
+from html import escape as html_escape
 from pathlib import Path
 from typing import cast
 from urllib.parse import quote
 
 import requests
-from rdflib import BNode, Graph, Literal, Namespace, URIRef
+from rdflib import BNode, Graph, Literal, Namespace, Node, URIRef
 from rdflib.namespace import DCTERMS, RDF, XSD
 
 SD = Namespace("http://www.w3.org/ns/sparql-service-description#")
@@ -19,12 +20,6 @@ VOID = Namespace("http://rdfs.org/ns/void#")
 FORMATS = Namespace("http://www.w3.org/ns/formats/")
 
 SparqlSelectResult = dict[str, dict[str, list[dict[str, dict[str, str]]]]]
-SPDX_TURTLE_HEADER = (
-    "# SPDX-FileCopyrightText: 2026 Arcangelo Massari <arcangelo.massari@unibo.it>\n"
-    "#\n"
-    "# SPDX-License-"
-    "Identifier: ISC\n\n"
-)
 
 
 @dataclass(frozen=True)
@@ -127,6 +122,41 @@ SERVICE_DESCRIPTION_SERIALIZATIONS = (
     ServiceDescriptionSerialization(suffix=".rdf", rdflib_format="xml"),
     ServiceDescriptionSerialization(suffix=".nt", rdflib_format="nt"),
 )
+
+RDFA_PREFIXES = (
+    "sd: http://www.w3.org/ns/sparql-service-description# "
+    "void: http://rdfs.org/ns/void# "
+    "dcterms: http://purl.org/dc/terms/ "
+    "xsd: http://www.w3.org/2001/XMLSchema#"
+)
+
+_CURIE_NAMESPACES = (
+    (str(SD), "sd"),
+    (str(VOID), "void"),
+    (str(DCTERMS), "dcterms"),
+    (str(FORMATS), "formats"),
+    (str(XSD), "xsd"),
+    (str(RDF), "rdf"),
+)
+
+URI_LABELS: dict[str, str] = {
+    str(SD.SPARQL10Query): "SPARQL 1.0 Query",
+    str(SD.SPARQL11Query): "SPARQL 1.1 Query",
+    str(SD.SPARQL11Update): "SPARQL 1.1 Update",
+    str(SD.BasicFederatedQuery): "Basic Federated Query",
+    str(SD.UnionDefaultGraph): "Union Default Graph",
+    str(SD.DereferencesURIs): "Dereferences URIs",
+    str(FORMATS.SPARQL_Results_JSON): "SPARQL Results JSON",
+    str(FORMATS.SPARQL_Results_XML): "SPARQL Results XML",
+    str(FORMATS.SPARQL_Results_CSV): "SPARQL Results CSV",
+    str(FORMATS.SPARQL_Results_TSV): "SPARQL Results TSV",
+    str(FORMATS.Turtle): "Turtle",
+    str(FORMATS.RDF_XML): "RDF/XML",
+    str(FORMATS["N-Triples"]): "N-Triples",
+    str(FORMATS["JSON-LD"]): "JSON-LD",
+    str(FORMATS.TriG): "TriG",
+    str(FORMATS["N-Quads"]): "N-Quads",
+}
 
 DISTINCT_STATISTIC_QUERIES = (
     StatisticQuery(
@@ -535,6 +565,244 @@ def build_service_description(
     return graph
 
 
+def _curie(uri: str) -> str:
+    for ns, prefix in _CURIE_NAMESPACES:
+        if uri.startswith(ns):
+            return f"{prefix}:{uri[len(ns) :]}"
+    return uri
+
+
+def _uri_label(uri: str) -> str:
+    label = URI_LABELS.get(uri)
+    if label is not None:
+        return label
+    fragment = uri.rsplit("#", 1)[-1] if "#" in uri else uri.rsplit("/", 1)[-1]
+    return fragment.replace("_", " ")
+
+
+def _render_scope_html(graph: Graph, scope_node: Node, h_part: int) -> str:
+    parts: list[str] = []
+
+    stat_predicates = [
+        (VOID.triples, "void:triples", "Triples"),
+        (VOID.distinctSubjects, "void:distinctSubjects", "Distinct Subjects"),
+        (VOID.distinctObjects, "void:distinctObjects", "Distinct Objects"),
+        (VOID.properties, "void:properties", "Properties"),
+        (VOID.classes, "void:classes", "Classes"),
+    ]
+
+    stats_items: list[str] = []
+    uri_spaces = list(graph.objects(scope_node, VOID.uriSpace, unique=True))
+    if uri_spaces:
+        stats_items.append("<dt>URI Space</dt>")
+        stats_items.append(
+            f'<dd><span property="void:uriSpace" lang="">'
+            f"{html_escape(str(uri_spaces[0]))}</span></dd>"
+        )
+    for pred, pred_curie, label in stat_predicates:
+        values = list(graph.objects(scope_node, pred, unique=True))
+        if values:
+            value = int(str(values[0]))
+            stats_items.append(f"<dt>{label}</dt>")
+            stats_items.append(
+                f'<dd><span property="{pred_curie}" content="{value}" '
+                f'datatype="xsd:integer">{value:,}</span></dd>'
+            )
+    if stats_items:
+        parts.append("<dl>")
+        parts.extend(stats_items)
+        parts.append("</dl>")
+
+    prop_partitions = list(
+        graph.objects(scope_node, VOID.propertyPartition, unique=True)
+    )
+    if prop_partitions:
+        rows: list[tuple[str, int]] = []
+        for pp in prop_partitions:
+            prop_uri = str(next(graph.objects(pp, VOID.property, unique=True)))
+            count = int(str(next(graph.objects(pp, VOID.triples, unique=True))))
+            rows.append((prop_uri, count))
+        rows.sort(key=lambda r: (-r[1], r[0]))
+        parts.append(f"<h{h_part}>Property Partitions</h{h_part}>")
+        parts.append(
+            "<table><thead><tr><th>Property</th><th>Triples</th></tr></thead><tbody>"
+        )
+        for prop_uri, count in rows:
+            parts.append(
+                f'<tr rel="void:propertyPartition" typeof="">'
+                f'<td><a rel="void:property" href="{html_escape(prop_uri)}">'
+                f"{html_escape(_uri_label(prop_uri))}</a></td>"
+                f'<td><span property="void:triples" content="{count}" '
+                f'datatype="xsd:integer">{count:,}</span></td></tr>'
+            )
+        parts.append("</tbody></table>")
+
+    class_partitions = list(graph.objects(scope_node, VOID.classPartition, unique=True))
+    if class_partitions:
+        class_rows: list[tuple[str, int]] = []
+        for cp in class_partitions:
+            class_uri = str(next(graph.objects(cp, VOID["class"], unique=True)))
+            count = int(str(next(graph.objects(cp, VOID.entities, unique=True))))
+            class_rows.append((class_uri, count))
+        class_rows.sort(key=lambda r: (-r[1], r[0]))
+        parts.append(f"<h{h_part}>Class Partitions</h{h_part}>")
+        parts.append(
+            "<table><thead><tr><th>Class</th><th>Entities</th></tr></thead><tbody>"
+        )
+        for class_uri, count in class_rows:
+            parts.append(
+                f'<tr rel="void:classPartition" typeof="">'
+                f'<td><a rel="void:class" href="{html_escape(class_uri)}">'
+                f"{html_escape(_uri_label(class_uri))}</a></td>"
+                f'<td><span property="void:entities" content="{count}" '
+                f'datatype="xsd:integer">{count:,}</span></td></tr>'
+            )
+        parts.append("</tbody></table>")
+
+    return "\n".join(parts)
+
+
+def _render_service_html(graph: Graph, service: Node, h_base: int) -> str:
+    endpoint_uri = str(next(graph.objects(service, SD.endpoint, unique=True)))
+    dataset = next(graph.objects(service, SD.defaultDataset, unique=True))
+    title = str(next(graph.objects(dataset, DCTERMS.title, unique=True)))
+    description = str(next(graph.objects(dataset, DCTERMS.description, unique=True)))
+    uri_space = str(next(graph.objects(dataset, VOID.uriSpace, unique=True)))
+    default_graph_node = next(graph.objects(dataset, SD.defaultGraph, unique=True))
+
+    parts: list[str] = []
+    parts.append('<article typeof="sd:Service">')
+
+    if h_base == 1:
+        parts.append("<h1>SPARQL Service Description</h1>")
+    else:
+        parts.append(f"<h{h_base}>{html_escape(title)}</h{h_base}>")
+
+    parts.append("<dl>")
+    parts.append("<dt>Endpoint</dt>")
+    parts.append(
+        f'<dd><a rel="sd:endpoint" href="{html_escape(endpoint_uri)}">'
+        f"{html_escape(endpoint_uri)}</a></dd>"
+    )
+    for predicate, rel, label in [
+        (SD.supportedLanguage, "sd:supportedLanguage", "Supported Languages"),
+        (SD.feature, "sd:feature", "Features"),
+        (SD.resultFormat, "sd:resultFormat", "Result Formats"),
+        (SD.inputFormat, "sd:inputFormat", "Input Formats"),
+    ]:
+        uris = sorted(
+            str(obj) for obj in graph.objects(service, predicate, unique=True)
+        )
+        if uris:
+            items = "".join(
+                f'<li><a rel="{rel}" href="{html_escape(u)}">'
+                f"{html_escape(_uri_label(u))}</a></li>"
+                for u in uris
+            )
+            parts.append(f"<dt>{label}</dt>")
+            parts.append(f'<dd><ul class="tags">{items}</ul></dd>')
+    parts.append("</dl>")
+
+    dataset_types = sorted(
+        str(t) for t in graph.objects(dataset, RDF.type, unique=True)
+    )
+    typeof_attr = " ".join(_curie(t) for t in dataset_types)
+
+    h_ds = h_base + 1
+    h_graph = h_base + 2
+    h_part = h_base + 3
+
+    parts.append(f'<div rel="sd:defaultDataset" typeof="{typeof_attr}">')
+    parts.append(
+        f'<h{h_ds}><span property="dcterms:title">{html_escape(title)}</span></h{h_ds}>'
+    )
+    parts.append(f'<p property="dcterms:description">{html_escape(description)}</p>')
+    parts.append("<dl>")
+    parts.append("<dt>URI Space</dt>")
+    parts.append(
+        f'<dd><span property="void:uriSpace" lang="">'
+        f"{html_escape(uri_space)}</span></dd>"
+    )
+    parts.append("<dt>SPARQL Endpoint</dt>")
+    parts.append(
+        f'<dd><a rel="void:sparqlEndpoint" href="{html_escape(endpoint_uri)}">'
+        f"{html_escape(endpoint_uri)}</a></dd>"
+    )
+    parts.append("</dl>")
+
+    parts.append('<div rel="sd:defaultGraph" typeof="sd:Graph">')
+    parts.append(f"<h{h_graph}>Default Graph</h{h_graph}>")
+    parts.append(_render_scope_html(graph, default_graph_node, h_part))
+    parts.append("</div>")
+
+    named_graphs = list(graph.objects(dataset, SD.namedGraph, unique=True))
+    if named_graphs:
+        named_graphs_sorted = sorted(
+            named_graphs,
+            key=lambda ng: str(next(graph.objects(ng, SD.name, unique=True))),
+        )
+        for ng in named_graphs_sorted:
+            ng_name = str(next(graph.objects(ng, SD.name, unique=True)))
+            ng_graph = next(graph.objects(ng, SD.graph, unique=True))
+            parts.append('<div rel="sd:namedGraph" typeof="sd:NamedGraph">')
+            parts.append(
+                f"<h{h_graph}>Named Graph: "
+                f'<a rel="sd:name" href="{html_escape(ng_name)}">'
+                f"{html_escape(ng_name)}</a></h{h_graph}>"
+            )
+            parts.append('<div rel="sd:graph" typeof="sd:Graph">')
+            parts.append(_render_scope_html(graph, ng_graph, h_part))
+            parts.append("</div>")
+            parts.append("</div>")
+
+    parts.append("</div>")
+    parts.append("</article>")
+    return "\n".join(parts)
+
+
+def serialize_html_rdfa(graph: Graph) -> str:
+    services = sorted(graph.subjects(RDF.type, SD.Service, unique=True), key=str)
+    multi = len(services) > 1
+
+    page_title = "SPARQL Service Description"
+    if multi:
+        page_title = "VoID Description"
+    elif services:
+        dataset = next(graph.objects(services[0], SD.defaultDataset, unique=True))
+        ds_title = str(next(graph.objects(dataset, DCTERMS.title, unique=True)))
+        page_title = f"SPARQL Service Description — {ds_title}"
+
+    body_parts: list[str] = []
+    if multi:
+        body_parts.append("<h1>VoID Description</h1>")
+    for s in services:
+        body_parts.append(_render_service_html(graph, s, h_base=2 if multi else 1))
+
+    return (
+        "<!DOCTYPE html>\n"
+        f'<html lang="en" prefix="{RDFA_PREFIXES}">\n'
+        "<head>\n"
+        '<meta charset="utf-8">\n'
+        f"<title>{html_escape(page_title)}</title>\n"
+        "</head>\n"
+        "<body>\n" + "\n".join(body_parts) + "\n</body>\n"
+        "</html>\n"
+    )
+
+
+def _serialize_graph_to_files(graph: Graph, output: Path) -> tuple[Path, ...]:
+    output_paths: list[Path] = []
+    for serialization in SERVICE_DESCRIPTION_SERIALIZATIONS:
+        output_path = output.with_suffix(serialization.suffix)
+        content = graph.serialize(format=serialization.rdflib_format)
+        output_path.write_text(f"{content.rstrip()}\n", encoding="utf-8")
+        output_paths.append(output_path)
+    html_path = output.with_suffix(".html")
+    html_path.write_text(serialize_html_rdfa(graph), encoding="utf-8")
+    output_paths.append(html_path)
+    return tuple(output_paths)
+
+
 def write_service_descriptions(
     dataset_name: str,
     endpoint: str,
@@ -549,20 +817,27 @@ def write_service_descriptions(
     graph = build_service_description(
         dataset_name, public_endpoint, metadata, capabilities
     )
-    output_paths: list[Path] = []
-    for serialization in SERVICE_DESCRIPTION_SERIALIZATIONS:
-        output_path = output.with_suffix(serialization.suffix)
-        content = graph.serialize(format=serialization.rdflib_format)
-        if serialization.rdflib_format == "turtle":
-            content = f"{SPDX_TURTLE_HEADER}{content}"
-        output_path.write_text(f"{content.rstrip()}\n", encoding="utf-8")
-        output_paths.append(output_path)
-    return tuple(output_paths)
+    return _serialize_graph_to_files(graph, output)
+
+
+def write_combined_void(source_dir: Path, output: Path) -> tuple[Path, ...]:
+    combined = Graph()
+    combined.bind("sd", SD)
+    combined.bind("void", VOID)
+    combined.bind("dcterms", DCTERMS)
+    combined.bind("formats", FORMATS)
+    for name in ("index", "meta"):
+        source = source_dir / f"{name}.ttl"
+        g = Graph()
+        g.parse(source, format="turtle")
+        for s, p, o in g:
+            combined.add((s, p, o))
+    return _serialize_graph_to_files(combined, output)
 
 
 def parse_args() -> argparse.Namespace:  # pragma: no cover
     parser = argparse.ArgumentParser(
-        description="Generate SPARQL Service Description RDF for an OpenCitations endpoint.",
+        description="Generate SPARQL Service Description files for an OpenCitations endpoint.",
     )
     parser.add_argument(
         "dataset",
@@ -576,13 +851,13 @@ def parse_args() -> argparse.Namespace:  # pragma: no cover
     )
     parser.add_argument(
         "--public-endpoint",
-        help="SPARQL endpoint URL to write in RDF when it differs from --endpoint.",
+        help="SPARQL endpoint URL to write when it differs from --endpoint.",
     )
     parser.add_argument(
         "--output",
         required=True,
         type=Path,
-        help="Output path whose suffix is replaced for each RDF serialization.",
+        help="Output path whose suffix is replaced for each serialization.",
     )
     parser.add_argument(
         "--timeout",

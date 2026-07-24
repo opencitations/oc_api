@@ -8,6 +8,8 @@ from unittest.mock import call, patch
 
 import pytest
 import requests
+from html5lib import parse
+from pyRdfa import pyRdfa
 from rdflib import Graph, Literal, Node, URIRef
 from rdflib.compare import isomorphic
 from rdflib.namespace import DCTERMS, RDF, XSD
@@ -19,7 +21,6 @@ from src.endpoint_metadata import (
     SD,
     SERVICE_DESCRIPTION_SERIALIZATIONS,
     SERVICE_QUERY_PROBE,
-    SPDX_TURTLE_HEADER,
     SPARQL_11_QUERY_PROBE,
     DISTINCT_STATISTIC_QUERIES,
     VOID,
@@ -37,6 +38,8 @@ from src.endpoint_metadata import (
     detect_supported_languages,
     execute_sparql,
     input_format_query,
+    serialize_html_rdfa,
+    write_combined_void,
     write_service_descriptions,
 )
 
@@ -603,9 +606,11 @@ def test_write_service_descriptions_use_public_endpoint(tmp_path: Path) -> None:
         tmp_path / "description.jsonld",
         tmp_path / "description.rdf",
         tmp_path / "description.nt",
+        tmp_path / "description.html",
     )
+    rdf_paths = output_paths[:4]
     for serialization, output_path in zip(
-        SERVICE_DESCRIPTION_SERIALIZATIONS, output_paths, strict=True
+        SERVICE_DESCRIPTION_SERIALIZATIONS, rdf_paths, strict=True
     ):
         parsed_graph = Graph()
         parsed_graph.parse(output_path, format=serialization.rdflib_format)
@@ -613,6 +618,9 @@ def test_write_service_descriptions_use_public_endpoint(tmp_path: Path) -> None:
         content = output_path.read_text(encoding="utf-8")
         assert content.endswith("\n") is True
         assert content.endswith("\n\n") is False
+
+    html_content = output_paths[4].read_text(encoding="utf-8")
+    assert html_content == serialize_html_rdfa(expected_graph)
 
     graph = Graph()
     graph.parse(output, format="turtle")
@@ -622,7 +630,6 @@ def test_write_service_descriptions_use_public_endpoint(tmp_path: Path) -> None:
 
     assert collect_metadata.call_args_list == [call("index", QUERY_ENDPOINT, 10)]
     assert detect.call_args_list == [call(QUERY_ENDPOINT, "index", 10, metadata)]
-    assert output.read_text(encoding="utf-8").startswith(SPDX_TURTLE_HEADER)
     assert set(graph.objects(service, SD.endpoint)) == {URIRef(PUBLIC_ENDPOINT)}
     assert set(graph.objects(default_graph, RDF.type)) == {SD.Graph}
     assert set(graph.objects(default_graph, VOID.triples)) == {
@@ -653,3 +660,78 @@ def test_write_service_descriptions_do_not_write_after_query_failure(
         output.with_suffix(serialization.suffix).exists()
         for serialization in SERVICE_DESCRIPTION_SERIALIZATIONS
     ] == [False, False, False, False]
+    assert output.with_suffix(".html").exists() is False
+
+
+def test_serialize_html_rdfa_contains_rdfa_for_named_graphs(tmp_path: Path) -> None:
+    metadata = _dataset_metadata(with_named_graph=True)
+    graph = build_service_description(
+        "meta", PUBLIC_ENDPOINT, metadata, _capabilities()
+    )
+    html = serialize_html_rdfa(graph)
+    html_path = tmp_path / "description.html"
+    html_path.write_text(html, encoding="utf-8")
+    extracted_graph = pyRdfa(media_type="text/html").graph_from_source(str(html_path))
+
+    assert isomorphic(extracted_graph, graph) is True
+
+
+def test_serialize_html_rdfa_multi_service_renders_void_heading(
+    tmp_path: Path,
+) -> None:
+    g1 = build_service_description(
+        "index", "https://example.org/index", _dataset_metadata(False), _capabilities()
+    )
+    g2 = build_service_description(
+        "meta", "https://example.org/meta", _dataset_metadata(False), _capabilities()
+    )
+    combined = Graph()
+    for s, p, o in g1:
+        combined.add((s, p, o))
+    for s, p, o in g2:
+        combined.add((s, p, o))
+    html = serialize_html_rdfa(combined)
+    root = parse(html, namespaceHTMLElements=False)
+    html_path = tmp_path / "void.html"
+    html_path.write_text(html, encoding="utf-8")
+    extracted_graph = pyRdfa(media_type="text/html").graph_from_source(str(html_path))
+
+    assert root.findtext("./head/title") == "VoID Description"
+    assert root.findtext("./body/h1") == "VoID Description"
+    assert [article.findtext("h2") for article in root.findall("./body/article")] == [
+        "OpenCitations Index",
+        "OpenCitations Meta",
+    ]
+    assert isomorphic(extracted_graph, combined) is True
+
+
+def test_write_combined_void_merges_both_endpoints(tmp_path: Path) -> None:
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    expected_graph = Graph()
+    for name, ds_name in [("index", "index"), ("meta", "meta")]:
+        g = build_service_description(
+            ds_name,
+            f"https://example.org/{ds_name}",
+            _dataset_metadata(with_named_graph=False),
+            _capabilities(),
+        )
+        (source_dir / f"{name}.ttl").write_text(
+            g.serialize(format="turtle"), encoding="utf-8"
+        )
+        for triple in g:
+            expected_graph.add(triple)
+
+    output = tmp_path / "void"
+    paths = write_combined_void(source_dir, output)
+
+    assert paths == (
+        tmp_path / "void.ttl",
+        tmp_path / "void.jsonld",
+        tmp_path / "void.rdf",
+        tmp_path / "void.nt",
+        tmp_path / "void.html",
+    )
+    combined = Graph()
+    combined.parse(paths[0], format="turtle")
+    assert isomorphic(combined, expected_graph) is True

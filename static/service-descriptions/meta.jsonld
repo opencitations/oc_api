@@ -281,258 +281,6 @@
     ]
   },
   {
-    "@id": "_:N47f395d2fd49411bb90ffdf7a91bc3af",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://prismstandard.org/namespaces/basic/2.0/endingPage"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 81134715
-      }
-    ]
-  },
-  {
-    "@id": "_:Nd5b06e5c854848e1ba7b354713dfd9bc",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://prismstandard.org/namespaces/basic/2.0/publicationDate"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 112453159
-      }
-    ]
-  },
-  {
-    "@id": "_:Nab16b48ff98a46319f28d03672b9c434",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://prismstandard.org/namespaces/basic/2.0/startingPage"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 81134704
-      }
-    ]
-  },
-  {
-    "@id": "_:Ne902d6283f7e4e9a90811656bb1aad23",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://purl.org/dc/terms/title"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 129215401
-      }
-    ]
-  },
-  {
-    "@id": "_:N9d92fc5528a44bf6a66dc9f278cee4d9",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://purl.org/spar/datacite/hasIdentifier"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 260711341
-      }
-    ]
-  },
-  {
-    "@id": "_:N0eec552b71134f1ebf9210c3a332081f",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://purl.org/spar/datacite/usesIdentifierScheme"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 251954117
-      }
-    ]
-  },
-  {
-    "@id": "_:Nc828079927724d7c9f21e3709a7997f5",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://purl.org/spar/fabio/hasSequenceIdentifier"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 11948142
-      }
-    ]
-  },
-  {
-    "@id": "_:N97a6e3ba997e4208aef1710a9952cd31",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://purl.org/spar/pro/isDocumentContextFor"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 534260004
-      }
-    ]
-  },
-  {
-    "@id": "_:Nf223a38917b548afaf06ea87acba67b1",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://purl.org/spar/pro/isHeldBy"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 541543125
-      }
-    ]
-  },
-  {
-    "@id": "_:N28bcb7facd21446191597d6fa6614af5",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://purl.org/spar/pro/withRole"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 541544409
-      }
-    ]
-  },
-  {
-    "@id": "_:Ne79abd641a8c4a5aa29f6b52fe49681c",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://purl.org/vocab/frbr/core#embodiment"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 82507304
-      }
-    ]
-  },
-  {
-    "@id": "_:N6c260354fcd844cc8f667af26c00abf8",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://purl.org/vocab/frbr/core#partOf"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 115198136
-      }
-    ]
-  },
-  {
-    "@id": "_:Nf9cfdf5ae0164790b5e25df1f854ab47",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "https://w3id.org/oc/ontology/hasNext"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 316466954
-      }
-    ]
-  },
-  {
-    "@id": "_:Neaa76cb410b44a5594089bf0e431defc",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://www.essepuntato.it/2010/06/literalreification/hasLiteralValue"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 251954117
-      }
-    ]
-  },
-  {
-    "@id": "_:N967067b8906e439e8626a6a182ac5ad5",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 1553367233
-      }
-    ]
-  },
-  {
-    "@id": "_:N2a5f84d074774066953f2527055a1d07",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://xmlns.com/foaf/0.1/familyName"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 342844564
-      }
-    ]
-  },
-  {
-    "@id": "_:N23d2647189f6467fbc8545f5af7f1909",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://xmlns.com/foaf/0.1/givenName"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 340076746
-      }
-    ]
-  },
-  {
-    "@id": "_:Naddcc520384a4781b0ff65cac3fe606a",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://xmlns.com/foaf/0.1/name"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 47742692
-      }
-    ]
-  },
-  {
     "@id": "_:Nc2f850a2fa7a4bcb8e609299cd2dba11",
     "http://rdfs.org/ns/void#class": [
       {
@@ -953,6 +701,258 @@
     ]
   },
   {
+    "@id": "_:N47f395d2fd49411bb90ffdf7a91bc3af",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://prismstandard.org/namespaces/basic/2.0/endingPage"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 81134715
+      }
+    ]
+  },
+  {
+    "@id": "_:Nd5b06e5c854848e1ba7b354713dfd9bc",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://prismstandard.org/namespaces/basic/2.0/publicationDate"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 112453159
+      }
+    ]
+  },
+  {
+    "@id": "_:Nab16b48ff98a46319f28d03672b9c434",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://prismstandard.org/namespaces/basic/2.0/startingPage"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 81134704
+      }
+    ]
+  },
+  {
+    "@id": "_:Ne902d6283f7e4e9a90811656bb1aad23",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://purl.org/dc/terms/title"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 129215401
+      }
+    ]
+  },
+  {
+    "@id": "_:N9d92fc5528a44bf6a66dc9f278cee4d9",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://purl.org/spar/datacite/hasIdentifier"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 260711341
+      }
+    ]
+  },
+  {
+    "@id": "_:N0eec552b71134f1ebf9210c3a332081f",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://purl.org/spar/datacite/usesIdentifierScheme"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 251954117
+      }
+    ]
+  },
+  {
+    "@id": "_:Nc828079927724d7c9f21e3709a7997f5",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://purl.org/spar/fabio/hasSequenceIdentifier"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 11948142
+      }
+    ]
+  },
+  {
+    "@id": "_:N97a6e3ba997e4208aef1710a9952cd31",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://purl.org/spar/pro/isDocumentContextFor"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 534260004
+      }
+    ]
+  },
+  {
+    "@id": "_:Nf223a38917b548afaf06ea87acba67b1",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://purl.org/spar/pro/isHeldBy"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 541543125
+      }
+    ]
+  },
+  {
+    "@id": "_:N28bcb7facd21446191597d6fa6614af5",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://purl.org/spar/pro/withRole"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 541544409
+      }
+    ]
+  },
+  {
+    "@id": "_:Ne79abd641a8c4a5aa29f6b52fe49681c",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://purl.org/vocab/frbr/core#embodiment"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 82507304
+      }
+    ]
+  },
+  {
+    "@id": "_:N6c260354fcd844cc8f667af26c00abf8",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://purl.org/vocab/frbr/core#partOf"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 115198136
+      }
+    ]
+  },
+  {
+    "@id": "_:Nf9cfdf5ae0164790b5e25df1f854ab47",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "https://w3id.org/oc/ontology/hasNext"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 316466954
+      }
+    ]
+  },
+  {
+    "@id": "_:Neaa76cb410b44a5594089bf0e431defc",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://www.essepuntato.it/2010/06/literalreification/hasLiteralValue"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 251954117
+      }
+    ]
+  },
+  {
+    "@id": "_:N967067b8906e439e8626a6a182ac5ad5",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 1553367233
+      }
+    ]
+  },
+  {
+    "@id": "_:N2a5f84d074774066953f2527055a1d07",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://xmlns.com/foaf/0.1/familyName"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 342844564
+      }
+    ]
+  },
+  {
+    "@id": "_:N23d2647189f6467fbc8545f5af7f1909",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://xmlns.com/foaf/0.1/givenName"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 340076746
+      }
+    ]
+  },
+  {
+    "@id": "_:Naddcc520384a4781b0ff65cac3fe606a",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://xmlns.com/foaf/0.1/name"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 47742692
+      }
+    ]
+  },
+  {
     "@id": "_:N0cc07889d02a4cfea40c1abc2a9e7045",
     "@type": [
       "http://www.w3.org/ns/sparql-service-description#NamedGraph"
@@ -1100,118 +1100,6 @@
     "http://rdfs.org/ns/void#uriSpace": [
       {
         "@value": "https://w3id.org/oc/meta/br/"
-      }
-    ]
-  },
-  {
-    "@id": "_:N6256ed068e3a45a2915b9ae1fe0ee11a",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://prismstandard.org/namespaces/basic/2.0/publicationDate"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 112453159
-      }
-    ]
-  },
-  {
-    "@id": "_:Nbd3363572b624ae7a560c7f291dd09ac",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://purl.org/dc/terms/title"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 129215401
-      }
-    ]
-  },
-  {
-    "@id": "_:N9816032c8ef74c25b5b040d8084fd77c",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://purl.org/spar/datacite/hasIdentifier"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 248310913
-      }
-    ]
-  },
-  {
-    "@id": "_:N152ddadeffe346e4a512dcd034c0fa33",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://purl.org/spar/fabio/hasSequenceIdentifier"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 11948142
-      }
-    ]
-  },
-  {
-    "@id": "_:N0033ccbd53e04cbd9377578036bbfa20",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://purl.org/spar/pro/isDocumentContextFor"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 534260004
-      }
-    ]
-  },
-  {
-    "@id": "_:N03cbf598d1444be8bad6ea1687e6478f",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://purl.org/vocab/frbr/core#embodiment"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 82507304
-      }
-    ]
-  },
-  {
-    "@id": "_:Nca17fd5d163c4fde8d9f509b58d5e52a",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://purl.org/vocab/frbr/core#partOf"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 115198136
-      }
-    ]
-  },
-  {
-    "@id": "_:N87926e6ec646497487177a52b1f426b5",
-    "http://rdfs.org/ns/void#property": [
-      {
-        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-      }
-    ],
-    "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 286781506
       }
     ]
   },
@@ -1580,6 +1468,118 @@
     ]
   },
   {
+    "@id": "_:N6256ed068e3a45a2915b9ae1fe0ee11a",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://prismstandard.org/namespaces/basic/2.0/publicationDate"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 112453159
+      }
+    ]
+  },
+  {
+    "@id": "_:Nbd3363572b624ae7a560c7f291dd09ac",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://purl.org/dc/terms/title"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 129215401
+      }
+    ]
+  },
+  {
+    "@id": "_:N9816032c8ef74c25b5b040d8084fd77c",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://purl.org/spar/datacite/hasIdentifier"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 248310913
+      }
+    ]
+  },
+  {
+    "@id": "_:N152ddadeffe346e4a512dcd034c0fa33",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://purl.org/spar/fabio/hasSequenceIdentifier"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 11948142
+      }
+    ]
+  },
+  {
+    "@id": "_:N0033ccbd53e04cbd9377578036bbfa20",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://purl.org/spar/pro/isDocumentContextFor"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 534260004
+      }
+    ]
+  },
+  {
+    "@id": "_:N03cbf598d1444be8bad6ea1687e6478f",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://purl.org/vocab/frbr/core#embodiment"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 82507304
+      }
+    ]
+  },
+  {
+    "@id": "_:Nca17fd5d163c4fde8d9f509b58d5e52a",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://purl.org/vocab/frbr/core#partOf"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 115198136
+      }
+    ]
+  },
+  {
+    "@id": "_:N87926e6ec646497487177a52b1f426b5",
+    "http://rdfs.org/ns/void#property": [
+      {
+        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+      }
+    ],
+    "http://rdfs.org/ns/void#triples": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 286781506
+      }
+    ]
+  },
+  {
     "@id": "_:Nf4fdb63443894544ab7a4401998e72b6",
     "@type": [
       "http://www.w3.org/ns/sparql-service-description#NamedGraph"
@@ -1641,6 +1641,20 @@
     ]
   },
   {
+    "@id": "_:N87384a11a3744cda9ae057dd26fbea3d",
+    "http://rdfs.org/ns/void#class": [
+      {
+        "@id": "http://purl.org/spar/datacite/Identifier"
+      }
+    ],
+    "http://rdfs.org/ns/void#entities": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 251954118
+      }
+    ]
+  },
+  {
     "@id": "_:N38633959bbfe4674954c0e070f55c833",
     "http://rdfs.org/ns/void#property": [
       {
@@ -1676,20 +1690,6 @@
       }
     ],
     "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 251954118
-      }
-    ]
-  },
-  {
-    "@id": "_:N87384a11a3744cda9ae057dd26fbea3d",
-    "http://rdfs.org/ns/void#class": [
-      {
-        "@id": "http://purl.org/spar/datacite/Identifier"
-      }
-    ],
-    "http://rdfs.org/ns/void#entities": [
       {
         "@type": "http://www.w3.org/2001/XMLSchema#integer",
         "@value": 251954118
@@ -1764,6 +1764,20 @@
     ]
   },
   {
+    "@id": "_:Nd5504ac79f214df5bca9656a48bf88c0",
+    "http://rdfs.org/ns/void#class": [
+      {
+        "@id": "http://xmlns.com/foaf/0.1/Agent"
+      }
+    ],
+    "http://rdfs.org/ns/void#entities": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 390541078
+      }
+    ]
+  },
+  {
     "@id": "_:Nb049a793cd1e419291440c2a22e6d9cd",
     "http://rdfs.org/ns/void#property": [
       {
@@ -1834,20 +1848,6 @@
     ]
   },
   {
-    "@id": "_:Nd5504ac79f214df5bca9656a48bf88c0",
-    "http://rdfs.org/ns/void#class": [
-      {
-        "@id": "http://xmlns.com/foaf/0.1/Agent"
-      }
-    ],
-    "http://rdfs.org/ns/void#entities": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 390541078
-      }
-    ]
-  },
-  {
     "@id": "_:N9c5cf3d367f14273afedd970aca28bb9",
     "@type": [
       "http://www.w3.org/ns/sparql-service-description#NamedGraph"
@@ -1912,6 +1912,20 @@
     ]
   },
   {
+    "@id": "_:Ncdc672ed6e974488b229e7baac16f44f",
+    "http://rdfs.org/ns/void#class": [
+      {
+        "@id": "http://purl.org/spar/pro/RoleInTime"
+      }
+    ],
+    "http://rdfs.org/ns/void#entities": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 541544410
+      }
+    ]
+  },
+  {
     "@id": "_:Nc35db50661ac495bbe4e5e61b04b9dca",
     "http://rdfs.org/ns/void#property": [
       {
@@ -1961,20 +1975,6 @@
       }
     ],
     "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 541544410
-      }
-    ]
-  },
-  {
-    "@id": "_:Ncdc672ed6e974488b229e7baac16f44f",
-    "http://rdfs.org/ns/void#class": [
-      {
-        "@id": "http://purl.org/spar/pro/RoleInTime"
-      }
-    ],
-    "http://rdfs.org/ns/void#entities": [
       {
         "@type": "http://www.w3.org/2001/XMLSchema#integer",
         "@value": 541544410
@@ -2043,6 +2043,20 @@
     ]
   },
   {
+    "@id": "_:Nf5478368960a43c28f739055e191e874",
+    "http://rdfs.org/ns/void#class": [
+      {
+        "@id": "http://purl.org/spar/fabio/Manifestation"
+      }
+    ],
+    "http://rdfs.org/ns/void#entities": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#integer",
+        "@value": 82546121
+      }
+    ]
+  },
+  {
     "@id": "_:N56ccf26ea037462ca008a40d250e07f7",
     "http://rdfs.org/ns/void#property": [
       {
@@ -2078,20 +2092,6 @@
       }
     ],
     "http://rdfs.org/ns/void#triples": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#integer",
-        "@value": 82546121
-      }
-    ]
-  },
-  {
-    "@id": "_:Nf5478368960a43c28f739055e191e874",
-    "http://rdfs.org/ns/void#class": [
-      {
-        "@id": "http://purl.org/spar/fabio/Manifestation"
-      }
-    ],
-    "http://rdfs.org/ns/void#entities": [
       {
         "@type": "http://www.w3.org/2001/XMLSchema#integer",
         "@value": 82546121

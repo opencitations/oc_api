@@ -28,7 +28,9 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "html5lib>=1.1",
     "jsonschema>=4.26.0",
+    "pyrdfa3>=3.6.5",
     "pyright>=1.1.410",
     "pyshacl>=0.31.0",
     "pytest>=8.4.1",

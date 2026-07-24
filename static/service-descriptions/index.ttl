@@ -1,22 +1,17 @@
-# SPDX-FileCopyrightText: 2026 Arcangelo Massari <arcangelo.massari@unibo.it>
-#
-# SPDX-License-Identifier: ISC
-
 @prefix dcterms: <http://purl.org/dc/terms/> .
-@prefix formats: <http://www.w3.org/ns/formats/> .
+@prefix ns1: <http://www.w3.org/ns/sparql-service-description#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix sd: <http://www.w3.org/ns/sparql-service-description#> .
 @prefix void: <http://rdfs.org/ns/void#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-[] a sd:Service ;
-    sd:defaultDataset [ a void:Dataset,
-                sd:Dataset ;
+[] a ns1:Service ;
+    ns1:defaultDataset [ a void:Dataset,
+                ns1:Dataset ;
             dcterms:description "OpenCitations Index data"@en ;
             dcterms:title "OpenCitations Index"@en ;
             void:sparqlEndpoint <https://sparql.opencitations.net/index> ;
             void:uriSpace "https://w3id.org/oc/index/" ;
-            sd:defaultGraph [ a sd:Graph ;
+            ns1:defaultGraph [ a ns1:Graph ;
                     void:classPartition [ void:class <http://purl.org/spar/cito/JournalSelfCitation> ;
                             void:entities 106690556 ],
                         [ void:class <http://purl.org/spar/cito/Citation> ;
@@ -38,11 +33,11 @@
                         [ void:property rdf:type ;
                             void:triples 2482792757 ] ;
                     void:triples 11451726516 ] ] ;
-    sd:endpoint <https://sparql.opencitations.net/index> ;
-    sd:feature sd:BasicFederatedQuery ;
-    sd:resultFormat formats:SPARQL_Results_CSV,
-        formats:SPARQL_Results_JSON,
-        formats:SPARQL_Results_TSV,
-        formats:SPARQL_Results_XML,
-        formats:Turtle ;
-    sd:supportedLanguage sd:SPARQL11Query .
+    ns1:endpoint <https://sparql.opencitations.net/index> ;
+    ns1:feature ns1:BasicFederatedQuery ;
+    ns1:resultFormat <http://www.w3.org/ns/formats/SPARQL_Results_CSV>,
+        <http://www.w3.org/ns/formats/SPARQL_Results_JSON>,
+        <http://www.w3.org/ns/formats/SPARQL_Results_TSV>,
+        <http://www.w3.org/ns/formats/SPARQL_Results_XML>,
+        <http://www.w3.org/ns/formats/Turtle> ;
+    ns1:supportedLanguage ns1:SPARQL11Query .

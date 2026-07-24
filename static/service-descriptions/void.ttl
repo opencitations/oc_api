@@ -1,31 +1,58 @@
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-@prefix ns1: <http://www.w3.org/ns/sparql-service-description#> .
+@prefix formats: <http://www.w3.org/ns/formats/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sd: <http://www.w3.org/ns/sparql-service-description#> .
 @prefix void: <http://rdfs.org/ns/void#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-[] a ns1:Service ;
-    ns1:defaultDataset [ a void:Dataset,
-                ns1:Dataset ;
+[] a sd:Service ;
+    sd:defaultDataset [ a void:Dataset,
+                sd:Dataset ;
+            dcterms:description "OpenCitations Index data"@en ;
+            dcterms:title "OpenCitations Index"@en ;
+            void:sparqlEndpoint <https://sparql.opencitations.net/index> ;
+            void:uriSpace "https://w3id.org/oc/index/" ;
+            sd:defaultGraph [ a sd:Graph ;
+                    void:classPartition [ void:class <http://purl.org/spar/cito/JournalSelfCitation> ;
+                            void:entities 106690556 ],
+                        [ void:class <http://purl.org/spar/cito/Citation> ;
+                            void:entities 2315872191 ],
+                        [ void:class <http://purl.org/spar/cito/AuthorSelfCitation> ;
+                            void:entities 60230010 ] ;
+                    void:classes 3 ;
+                    void:distinctObjects 101077399 ;
+                    void:distinctSubjects 2315872191 ;
+                    void:properties 5 ;
+                    void:propertyPartition [ void:property <http://purl.org/spar/cito/hasCitedEntity> ;
+                            void:triples 2315872191 ],
+                        [ void:property rdf:type ;
+                            void:triples 2482792757 ],
+                        [ void:property <http://purl.org/spar/cito/hasCitationCreationDate> ;
+                            void:triples 2298554972 ],
+                        [ void:property <http://purl.org/spar/cito/hasCitingEntity> ;
+                            void:triples 2315872191 ],
+                        [ void:property <http://purl.org/spar/cito/hasCitationTimeSpan> ;
+                            void:triples 2038634405 ] ;
+                    void:triples 11451726516 ] ] ;
+    sd:endpoint <https://sparql.opencitations.net/index> ;
+    sd:feature sd:BasicFederatedQuery ;
+    sd:resultFormat formats:SPARQL_Results_CSV,
+        formats:SPARQL_Results_JSON,
+        formats:SPARQL_Results_TSV,
+        formats:SPARQL_Results_XML,
+        formats:Turtle ;
+    sd:supportedLanguage sd:SPARQL11Query .
+
+[] a sd:Service ;
+    sd:defaultDataset [ a void:Dataset,
+                sd:Dataset ;
             dcterms:description "OpenCitations Meta entity data"@en ;
             dcterms:title "OpenCitations Meta"@en ;
             void:sparqlEndpoint <https://sparql.opencitations.net/meta> ;
             void:uriSpace "https://w3id.org/oc/meta/" ;
-            ns1:defaultGraph [ a ns1:Graph ;
-                    void:classPartition [ void:class <http://purl.org/spar/fabio/Presentation> ;
-                            void:entities 2 ],
-                        [ void:class <http://purl.org/spar/fabio/Thesis> ;
-                            void:entities 65125 ],
-                        [ void:class <http://purl.org/spar/fabio/ProceedingsPaper> ;
-                            void:entities 6504081 ],
-                        [ void:class <http://purl.org/spar/fabio/ReferenceBook> ;
-                            void:entities 241168 ],
-                        [ void:class <http://purl.org/spar/fabio/Book> ;
-                            void:entities 7649106 ],
-                        [ void:class <http://purl.org/spar/fabio/Series> ;
-                            void:entities 14088 ],
-                        [ void:class <http://purl.org/spar/pro/RoleInTime> ;
+            sd:defaultGraph [ a sd:Graph ;
+                    void:classPartition [ void:class <http://purl.org/spar/pro/RoleInTime> ;
                             void:entities 541544410 ],
                         [ void:class <http://purl.org/spar/fabio/ReferenceEntry> ;
                             void:entities 203258 ],
@@ -72,7 +99,19 @@
                         [ void:class <http://purl.org/spar/doco/Part> ;
                             void:entities 4167 ],
                         [ void:class <http://purl.org/spar/fabio/ReportDocument> ;
-                            void:entities 411417 ] ;
+                            void:entities 411417 ],
+                        [ void:class <http://purl.org/spar/fabio/Presentation> ;
+                            void:entities 2 ],
+                        [ void:class <http://purl.org/spar/fabio/Thesis> ;
+                            void:entities 65125 ],
+                        [ void:class <http://purl.org/spar/fabio/ProceedingsPaper> ;
+                            void:entities 6504081 ],
+                        [ void:class <http://purl.org/spar/fabio/ReferenceBook> ;
+                            void:entities 241168 ],
+                        [ void:class <http://purl.org/spar/fabio/Book> ;
+                            void:entities 7649106 ],
+                        [ void:class <http://purl.org/spar/fabio/Series> ;
+                            void:entities 14088 ] ;
                     void:classes 30 ;
                     void:distinctObjects 1673125053 ;
                     void:distinctSubjects 1413954824 ;
@@ -114,8 +153,38 @@
                         [ void:property <https://w3id.org/oc/ontology/hasNext> ;
                             void:triples 316466954 ] ;
                     void:triples 5596056863 ] ;
-            ns1:namedGraph [ a ns1:NamedGraph ;
-                    ns1:graph [ a ns1:Graph ;
+            sd:namedGraph [ a sd:NamedGraph ;
+                    sd:graph [ a sd:Graph ;
+                            void:classPartition [ void:class <http://purl.org/spar/datacite/Identifier> ;
+                                    void:entities 251954118 ] ;
+                            void:classes 1 ;
+                            void:properties 3 ;
+                            void:propertyPartition [ void:property <http://www.essepuntato.it/2010/06/literalreification/hasLiteralValue> ;
+                                    void:triples 251954117 ],
+                                [ void:property <http://purl.org/spar/datacite/usesIdentifierScheme> ;
+                                    void:triples 251954117 ],
+                                [ void:property rdf:type ;
+                                    void:triples 251954118 ] ;
+                            void:triples 755862352 ;
+                            void:uriSpace "https://w3id.org/oc/meta/id/" ] ;
+                    sd:name <https://w3id.org/oc/meta/id/> ],
+                [ a sd:NamedGraph ;
+                    sd:graph [ a sd:Graph ;
+                            void:classPartition [ void:class <http://purl.org/spar/fabio/Manifestation> ;
+                                    void:entities 82546121 ] ;
+                            void:classes 1 ;
+                            void:properties 3 ;
+                            void:propertyPartition [ void:property rdf:type ;
+                                    void:triples 82546121 ],
+                                [ void:property <http://prismstandard.org/namespaces/basic/2.0/endingPage> ;
+                                    void:triples 81134715 ],
+                                [ void:property <http://prismstandard.org/namespaces/basic/2.0/startingPage> ;
+                                    void:triples 81134704 ] ;
+                            void:triples 244815540 ;
+                            void:uriSpace "https://w3id.org/oc/meta/re/" ] ;
+                    sd:name <https://w3id.org/oc/meta/re/> ],
+                [ a sd:NamedGraph ;
+                    sd:graph [ a sd:Graph ;
                             void:classPartition [ void:class <http://purl.org/spar/fabio/WebContent> ;
                                     void:entities 992645 ],
                                 [ void:class <http://purl.org/spar/fabio/Thesis> ;
@@ -188,9 +257,9 @@
                                     void:triples 115198136 ] ;
                             void:triples 1520674565 ;
                             void:uriSpace "https://w3id.org/oc/meta/br/" ] ;
-                    ns1:name <https://w3id.org/oc/meta/br/> ],
-                [ a ns1:NamedGraph ;
-                    ns1:graph [ a ns1:Graph ;
+                    sd:name <https://w3id.org/oc/meta/br/> ],
+                [ a sd:NamedGraph ;
+                    sd:graph [ a sd:Graph ;
                             void:classPartition [ void:class foaf:Agent ;
                                     void:entities 390541078 ] ;
                             void:classes 1 ;
@@ -207,60 +276,30 @@
                                     void:triples 12400428 ] ;
                             void:triples 1133605508 ;
                             void:uriSpace "https://w3id.org/oc/meta/ra/" ] ;
-                    ns1:name <https://w3id.org/oc/meta/ra/> ],
-                [ a ns1:NamedGraph ;
-                    ns1:graph [ a ns1:Graph ;
+                    sd:name <https://w3id.org/oc/meta/ra/> ],
+                [ a sd:NamedGraph ;
+                    sd:graph [ a sd:Graph ;
                             void:classPartition [ void:class <http://purl.org/spar/pro/RoleInTime> ;
                                     void:entities 541544410 ] ;
                             void:classes 1 ;
                             void:properties 4 ;
-                            void:propertyPartition [ void:property <https://w3id.org/oc/ontology/hasNext> ;
-                                    void:triples 316466954 ],
-                                [ void:property <http://purl.org/spar/pro/isHeldBy> ;
+                            void:propertyPartition [ void:property <http://purl.org/spar/pro/isHeldBy> ;
                                     void:triples 541543125 ],
                                 [ void:property <http://purl.org/spar/pro/withRole> ;
                                     void:triples 541544409 ],
                                 [ void:property rdf:type ;
-                                    void:triples 541544410 ] ;
+                                    void:triples 541544410 ],
+                                [ void:property <https://w3id.org/oc/ontology/hasNext> ;
+                                    void:triples 316466954 ] ;
                             void:triples 1941098898 ;
                             void:uriSpace "https://w3id.org/oc/meta/ar/" ] ;
-                    ns1:name <https://w3id.org/oc/meta/ar/> ],
-                [ a ns1:NamedGraph ;
-                    ns1:graph [ a ns1:Graph ;
-                            void:classPartition [ void:class <http://purl.org/spar/datacite/Identifier> ;
-                                    void:entities 251954118 ] ;
-                            void:classes 1 ;
-                            void:properties 3 ;
-                            void:propertyPartition [ void:property <http://www.essepuntato.it/2010/06/literalreification/hasLiteralValue> ;
-                                    void:triples 251954117 ],
-                                [ void:property <http://purl.org/spar/datacite/usesIdentifierScheme> ;
-                                    void:triples 251954117 ],
-                                [ void:property rdf:type ;
-                                    void:triples 251954118 ] ;
-                            void:triples 755862352 ;
-                            void:uriSpace "https://w3id.org/oc/meta/id/" ] ;
-                    ns1:name <https://w3id.org/oc/meta/id/> ],
-                [ a ns1:NamedGraph ;
-                    ns1:graph [ a ns1:Graph ;
-                            void:classPartition [ void:class <http://purl.org/spar/fabio/Manifestation> ;
-                                    void:entities 82546121 ] ;
-                            void:classes 1 ;
-                            void:properties 3 ;
-                            void:propertyPartition [ void:property rdf:type ;
-                                    void:triples 82546121 ],
-                                [ void:property <http://prismstandard.org/namespaces/basic/2.0/endingPage> ;
-                                    void:triples 81134715 ],
-                                [ void:property <http://prismstandard.org/namespaces/basic/2.0/startingPage> ;
-                                    void:triples 81134704 ] ;
-                            void:triples 244815540 ;
-                            void:uriSpace "https://w3id.org/oc/meta/re/" ] ;
-                    ns1:name <https://w3id.org/oc/meta/re/> ] ] ;
-    ns1:endpoint <https://sparql.opencitations.net/meta> ;
-    ns1:feature ns1:BasicFederatedQuery,
-        ns1:UnionDefaultGraph ;
-    ns1:resultFormat <http://www.w3.org/ns/formats/SPARQL_Results_CSV>,
-        <http://www.w3.org/ns/formats/SPARQL_Results_JSON>,
-        <http://www.w3.org/ns/formats/SPARQL_Results_TSV>,
-        <http://www.w3.org/ns/formats/SPARQL_Results_XML>,
-        <http://www.w3.org/ns/formats/Turtle> ;
-    ns1:supportedLanguage ns1:SPARQL11Query .
+                    sd:name <https://w3id.org/oc/meta/ar/> ] ] ;
+    sd:endpoint <https://sparql.opencitations.net/meta> ;
+    sd:feature sd:BasicFederatedQuery,
+        sd:UnionDefaultGraph ;
+    sd:resultFormat formats:SPARQL_Results_CSV,
+        formats:SPARQL_Results_JSON,
+        formats:SPARQL_Results_TSV,
+        formats:SPARQL_Results_XML,
+        formats:Turtle ;
+    sd:supportedLanguage sd:SPARQL11Query .
