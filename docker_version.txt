@@ -1,2 +1,0 @@
-DEPRECATED
-Use the version inside the pyproject.toml file
