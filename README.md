@@ -81,21 +81,6 @@ When static sync is enabled (via `--sync-static` or `SYNC_ENABLED=true`), the ap
 
 ## Running Options
 
-### SPARQL Service Description generation
-
-Generate the Service Description for an endpoint with:
-
-```bash
-uv run python -m src.endpoint_metadata meta \
-  --endpoint http://virtuoso:8890/sparql \
-  --public-endpoint https://sparql.opencitations.net/meta \
-  --output /tmp/meta.ttl
-```
-
-The suffix of `--output` is used as the serialization base. The command above
-creates `meta.ttl`, `meta.jsonld`, `meta.rdf`, and `meta.nt` for Turtle,
-JSON-LD, RDF/XML, and N-Triples respectively.
-
 ### Local Development
 
 For local development and testing, the application uses the built-in web.py HTTP server:
