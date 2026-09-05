@@ -25,7 +25,7 @@
         "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
         "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
         {
-            "@base": "https://w3id.org/skg-if/sandbox/oc/"
+            "@base": "https://api-stg.opencitations.net/"
         }
     ],
     "meta": {
@@ -235,8 +235,8 @@
         }
     ]
 }
-#format skgif,to_skg_if,application/ld+json
-#default_format skgif
+#format skg_if,to_skg_if,application/json
+#default_format skg_if
 #sparql PREFIX fabio: <http://purl.org/spar/fabio/>
 PREFIX dcterm: <http://purl.org/dc/terms/>
 PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
@@ -247,6 +247,7 @@ PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
 SELECT ?local_identifier ?identifier_scheme ?identifier_value
        ?title ?product_type
        ?manifestation_type_class ?manifestation_type_label ?manifestation_type_label_lang
+       ?manifestation_type_defined_in
        ?manifestation_dates_type ?manifestation_dates_value
        ?manifestation_biblio_volume ?manifestation_biblio_issue
        ?manifestation_biblio_pages_first ?manifestation_biblio_pages_last
@@ -260,6 +261,7 @@ WHERE {
   BIND(IF(!BOUND(?manifestation_type_class), "literature", IF(?manifestation_type_class IN (<http://purl.org/spar/fabio/DataFile>, <http://purl.org/spar/fabio/DataManagementPlan>), "research data", IF(?manifestation_type_class = <http://purl.org/spar/fabio/ComputerProgram>, "research software", "literature"))) AS ?product_type)
   BIND(IF(BOUND(?manifestation_type_class), LCASE(REPLACE(REPLACE(STR(?manifestation_type_class), "^.*[/#]", ""), "([a-z])([A-Z])", "$1 $2")), "") AS ?manifestation_type_label)
   BIND(IF(BOUND(?manifestation_type_class), "en", "") AS ?manifestation_type_label_lang)
+  BIND(IF(BOUND(?manifestation_type_class), REPLACE(STR(?manifestation_type_class), "[/#][^/#]+$", ""), "") AS ?manifestation_type_defined_in)
   OPTIONAL {
     ?local_identifier prism:publicationDate ?manifestation_dates_value .
     BIND("publication" AS ?manifestation_dates_type)
@@ -361,8 +363,6 @@ WHERE {
 #custom_params filter,skgif_filters.ocdm.yaml,Search filter.
 Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 Filters in the first group use exact matching. For `cf.search.*`, matching is text contains.
-Filters marked as currently empty are accepted but return no matches in OpenCitations at the moment.
-
 **Attribute filters:**
 
 - `product_type`
@@ -374,36 +374,23 @@ Filters marked as currently empty are accepted but return no matches in OpenCita
 - `contributions.by.family_name`
 - `contributions.by.given_name`
 - `contributions.by.name`
-- `contributions.declared_affiliations.local_identifier` (currently empty)
-- `contributions.declared_affiliations.identifiers.id` (currently empty)
-- `contributions.declared_affiliations.identifiers.scheme` (currently empty)
-- `contributions.declared_affiliations.name` (currently empty)
-- `contributions.declared_affiliations.short_name` (currently empty)
-- `funding.local_identifier` (currently empty)
-- `funding.grant_number` (currently empty)
-- `funding.identifiers.id` (currently empty)
-- `funding.identifiers.scheme` (currently empty)
-
 **Convenience filters (`cf.*`):**
 
 - `cf.search.title`
-- `cf.search.title_abstract` (currently empty)
 - `cf.contributions_orcid`
-- `cf.contributions_aff_ror` (currently empty)
-- `cf.contributions_aff_country` (currently empty)
 - `cf.cites`
 - `cf.cited_by`
 - `cf.cites_doi`
 - `cf.cited_by_doi`
-#format skgif,to_skg_if,application/ld+json
-#default_format skgif
+#format skg_if,to_skg_if,application/json
+#default_format skg_if
 #call /products?filter=cf.search.title:OpenCitations
 #output_json {
     "@context": [
         "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
         "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
         {
-            "@base": "https://w3id.org/skg-if/sandbox/oc/"
+            "@base": "https://api-stg.opencitations.net/"
         }
     ],
     "meta": {
@@ -1353,6 +1340,7 @@ PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 SELECT ?local_identifier ?identifier_scheme ?identifier_value
        ?title ?product_type
        ?manifestation_type_class ?manifestation_type_label ?manifestation_type_label_lang
+       ?manifestation_type_defined_in
        ?manifestation_dates_type ?manifestation_dates_value
        ?manifestation_biblio_volume ?manifestation_biblio_issue
        ?manifestation_biblio_pages_first ?manifestation_biblio_pages_last
@@ -1365,6 +1353,7 @@ WHERE {
   BIND(IF(!BOUND(?manifestation_type_class), "literature", IF(?manifestation_type_class IN (<http://purl.org/spar/fabio/DataFile>, <http://purl.org/spar/fabio/DataManagementPlan>), "research data", IF(?manifestation_type_class = <http://purl.org/spar/fabio/ComputerProgram>, "research software", "literature"))) AS ?product_type)
   BIND(IF(BOUND(?manifestation_type_class), LCASE(REPLACE(REPLACE(STR(?manifestation_type_class), "^.*[/#]", ""), "([a-z])([A-Z])", "$1 $2")), "") AS ?manifestation_type_label)
   BIND(IF(BOUND(?manifestation_type_class), "en", "") AS ?manifestation_type_label_lang)
+  BIND(IF(BOUND(?manifestation_type_class), REPLACE(STR(?manifestation_type_class), "[/#][^/#]+$", ""), "") AS ?manifestation_type_defined_in)
   OPTIONAL {
     ?local_identifier prism:publicationDate ?manifestation_dates_value .
     BIND("publication" AS ?manifestation_dates_type)
@@ -1461,18 +1450,61 @@ WHERE {
 
 #url /persons/{local_identifier}
 #type operation
+#local_identifier str(https:/{1,2}w3id\.org/oc/meta/.+)
+#preprocess normalize_local_identifier_url(local_identifier)
 #method get
-#description Coming soon. Returns a single person when implemented; this placeholder currently returns 404.
-#call /persons/https://w3id.org/oc/meta/ra/0621012370564
-#format skgif,to_skg_if,application/ld+json
-#default_format skgif
-#output_json HTTP status code 404: entity not found
-#sparql SELECT ?dummy WHERE { FILTER(false) }
+#description Returns a single person agent identified by their OpenCitations Meta identifier (OMID). The response includes agent metadata from OpenCitations Meta.
+#call /persons/https://w3id.org/oc/meta/ra/0614010840729
+#output_json {
+  "@context": [
+    "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
+    "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
+    {
+      "@base": "https://api-stg.opencitations.net/"
+    }
+  ],
+  "@graph": [
+    {
+      "local_identifier": "https://w3id.org/oc/meta/ra/0614010840729",
+      "entity_type": "person",
+      "identifiers": [
+        {
+          "scheme": "orcid",
+          "value": "0000-0003-0530-4305"
+        }
+      ],
+      "given_name": "Silvio",
+      "family_name": "Peroni",
+      "name": "Peroni Silvio"
+    }
+  ]
+}
+#format skg_if,to_skg_if,application/json
+#default_format skg_if
+#sparql PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+SELECT ?local_identifier ?name ?family_name ?given_name ?identifier_scheme ?identifier_value
+WHERE {
+  BIND(<[[local_identifier]]> AS ?local_identifier)
+  ?local_identifier a foaf:Agent.
+  OPTIONAL { ?local_identifier foaf:familyName ?family_name . }
+  OPTIONAL { ?local_identifier foaf:givenName ?given_name . }
+  OPTIONAL { ?local_identifier foaf:name ?name. }
+  OPTIONAL {
+    ?local_identifier datacite:hasIdentifier ?identifier .
+    ?identifier datacite:usesIdentifierScheme ?identifier_scheme_uri;
+      literal:hasLiteralValue ?identifier_value.
+    BIND(STRAFTER(STR(?identifier_scheme_uri), "http://purl.org/spar/datacite/") AS ?identifier_scheme)
+  }
+  FILTER(BOUND(?family_name) || BOUND(?given_name))
+}
 
 #url /persons
 #type operation
 #method get
-#description Coming soon. Returns a list of persons matching the given filters when implemented; this placeholder currently returns an empty result.
+#description Returns a list of persons matching the given filters.
 #custom_params filter,skgif_filters.persons.yaml,Search filter.
 Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 Filters in the first group use exact matching. For `cf.search.*`, matching is text contains.
@@ -1483,10 +1515,6 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
 - `given_name`
 - `family_name`
 - `name`
-- `affiliations.affiliation.local_identifier`
-- `affiliations.affiliation.name`
-- `affiliations.affiliation.short_name`
-- `affiliations.role`
 
 **Convenience filters (`cf.*`):**
 
@@ -1495,14 +1523,14 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
 - `cf.search.name`
 
 #call /persons?filter=cf.search.given_name:Silvio,cf.search.family_name:Peroni
-#format skgif,to_skg_if,application/ld+json
-#default_format skgif
+#format skg_if,to_skg_if,application/json
+#default_format skg_if
 #output_json {
     "@context": [
         "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
         "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
         {
-            "@base": "https://w3id.org/skg-if/sandbox/oc/"
+          "@base": "https://api-stg.opencitations.net/"
         }
     ],
     "meta": {
@@ -1511,34 +1539,99 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
         "part_of": {
             "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/persons?filter=cf.search.given_name:Silvio,cf.search.family_name:Peroni",
             "entity_type": "search_result",
-            "total_items": 0,
-            "first_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/persons?filter=cf.search.given_name:Silvio,cf.search.family_name:Peroni&page=1&page_size=1",
-                "entity_type": "search_result_page"
-            },
-            "last_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/persons?filter=cf.search.given_name:Silvio,cf.search.family_name:Peroni&page=1&page_size=1",
-                "entity_type": "search_result_page"
-            }
+            "total_items": 1
         }
     },
-    "@graph": []
+    "@graph": [
+      {
+        "local_identifier": "https://w3id.org/oc/meta/ra/0614010840729",
+        "entity_type": "person",
+        "identifiers": [
+          {
+            "scheme": "orcid",
+            "value": "0000-0003-0530-4305"
+          }
+        ],
+        "given_name": "Silvio",
+        "family_name": "Peroni",
+        "name": "Peroni Silvio"
+      }
+  ]
 }
-#sparql SELECT ?dummy WHERE { FILTER(false) [[filter]] }
+#sparql PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+SELECT ?local_identifier ?name ?family_name ?given_name ?identifier_scheme ?identifier_value
+WHERE {
+  ?local_identifier a foaf:Agent.
+  OPTIONAL { ?local_identifier foaf:familyName ?family_name . }
+  OPTIONAL { ?local_identifier foaf:givenName ?given_name . }
+  OPTIONAL { ?local_identifier foaf:name ?name. }
+  OPTIONAL {
+    ?local_identifier datacite:hasIdentifier ?identifier .
+    ?identifier datacite:usesIdentifierScheme ?identifier_scheme_uri;
+      literal:hasLiteralValue ?identifier_value.
+    BIND(STRAFTER(STR(?identifier_scheme_uri), "http://purl.org/spar/datacite/") AS ?identifier_scheme)
+  }
+  FILTER(BOUND(?family_name) || BOUND(?given_name))
+  [[filter]]
+}
+
 #url /organisations/{local_identifier}
 #type operation
+#local_identifier str(https:/{1,2}w3id\.org/oc/meta/.+)
+#preprocess normalize_local_identifier_url(local_identifier)
 #method get
-#description Coming soon. Returns a single organisation when implemented; this placeholder currently returns 404.
-#call /organisations/https://w3id.org/oc/meta/ra/0610116105
-#format skgif,to_skg_if,application/ld+json
-#default_format skgif
-#output_json HTTP status code 404: entity not found
-#sparql SELECT ?dummy WHERE { FILTER(false) }
+#description Returns a single organisation agent identified by its OpenCitations Meta identifier (OMID). The response includes agent metadata from OpenCitations Meta.
+#call /organisations/https://w3id.org/oc/meta/ra/0670114921
+#format skg_if,to_skg_if,application/json
+#default_format skg_if
+#output_json {
+  "@context": [
+    "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
+    "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
+    {
+      "@base": "https://api-stg.opencitations.net/"
+    }
+  ],
+  "@graph": [
+    {
+      "local_identifier": "https://w3id.org/oc/meta/ra/0670114921",
+      "entity_type": "organisation",
+      "identifiers": [
+        {
+          "scheme": "crossref",
+          "value": "4099"
+        }
+      ],
+      "name": "Korean Council Of Science Editors"
+    }
+  ]
+}
+#sparql PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?local_identifier ?name ?identifier_scheme ?identifier_value
+WHERE {
+  BIND(<[[local_identifier]]> AS ?local_identifier)
+  ?local_identifier a foaf:Agent ;
+                    foaf:name ?name .
+  FILTER NOT EXISTS { ?local_identifier foaf:givenName ?givenName . }
+  FILTER NOT EXISTS { ?local_identifier foaf:familyName ?familyName . }
+
+  OPTIONAL {
+    ?local_identifier datacite:hasIdentifier ?identifier .
+    ?identifier datacite:usesIdentifierScheme ?identifier_scheme_uri ;
+                literal:hasLiteralValue ?identifier_value .
+    BIND(STRAFTER(STR(?identifier_scheme_uri), "http://purl.org/spar/datacite/") AS ?identifier_scheme)
+  }
+}
 
 #url /organisations
 #type operation
 #method get
-#description Coming soon. Returns a list of organisations matching the given filters when implemented; this placeholder currently returns an empty result.
+#description Returns a list of organisations matching the given filters.
 #custom_params filter,skgif_filters.organisations.yaml,Search filter.
 Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 Filters in the first group use exact matching. For `cf.search.*`, matching is text contains.
@@ -1547,23 +1640,20 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
 - `identifiers.id`
 - `identifiers.scheme`
 - `name`
-- `short_name`
-- `website`
-- `country`
 
 **Convenience filters (`cf.*`):**
 
 - `cf.search.name`
 
 #call /organisations?filter=cf.search.name:Mit Press
-#format skgif,to_skg_if,application/ld+json
-#default_format skgif
+#format skg_if,to_skg_if,application/json
+#default_format skg_if
 #output_json {
     "@context": [
         "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
         "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
         {
-            "@base": "https://w3id.org/skg-if/sandbox/oc/"
+            "@base": "https://api-stg.opencitations.net/"
         }
     ],
     "meta": {
@@ -1572,41 +1662,117 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
         "part_of": {
             "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/organisations?filter=cf.search.name:Mit Press",
             "entity_type": "search_result",
-            "total_items": 0,
-            "first_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/organisations?filter=cf.search.name:Mit Press&page=1&page_size=1",
-                "entity_type": "search_result_page"
-            },
-            "last_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/organisations?filter=cf.search.name:Mit Press&page=1&page_size=1",
-                "entity_type": "search_result_page"
-            }
+            "total_items": 1
         }
     },
-    "@graph": []
+    "@graph": [
+    {
+      "local_identifier": "https://w3id.org/oc/meta/ra/0610116105",
+      "entity_type": "organisation",
+      "identifiers": [
+        {
+          "scheme": "crossref",
+          "value": "281"
+        }
+      ],
+      "name": "Mit Press"
+    }
+  ]
 }
-#sparql SELECT ?dummy WHERE { FILTER(false) [[filter]] }
+#sparql PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?local_identifier ?name ?identifier_scheme ?identifier_value
+WHERE {
+  ?local_identifier a foaf:Agent ;
+                    foaf:name ?name .
+  FILTER NOT EXISTS { ?local_identifier foaf:givenName ?givenName . }
+  FILTER NOT EXISTS { ?local_identifier foaf:familyName ?familyName . }
+
+  OPTIONAL {
+    ?local_identifier datacite:hasIdentifier ?identifier .
+    ?identifier datacite:usesIdentifierScheme ?identifier_scheme_uri ;
+                literal:hasLiteralValue ?identifier_value .
+    BIND(STRAFTER(STR(?identifier_scheme_uri), "http://purl.org/spar/datacite/") AS ?identifier_scheme)
+  }
+  [[filter]]
+}
 
 #url /venues/{local_identifier}
 #type operation
+#local_identifier str(https:/{1,2}w3id\.org/oc/meta/.+)
+#preprocess normalize_local_identifier_url(local_identifier)
 #method get
-#description Coming soon. Returns a single venue when implemented; this placeholder currently returns 404.
+#description Returns a single venue identified by its OpenCitations Meta identifier (OMID). The response includes venue metadata from OpenCitations Meta.
 #call /venues/https://w3id.org/oc/meta/br/062501778099
-#format skgif,to_skg_if,application/ld+json
-#default_format skgif
-#output_json HTTP status code 404: entity not found
-#sparql SELECT ?dummy WHERE { FILTER(false) }
+#format skg_if,to_skg_if,application/json
+#default_format skg_if
+#output_json {
+  "@context": [
+    "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
+    "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
+    {
+      "@base": "https://api-stg.opencitations.net/"
+    }
+  ],
+  "@graph": [
+    {
+      "local_identifier": "https://w3id.org/oc/meta/br/062501778099",
+      "entity_type": "venue",
+      "identifiers": [
+        {
+          "scheme": "issn",
+          "value": "2641-3337"
+        },
+        {
+          "scheme": "openalex",
+          "value": "S4210195326"
+        }
+      ],
+      "name": "Quantitative Science Studies",
+      "type": "journal"
+    }
+  ]
+}
+#sparql PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX fabio: <http://purl.org/spar/fabio/>
+
+SELECT ?local_identifier ?name ?identifier_scheme ?identifier_value ?type
+WHERE {
+  BIND(<[[local_identifier]]> AS ?local_identifier)
+  ?br frbr:partOf+ ?local_identifier .
+  FILTER NOT EXISTS { ?local_identifier frbr:partOf ?parent. }
+  ?local_identifier a ?type_uri .
+  FILTER(?type_uri != fabio:Expression)
+  OPTIONAL {
+    ?local_identifier dcterms:title ?name .
+  }
+  OPTIONAL {
+    ?local_identifier datacite:hasIdentifier ?identifier .
+    ?identifier datacite:usesIdentifierScheme ?identifier_scheme_uri ;
+                literal:hasLiteralValue ?identifier_value .
+    BIND(STRAFTER(STR(?identifier_scheme_uri), "http://purl.org/spar/datacite/") AS ?identifier_scheme)
+  }
+  BIND(
+  IF(!BOUND(?type_uri), "unknown",
+    IF(?type_uri = fabio:Journal, "journal",
+      IF(?type_uri = fabio:AcademicProceedings, "conference",
+        IF(?type_uri = fabio:Book || ?type_uri = fabio:ReferenceBook, "book", "other")))
+  ) AS ?type)
+}
 
 #url /venues
 #type operation
 #method get
-#description Coming soon. Returns a list of venues matching the given filters when implemented; this placeholder currently returns an empty result.
+#description Returns a list of venues matching the given filters.
 #custom_params filter,skgif_filters.venues.yaml,Search filter.
 Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 Filters in the first group use exact matching. For `cf.search.*`, matching is text contains.
 **Attribute filters:**
 
-- `acronym`
 - `type`
 - `identifiers.scheme`
 - `identifiers.value`
@@ -1617,14 +1783,14 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
 - `cf.search.name`
 
 #call /venues?filter=cf.search.name:Quantitative Science Studies
-#format skgif,to_skg_if,application/ld+json
-#default_format skgif
+#format skg_if,to_skg_if,application/json
+#default_format skg_if
 #output_json {
     "@context": [
         "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
         "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
         {
-            "@base": "https://w3id.org/skg-if/sandbox/oc/"
+            "@base": "https://api-stg.opencitations.net/"
         }
     ],
     "meta": {
@@ -1633,28 +1799,65 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
         "part_of": {
             "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/venues?filter=cf.search.name:Quantitative Science Studies",
             "entity_type": "search_result",
-            "total_items": 0,
-            "first_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/venues?filter=cf.search.name:Quantitative Science Studies&page=1&page_size=1",
-                "entity_type": "search_result_page"
-            },
-            "last_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/venues?filter=cf.search.name:Quantitative Science Studies&page=1&page_size=1",
-                "entity_type": "search_result_page"
-            }
+            "total_items": 1
         }
     },
-    "@graph": []
+    "@graph": [
+    {
+      "local_identifier": "https://w3id.org/oc/meta/br/062501778099",
+      "entity_type": "venue",
+      "identifiers": [
+        {
+          "scheme": "issn",
+          "value": "2641-3337"
+        },
+        {
+          "scheme": "openalex",
+          "value": "S4210195326"
+        }
+      ],
+      "name": "Quantitative Science Studies",
+      "type": "journal"
+    }
+  ]
 }
-#sparql SELECT ?dummy WHERE { FILTER(false) [[filter]] }
+#sparql PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX fabio: <http://purl.org/spar/fabio/>
+
+SELECT ?local_identifier ?name ?identifier_scheme ?identifier_value ?type
+WHERE {
+  ?br frbr:partOf+ ?local_identifier .
+  FILTER NOT EXISTS { ?local_identifier frbr:partOf ?parent. }
+  ?local_identifier a ?type_uri .
+  FILTER(?type_uri != fabio:Expression)
+  OPTIONAL {
+    ?local_identifier dcterms:title ?name .
+  }
+  OPTIONAL {
+    ?local_identifier datacite:hasIdentifier ?identifier .
+    ?identifier datacite:usesIdentifierScheme ?identifier_scheme_uri ;
+                literal:hasLiteralValue ?identifier_value .
+    BIND(STRAFTER(STR(?identifier_scheme_uri), "http://purl.org/spar/datacite/") AS ?identifier_scheme)
+  }
+  BIND(
+  IF(!BOUND(?type_uri), "unknown",
+    IF(?type_uri = fabio:Journal, "journal",
+      IF(?type_uri = fabio:AcademicProceedings, "conference",
+        IF(?type_uri = fabio:Book || ?type_uri = fabio:ReferenceBook, "book", "other")))
+  ) AS ?type)
+  [[filter]]
+}
 
 #url /grants/{local_identifier}
 #type operation
 #method get
 #description Returns a single grant. Note: OpenCitations does not currently hold grant data; this endpoint always returns 404.
 #call /grants/example-grant-id
-#format skgif,to_skg_if,application/ld+json
-#default_format skgif
+#format skg_if,to_skg_if,application/json
+#default_format skg_if
 #output_json HTTP status code 404: entity not found
 #sparql SELECT ?dummy WHERE { FILTER(false) }
 
@@ -1714,14 +1917,14 @@ All filters below are accepted but currently return no matches because OpenCitat
 - `cf.duration.end.from`
 
 #call /grants?filter=grant_number:12345
-#format skgif,to_skg_if,application/ld+json
-#default_format skgif
+#format skg_if,to_skg_if,application/json
+#default_format skg_if
 #output_json {
     "@context": [
         "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
         "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
         {
-            "@base": "https://w3id.org/skg-if/sandbox/oc/"
+            "@base": "https://api-stg.opencitations.net/"
         }
     ],
     "meta": {
@@ -1750,8 +1953,8 @@ All filters below are accepted but currently return no matches because OpenCitat
 #method get
 #description Returns a single data source. Note: OpenCitations does not currently hold data source records; this endpoint always returns 404.
 #call /datasources/example-datasource-id
-#format skgif,to_skg_if,application/ld+json
-#default_format skgif
+#format skg_if,to_skg_if,application/json
+#default_format skg_if
 #output_json HTTP status code 404: entity not found
 #sparql SELECT ?dummy WHERE { FILTER(false) }
 #url /datasources
@@ -1776,14 +1979,14 @@ All filters below are accepted but currently return no matches because OpenCitat
 - `cf.search.name`
 
 #call /datasources?filter=research_product_type:literature
-#format skgif,to_skg_if,application/ld+json
-#default_format skgif
+#format skg_if,to_skg_if,application/json
+#default_format skg_if
 #output_json {
     "@context": [
         "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
         "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
         {
-            "@base": "https://w3id.org/skg-if/sandbox/oc/"
+            "@base": "https://api-stg.opencitations.net/"
         }
     ],
     "meta": {
@@ -1812,8 +2015,8 @@ All filters below are accepted but currently return no matches because OpenCitat
 #method get
 #description Returns a single topic. Note: OpenCitations does not currently hold topic data; this endpoint always returns 404.
 #call /topics/example-topic-id
-#format skgif,to_skg_if,application/ld+json
-#default_format skgif
+#format skg_if,to_skg_if,application/json
+#default_format skg_if
 #output_json HTTP status code 404: entity not found
 #sparql SELECT ?dummy WHERE { FILTER(false) }
 
@@ -1837,14 +2040,14 @@ All filters below are accepted but currently return no matches because OpenCitat
 - `cf.search.language`
 
 #call /topics?filter=cf.search.labels:biology
-#format skgif,to_skg_if,application/ld+json
-#default_format skgif
+#format skg_if,to_skg_if,application/json
+#default_format skg_if
 #output_json {
     "@context": [
         "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
         "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
         {
-            "@base": "https://w3id.org/skg-if/sandbox/oc/"
+            "@base": "https://api-stg.opencitations.net/"
         }
     ],
     "meta": {

@@ -2,10 +2,13 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-identifiers.id: {}
-identifiers.scheme: {}
-name: {}
-short_name: {}
-website: {}
-country: {}
-cf.search.name: {}
+identifiers.id:
+  filter: '?local_identifier datacite:hasIdentifier [ literal:hasLiteralValue "{{value}}"^^<http://www.w3.org/2001/XMLSchema#string> ] .'
+identifiers.scheme:
+  filter: "?local_identifier datacite:hasIdentifier [ datacite:usesIdentifierScheme datacite:{{value}} ] ."
+name:
+  filter: "?local_identifier foaf:name '{{value}}'. "
+cf.search.name:
+  filter: |-
+    ?local_identifier foaf:name ?name .
+    ?name bif:contains "'{{value}}'" .

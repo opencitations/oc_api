@@ -10,6 +10,7 @@ from rdflib.plugins.sparql.parser import parseUpdate
 import subprocess
 import sys
 import argparse
+from http import HTTPStatus
 from ramose import (
     APIManager,
     Operation,
@@ -493,7 +494,7 @@ class Api:
                 else:
                     requested_content_type = "application/json"
 
-                call = f"/{dataset}{call}"
+                call = f"/{dataset}{unquote(call)}"
                 operation_url = call + unquote(web.ctx.query)
                 op = man.get_op(operation_url)
 
@@ -519,6 +520,21 @@ class Api:
                         # web_logger.mes()
                         return res
                     else:
+                        if dataset == "skg-if":
+                            problem = {
+                                "type": "about:blank",
+                                "title": HTTPStatus(status_code).phrase,
+                                "status": status_code,
+                                "detail": re.sub(
+                                    r"^HTTP status code \d+:\s*", "", str(res)
+                                ),
+                                "instance": operation_url,
+                            }
+                            raise web.HTTPError(
+                                f"{status_code} {HTTPStatus(status_code).phrase}",
+                                {"Content-Type": "application/json"},
+                                json.dumps(problem, ensure_ascii=False),
+                            )
                         try:
                             with StringIO(res) as f:
                                 if requested_content_type == "text/csv":
@@ -539,6 +555,19 @@ class Api:
                                 str(res),
                             )
                 else:
+                    if dataset == "skg-if":
+                        problem = {
+                            "type": "about:blank",
+                            "title": "Not Found",
+                            "status": 404,
+                            "detail": "the operation requested does not exist",
+                            "instance": operation_url,
+                        }
+                        raise web.HTTPError(
+                            "404 Not Found",
+                            {"Content-Type": "application/json"},
+                            json.dumps(problem, ensure_ascii=False),
+                        )
                     raise web.HTTPError(
                         "404 ",
                         {"Content-Type": requested_content_type},

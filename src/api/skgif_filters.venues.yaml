@@ -2,9 +2,25 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-acronym: {}
-type: {}
-identifiers.scheme: {}
-identifiers.value: {}
-name: {}
-cf.search.name: {}
+type:
+  filter:
+    journal: |-
+      FILTER(?type = "journal")
+    conference: |-
+      FILTER(?type = "conference")
+    book: |-
+      FILTER(?type = "book")
+    repository: "FILTER(false)"
+    other: |-
+      FILTER(?type = "other")
+    unknown: "FILTER(false)"
+identifiers.value:
+  filter: '?local_identifier datacite:hasIdentifier [ literal:hasLiteralValue "{{value}}"^^<http://www.w3.org/2001/XMLSchema#string> ] .'
+identifiers.scheme:
+  filter: "?local_identifier datacite:hasIdentifier [ datacite:usesIdentifierScheme datacite:{{value}} ] ."
+name:
+  filter: "?local_identifier dcterms:title '{{value}}'. "
+cf.search.name:
+  filter: |-
+    ?local_identifier dcterms:title ?name .
+    ?name bif:contains "'{{value}}'" .

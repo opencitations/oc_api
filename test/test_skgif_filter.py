@@ -18,13 +18,9 @@ with (Path(__file__).parent / "data" / "expected_search_products.json").open(
 ) as _f:
     EXPECTED_SEARCH: dict[str, list[dict]] = json.load(_f)
 
-COMING_SOON_MOCK_ENDPOINTS = ("persons", "organisations", "venues")
 EMPTY_DATA_MOCK_ENDPOINTS = ("grants", "datasources", "topics")
-MOCK_ENDPOINTS = (*COMING_SOON_MOCK_ENDPOINTS, *EMPTY_DATA_MOCK_ENDPOINTS)
+MOCK_ENDPOINTS = EMPTY_DATA_MOCK_ENDPOINTS
 MOCK_FILTER_EXAMPLES = {
-    "persons": "cf.search.given_name:Silvio,cf.search.family_name:Peroni",
-    "organisations": "cf.search.name:Mit Press",
-    "venues": "cf.search.name:Quantitative Science Studies",
     "grants": "grant_number:12345",
     "datasources": "research_product_type:literature",
     "topics": "cf.search.labels:biology",
@@ -56,20 +52,8 @@ FILTER_DESCRIPTION_ORDER = {
         "contributions.by.family_name",
         "contributions.by.given_name",
         "contributions.by.name",
-        "contributions.declared_affiliations.local_identifier",
-        "contributions.declared_affiliations.identifiers.id",
-        "contributions.declared_affiliations.identifiers.scheme",
-        "contributions.declared_affiliations.name",
-        "contributions.declared_affiliations.short_name",
-        "funding.local_identifier",
-        "funding.grant_number",
-        "funding.identifiers.id",
-        "funding.identifiers.scheme",
         "cf.search.title",
-        "cf.search.title_abstract",
         "cf.contributions_orcid",
-        "cf.contributions_aff_ror",
-        "cf.contributions_aff_country",
         "cf.cites",
         "cf.cited_by",
         "cf.cites_doi",
@@ -81,10 +65,6 @@ FILTER_DESCRIPTION_ORDER = {
         "given_name",
         "family_name",
         "name",
-        "affiliations.affiliation.local_identifier",
-        "affiliations.affiliation.name",
-        "affiliations.affiliation.short_name",
-        "affiliations.role",
         "cf.search.family_name",
         "cf.search.given_name",
         "cf.search.name",
@@ -93,13 +73,9 @@ FILTER_DESCRIPTION_ORDER = {
         "identifiers.id",
         "identifiers.scheme",
         "name",
-        "short_name",
-        "website",
-        "country",
         "cf.search.name",
     ),
     "venues": (
-        "acronym",
         "type",
         "identifiers.scheme",
         "identifiers.value",
@@ -194,6 +170,16 @@ def _exec_raw(skgif_api_manager: APIManager, url: str) -> tuple[int, str]:
         raise TypeError(msg)
     status, result, _, _ = op.exec(method="get", content_type="application/json")
     return status, result
+
+
+def _canonical_entities(entities: list[dict]) -> list[dict]:
+    canonical = json.loads(json.dumps(entities))
+    for entity in canonical:
+        if "identifiers" in entity:
+            entity["identifiers"].sort(
+                key=lambda identifier: (identifier["scheme"], identifier["value"])
+            )
+    return sorted(canonical, key=lambda entity: entity["local_identifier"])
 
 
 def _filter_param_description(spec: dict, entity: str) -> str:
@@ -311,7 +297,7 @@ class TestProductTypeFilter:
         status, result = _exec_raw(
             skgif_api_manager, "/skg-if/v1/products?filter=product_type:nonexistent"
         )
-        assert status == 400
+        assert status == 422
         assert (
             "The value 'nonexistent' is not valid for filter 'product_type'" in result
         )
@@ -397,63 +383,16 @@ class TestUnsupportedFilter:
             skgif_api_manager,
             "/skg-if/v1/products?filter=unsupported_field:value",
         )
-        assert status == 400
-        expected_prefix = (
-            "HTTP status code 400: parameter in the request not compliant with the type specified - ValueError: "
-            "The filter 'unsupported_field' is not configured, "
-            "configured filters are "
-            "cf.cited_by, cf.cited_by_doi, cf.cites, cf.cites_doi, "
-            "cf.contributions_aff_country, cf.contributions_aff_ror, cf.contributions_orcid, "
-            "cf.search.title, cf.search.title_abstract, "
+        assert status == 422
+        assert result == (
+            "HTTP status code 422: The filter 'unsupported_field' is not configured, "
+            "configured filters are cf.cited_by, cf.cited_by_doi, cf.cites, "
+            "cf.cites_doi, cf.contributions_orcid, cf.search.title, "
             "contributions.by.family_name, contributions.by.given_name, "
             "contributions.by.identifiers.id, contributions.by.identifiers.scheme, "
-            "contributions.by.local_identifier, contributions.by.name, "
-            "contributions.declared_affiliations.identifiers.id, "
-            "contributions.declared_affiliations.identifiers.scheme, "
-            "contributions.declared_affiliations.local_identifier, "
-            "contributions.declared_affiliations.name, "
-            "contributions.declared_affiliations.short_name, "
-            "funding.grant_number, funding.identifiers.id, "
-            "funding.identifiers.scheme, funding.local_identifier, "
-            "identifiers.id, identifiers.scheme, product_type (line "
+            "contributions.by.local_identifier, contributions.by.name, identifiers.id, "
+            "identifiers.scheme, product_type"
         )
-        assert result.startswith(expected_prefix)
-
-    def test_unsupported_affiliation_filter_returns_empty(
-        self, skgif_api_manager: APIManager
-    ) -> None:
-        results = _exec(
-            skgif_api_manager,
-            "/skg-if/v1/products?filter=contributions.declared_affiliations.name:MIT",
-        )
-        assert results == []
-
-    def test_unsupported_title_abstract_returns_empty(
-        self, skgif_api_manager: APIManager
-    ) -> None:
-        results = _exec(
-            skgif_api_manager,
-            "/skg-if/v1/products?filter=cf.search.title_abstract:OpenCitations",
-        )
-        assert results == []
-
-    def test_unsupported_combined_with_supported_returns_empty(
-        self, skgif_api_manager: APIManager
-    ) -> None:
-        results = _exec(
-            skgif_api_manager,
-            "/skg-if/v1/products?filter=cf.search.title:OpenCitations,cf.search.title_abstract:test",
-        )
-        assert results == []
-
-    def test_unsupported_funding_filter_returns_empty(
-        self, skgif_api_manager: APIManager
-    ) -> None:
-        results = _exec(
-            skgif_api_manager,
-            "/skg-if/v1/products?filter=funding.local_identifier:some-grant",
-        )
-        assert results == []
 
 
 class TestCitesFilter:
@@ -645,50 +584,175 @@ class TestCustomParamsInDocumentation:
             description = _filter_param_description(spec, entity)
             assert _filter_keys_from_description(description) == list(expected_order)
 
-    def test_coming_soon_mock_endpoints_are_labelled(
+
+class TestPersonsEndpoint:
+    def test_text_search_uses_virtuoso_index(
         self, skgif_api_manager: APIManager
     ) -> None:
-        handler = OpenAPIDocumentationHandler(skgif_api_manager)
-        _, yml = handler.get_documentation()
-        spec = yaml.safe_load(yml)
-        for entity in COMING_SOON_MOCK_ENDPOINTS:
-            assert spec["paths"][f"/{entity}"]["get"]["summary"].startswith(
-                "Coming soon"
-            )
-            assert spec["paths"][f"/{entity}/{{local_identifier}}"]["get"][
-                "summary"
-            ].startswith("Coming soon")
+        expected_filters = {
+            "cf.search.family_name:Peroni": (
+                "?local_identifier foaf:familyName ?familyName .\n"
+                "?familyName bif:contains \"'Peroni'\" ."
+            ),
+            "cf.search.given_name:Silvio": (
+                "?local_identifier foaf:givenName ?givenName .\n"
+                "?givenName bif:contains \"'Silvio'\" ."
+            ),
+            "cf.search.name:Peroni Silvio": (
+                "?local_identifier foaf:name ?name .\n"
+                "?name bif:contains \"'Peroni Silvio'\" ."
+            ),
+        }
+        for filter_value, expected_filter in expected_filters.items():
+            op = skgif_api_manager.get_op(f"/skg-if/v1/persons?filter={filter_value}")
+            assert isinstance(op, Operation)
+            filter_param = op._prepare_params()["filter"]
+            assert isinstance(filter_param, str)
+            assert filter_param == expected_filter
+            assert "FILTER(CONTAINS" not in filter_param
 
+    def test_returns_person_by_identifier(self, skgif_api_manager: APIManager) -> None:
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/persons/https://w3id.org/oc/meta/ra/0614010840729",
+        )
+        assert results == [
+            {
+                "local_identifier": "https://w3id.org/oc/meta/ra/0614010840729",
+                "entity_type": "person",
+                "identifiers": [{"value": "0000-0003-0530-4305", "scheme": "orcid"}],
+                "name": "Peroni Silvio",
+                "family_name": "Peroni",
+                "given_name": "Silvio",
+            }
+        ]
 
-class TestComingSoonMockEndpoints:
-    def test_list_returns_empty(self, skgif_api_manager: APIManager) -> None:
-        for entity in COMING_SOON_MOCK_ENDPOINTS:
-            results = _exec(skgif_api_manager, f"/skg-if/v1/{entity}")
-            assert results == []
+    def test_returns_all_persons(self, skgif_api_manager: APIManager) -> None:
+        results = _exec(skgif_api_manager, "/skg-if/v1/persons")
+        assert len(results) == 1869
 
-    def test_list_with_filter_returns_empty(
-        self, skgif_api_manager: APIManager
-    ) -> None:
-        for entity in COMING_SOON_MOCK_ENDPOINTS:
+    def test_filters(self, skgif_api_manager: APIManager) -> None:
+        filters = (
+            "identifiers.scheme:orcid",
+            "identifiers.id:0000-0002-7562-5203",
+            "given_name:Greg",
+            "cf.search.given_name:Greg",
+            "family_name:Nakamura",
+            "cf.search.family_name:Nakamura",
+            "cf.search.given_name:Silvio,cf.search.family_name:Peroni",
+        )
+        for filter_value in filters:
             results = _exec(
-                skgif_api_manager,
-                f"/skg-if/v1/{entity}?filter={MOCK_FILTER_EXAMPLES[entity]}",
+                skgif_api_manager, f"/skg-if/v1/persons?filter={filter_value}"
             )
-            assert results == []
+            assert _canonical_entities(results) == _canonical_entities(
+                EXPECTED_SEARCH[filter_value]
+            )
 
-    def test_list_invalid_filter_returns_error(
+
+class TestOrganisationsEndpoint:
+    def test_text_search_uses_virtuoso_index(
         self, skgif_api_manager: APIManager
     ) -> None:
-        for entity in COMING_SOON_MOCK_ENDPOINTS:
-            status, _ = _exec_raw(
-                skgif_api_manager, f"/skg-if/v1/{entity}?filter=invalid_field:value"
-            )
-            assert status == 400
+        op = skgif_api_manager.get_op(
+            "/skg-if/v1/organisations?filter=cf.search.name:Mit Press"
+        )
+        assert isinstance(op, Operation)
+        filter_param = op._prepare_params()["filter"]
+        assert isinstance(filter_param, str)
+        assert filter_param == (
+            "?local_identifier foaf:name ?name .\n?name bif:contains \"'Mit Press'\" ."
+        )
+        assert "FILTER(CONTAINS" not in filter_param
 
-    def test_single_returns_404(self, skgif_api_manager: APIManager) -> None:
-        for entity in COMING_SOON_MOCK_ENDPOINTS:
-            status, _ = _exec_raw(skgif_api_manager, f"/skg-if/v1/{entity}/example-id")
-            assert status == 404
+    def test_returns_organisation_by_identifier(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/organisations/https://w3id.org/oc/meta/ra/0670114921",
+        )
+        assert results == [
+            {
+                "local_identifier": "https://w3id.org/oc/meta/ra/0670114921",
+                "entity_type": "organisation",
+                "identifiers": [{"value": "4099", "scheme": "crossref"}],
+                "name": "Korean Council Of Science Editors",
+            }
+        ]
+
+    def test_returns_all_organisations(self, skgif_api_manager: APIManager) -> None:
+        results = _exec(skgif_api_manager, "/skg-if/v1/organisations")
+        assert len(results) == 32
+
+    def test_filters(self, skgif_api_manager: APIManager) -> None:
+        filters = (
+            "identifiers.scheme:crossref",
+            "identifiers.id:140",
+            "cf.search.name:Mit Press",
+        )
+        for filter_value in filters:
+            results = _exec(
+                skgif_api_manager, f"/skg-if/v1/organisations?filter={filter_value}"
+            )
+            assert _canonical_entities(results) == _canonical_entities(
+                EXPECTED_SEARCH[filter_value]
+            )
+
+
+class TestVenuesEndpoint:
+    def test_text_search_uses_virtuoso_index(
+        self, skgif_api_manager: APIManager
+    ) -> None:
+        op = skgif_api_manager.get_op(
+            "/skg-if/v1/venues?filter=cf.search.name:Digital Libraries"
+        )
+        assert isinstance(op, Operation)
+        filter_param = op._prepare_params()["filter"]
+        assert isinstance(filter_param, str)
+        assert filter_param == (
+            "?local_identifier dcterms:title ?name .\n"
+            "?name bif:contains \"'Digital Libraries'\" ."
+        )
+        assert "FILTER(CONTAINS" not in filter_param
+
+    def test_returns_venue_by_identifier(self, skgif_api_manager: APIManager) -> None:
+        results = _exec(
+            skgif_api_manager,
+            "/skg-if/v1/venues/https://w3id.org/oc/meta/br/062501778099",
+        )
+        assert _canonical_entities(results) == _canonical_entities(
+            [
+                {
+                    "local_identifier": "https://w3id.org/oc/meta/br/062501778099",
+                    "entity_type": "venue",
+                    "identifiers": [
+                        {"value": "2641-3337", "scheme": "issn"},
+                        {"value": "S4210195326", "scheme": "openalex"},
+                    ],
+                    "name": "Quantitative Science Studies",
+                    "type": "journal",
+                }
+            ]
+        )
+
+    def test_returns_all_venues(self, skgif_api_manager: APIManager) -> None:
+        results = _exec(skgif_api_manager, "/skg-if/v1/venues")
+        assert len(results) == 46
+
+    def test_filters(self, skgif_api_manager: APIManager) -> None:
+        filters = (
+            "type:conference",
+            "identifiers.value:2059-481X",
+            "cf.search.name:Digital Libraries",
+        )
+        for filter_value in filters:
+            results = _exec(
+                skgif_api_manager, f"/skg-if/v1/venues?filter={filter_value}"
+            )
+            assert _canonical_entities(results) == _canonical_entities(
+                EXPECTED_SEARCH[filter_value]
+            )
 
 
 class TestGrantsEndpoints:
@@ -710,7 +774,7 @@ class TestGrantsEndpoints:
         status, _ = _exec_raw(
             skgif_api_manager, "/skg-if/v1/grants?filter=invalid_field:value"
         )
-        assert status == 400
+        assert status == 422
 
     def test_single_returns_404(self, skgif_api_manager: APIManager) -> None:
         status, _ = _exec_raw(skgif_api_manager, "/skg-if/v1/grants/example-id")
@@ -736,7 +800,7 @@ class TestTopicsEndpoints:
         status, _ = _exec_raw(
             skgif_api_manager, "/skg-if/v1/topics?filter=invalid_field:value"
         )
-        assert status == 400
+        assert status == 422
 
     def test_single_returns_404(self, skgif_api_manager: APIManager) -> None:
         status, _ = _exec_raw(skgif_api_manager, "/skg-if/v1/topics/example-id")
@@ -763,7 +827,7 @@ class TestDatasourcesEndpoints:
         status, _ = _exec_raw(
             skgif_api_manager, "/skg-if/v1/datasources?filter=invalid_field:value"
         )
-        assert status == 400
+        assert status == 422
 
     def test_single_returns_404(self, skgif_api_manager: APIManager) -> None:
         status, _ = _exec_raw(skgif_api_manager, "/skg-if/v1/datasources/example-id")
@@ -773,7 +837,7 @@ class TestDatasourcesEndpoints:
 SKGIF_CONTEXT = [
     "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
     "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
-    {"@base": "https://w3id.org/skg-if/sandbox/oc/"},
+    {"@base": "https://api-stg.opencitations.net/"},
 ]
 SKGIF_PUBLIC_BASE_URL = "https://api-stg.opencitations.net"
 

@@ -2,15 +2,25 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-identifiers.id: {}
-identifiers.scheme: {}
-given_name: {}
-family_name: {}
-name: {}
-affiliations.affiliation.local_identifier: {}
-affiliations.affiliation.name: {}
-affiliations.affiliation.short_name: {}
-affiliations.role: {}
-cf.search.family_name: {}
-cf.search.given_name: {}
-cf.search.name: {}
+identifiers.id:
+  filter: '?local_identifier datacite:hasIdentifier [ literal:hasLiteralValue "{{value}}"^^<http://www.w3.org/2001/XMLSchema#string> ] .'
+identifiers.scheme:
+  filter: "?local_identifier datacite:hasIdentifier [ datacite:usesIdentifierScheme datacite:{{value}} ] ."
+given_name:
+  filter: "?local_identifier foaf:givenName '{{value}}' . "
+family_name:
+  filter: "?local_identifier foaf:familyName '{{value}}'. "
+name:
+  filter: "?local_identifier foaf:name '{{value}}'. "
+cf.search.family_name:
+  filter: |-
+    ?local_identifier foaf:familyName ?familyName .
+    ?familyName bif:contains "'{{value}}'" .
+cf.search.given_name:
+  filter: |-
+    ?local_identifier foaf:givenName ?givenName .
+    ?givenName bif:contains "'{{value}}'" .
+cf.search.name:
+  filter: |-
+    ?local_identifier foaf:name ?name .
+    ?name bif:contains "'{{value}}'" .
