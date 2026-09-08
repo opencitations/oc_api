@@ -525,7 +525,7 @@ wheels = [
 
 [[package]]
 name = "oc-api"
-version = "0.12.1"
+version = "3.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "gevent" },
