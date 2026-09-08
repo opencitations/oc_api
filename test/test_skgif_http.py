@@ -25,7 +25,7 @@ def api_module() -> ApiModule:
 
 def test_skgif_success_uses_json_media_type(api_module: ApiModule) -> None:
     body = json.dumps(
-        {"@context": [{"@base": "https://api-stg.opencitations.net/"}], "@graph": []}
+        {"@context": [{"@base": "https://api.opencitations.net/"}], "@graph": []}
     )
     with patch.object(
         Operation, "exec", return_value=(200, body, "application/json", {})
@@ -35,7 +35,7 @@ def test_skgif_success_uses_json_media_type(api_module: ApiModule) -> None:
     assert response.status == "200 OK"
     assert response.headers["Content-Type"] == "application/json"
     assert json.loads(response.data) == {
-        "@context": [{"@base": "https://api-stg.opencitations.net/"}],
+        "@context": [{"@base": "https://api.opencitations.net/"}],
         "@graph": [],
     }
 
@@ -45,7 +45,7 @@ def test_skgif_resolves_percent_encoded_product_identifier(
 ) -> None:
     body = json.dumps(
         {
-            "@context": [{"@base": "https://api-stg.opencitations.net/"}],
+            "@context": [{"@base": "https://api.opencitations.net/"}],
             "@graph": [
                 {
                     "local_identifier": "https://w3id.org/oc/meta/br/0601",

@@ -1,6 +1,6 @@
 #url /skg-if/v1
 #type api
-#base https://api-stg.opencitations.net
+#base https://api.opencitations.net
 #title SKG-IF API for OpenCitations
 #description SKG-IF compliant API exposing OpenCitations bibliographic data as JSON-LD, following the [Scholarly Knowledge Graph Interoperability Framework specification](https://skg-if.github.io/interoperability-framework/).
 #html_meta_description SKG-IF API for OpenCitations: access bibliographic metadata, citations, authors, and venues as JSON-LD via the Scholarly Knowledge Graph Interoperability Framework.
@@ -25,11 +25,11 @@
         "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
         "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
         {
-            "@base": "https://api-stg.opencitations.net/"
+            "@base": "https://api.opencitations.net/"
         }
     ],
     "meta": {
-        "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/products/https://w3id.org/oc/meta/br/062104388184",
+        "local_identifier": "https://api.opencitations.net/skg-if/v1/products/https://w3id.org/oc/meta/br/062104388184",
         "entity_type": "single_entity"
     },
     "@graph": [
@@ -390,22 +390,22 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
         "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
         "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
         {
-            "@base": "https://api-stg.opencitations.net/"
+            "@base": "https://api.opencitations.net/"
         }
     ],
     "meta": {
-        "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=1&page_size=10",
+        "local_identifier": "https://api.opencitations.net/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=1&page_size=10",
         "entity_type": "search_result_page",
         "part_of": {
-            "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/products?filter=cf.search.title:OpenCitations",
+            "local_identifier": "https://api.opencitations.net/skg-if/v1/products?filter=cf.search.title:OpenCitations",
             "entity_type": "search_result",
             "total_items": 7,
             "first_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=1&page_size=10",
+                "local_identifier": "https://api.opencitations.net/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=1&page_size=10",
                 "entity_type": "search_result_page"
             },
             "last_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=1&page_size=10",
+                "local_identifier": "https://api.opencitations.net/skg-if/v1/products?filter=cf.search.title:OpenCitations&page=1&page_size=10",
                 "entity_type": "search_result_page"
             }
         }
@@ -1460,7 +1460,7 @@ WHERE {
     "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
     "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
     {
-      "@base": "https://api-stg.opencitations.net/"
+      "@base": "https://api.opencitations.net/"
     }
   ],
   "@graph": [
@@ -1530,14 +1530,14 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
         "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
         "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
         {
-          "@base": "https://api-stg.opencitations.net/"
+          "@base": "https://api.opencitations.net/"
         }
     ],
     "meta": {
-        "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/persons?filter=cf.search.given_name:Silvio,cf.search.family_name:Peroni&page=1&page_size=1",
+        "local_identifier": "https://api.opencitations.net/skg-if/v1/persons?filter=cf.search.given_name:Silvio,cf.search.family_name:Peroni&page=1&page_size=1",
         "entity_type": "search_result_page",
         "part_of": {
-            "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/persons?filter=cf.search.given_name:Silvio,cf.search.family_name:Peroni",
+            "local_identifier": "https://api.opencitations.net/skg-if/v1/persons?filter=cf.search.given_name:Silvio,cf.search.family_name:Peroni",
             "entity_type": "search_result",
             "total_items": 1
         }
@@ -1592,7 +1592,7 @@ WHERE {
     "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
     "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
     {
-      "@base": "https://api-stg.opencitations.net/"
+      "@base": "https://api.opencitations.net/"
     }
   ],
   "@graph": [
@@ -1653,14 +1653,14 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
         "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
         "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
         {
-            "@base": "https://api-stg.opencitations.net/"
+            "@base": "https://api.opencitations.net/"
         }
     ],
     "meta": {
-        "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/organisations?filter=cf.search.name:Mit Press&page=1&page_size=1",
+        "local_identifier": "https://api.opencitations.net/skg-if/v1/organisations?filter=cf.search.name:Mit Press&page=1&page_size=1",
         "entity_type": "search_result_page",
         "part_of": {
-            "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/organisations?filter=cf.search.name:Mit Press",
+            "local_identifier": "https://api.opencitations.net/skg-if/v1/organisations?filter=cf.search.name:Mit Press",
             "entity_type": "search_result",
             "total_items": 1
         }
@@ -1712,7 +1712,7 @@ WHERE {
     "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
     "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
     {
-      "@base": "https://api-stg.opencitations.net/"
+      "@base": "https://api.opencitations.net/"
     }
   ],
   "@graph": [
@@ -1790,14 +1790,14 @@ Filters in the first group use exact matching. For `cf.search.*`, matching is te
         "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
         "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
         {
-            "@base": "https://api-stg.opencitations.net/"
+            "@base": "https://api.opencitations.net/"
         }
     ],
     "meta": {
-        "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/venues?filter=cf.search.name:Quantitative Science Studies&page=1&page_size=1",
+        "local_identifier": "https://api.opencitations.net/skg-if/v1/venues?filter=cf.search.name:Quantitative Science Studies&page=1&page_size=1",
         "entity_type": "search_result_page",
         "part_of": {
-            "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/venues?filter=cf.search.name:Quantitative Science Studies",
+            "local_identifier": "https://api.opencitations.net/skg-if/v1/venues?filter=cf.search.name:Quantitative Science Studies",
             "entity_type": "search_result",
             "total_items": 1
         }
@@ -1924,22 +1924,22 @@ All filters below are accepted but currently return no matches because OpenCitat
         "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
         "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
         {
-            "@base": "https://api-stg.opencitations.net/"
+            "@base": "https://api.opencitations.net/"
         }
     ],
     "meta": {
-        "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/grants?filter=grant_number:12345&page=1&page_size=1",
+        "local_identifier": "https://api.opencitations.net/skg-if/v1/grants?filter=grant_number:12345&page=1&page_size=1",
         "entity_type": "search_result_page",
         "part_of": {
-            "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/grants?filter=grant_number:12345",
+            "local_identifier": "https://api.opencitations.net/skg-if/v1/grants?filter=grant_number:12345",
             "entity_type": "search_result",
             "total_items": 0,
             "first_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/grants?filter=grant_number:12345&page=1&page_size=1",
+                "local_identifier": "https://api.opencitations.net/skg-if/v1/grants?filter=grant_number:12345&page=1&page_size=1",
                 "entity_type": "search_result_page"
             },
             "last_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/grants?filter=grant_number:12345&page=1&page_size=1",
+                "local_identifier": "https://api.opencitations.net/skg-if/v1/grants?filter=grant_number:12345&page=1&page_size=1",
                 "entity_type": "search_result_page"
             }
         }
@@ -1986,22 +1986,22 @@ All filters below are accepted but currently return no matches because OpenCitat
         "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
         "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
         {
-            "@base": "https://api-stg.opencitations.net/"
+            "@base": "https://api.opencitations.net/"
         }
     ],
     "meta": {
-        "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/datasources?filter=research_product_type:literature&page=1&page_size=1",
+        "local_identifier": "https://api.opencitations.net/skg-if/v1/datasources?filter=research_product_type:literature&page=1&page_size=1",
         "entity_type": "search_result_page",
         "part_of": {
-            "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/datasources?filter=research_product_type:literature",
+            "local_identifier": "https://api.opencitations.net/skg-if/v1/datasources?filter=research_product_type:literature",
             "entity_type": "search_result",
             "total_items": 0,
             "first_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/datasources?filter=research_product_type:literature&page=1&page_size=1",
+                "local_identifier": "https://api.opencitations.net/skg-if/v1/datasources?filter=research_product_type:literature&page=1&page_size=1",
                 "entity_type": "search_result_page"
             },
             "last_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/datasources?filter=research_product_type:literature&page=1&page_size=1",
+                "local_identifier": "https://api.opencitations.net/skg-if/v1/datasources?filter=research_product_type:literature&page=1&page_size=1",
                 "entity_type": "search_result_page"
             }
         }
@@ -2047,22 +2047,22 @@ All filters below are accepted but currently return no matches because OpenCitat
         "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
         "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
         {
-            "@base": "https://api-stg.opencitations.net/"
+            "@base": "https://api.opencitations.net/"
         }
     ],
     "meta": {
-        "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/topics?filter=cf.search.labels:biology&page=1&page_size=1",
+        "local_identifier": "https://api.opencitations.net/skg-if/v1/topics?filter=cf.search.labels:biology&page=1&page_size=1",
         "entity_type": "search_result_page",
         "part_of": {
-            "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/topics?filter=cf.search.labels:biology",
+            "local_identifier": "https://api.opencitations.net/skg-if/v1/topics?filter=cf.search.labels:biology",
             "entity_type": "search_result",
             "total_items": 0,
             "first_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/topics?filter=cf.search.labels:biology&page=1&page_size=1",
+                "local_identifier": "https://api.opencitations.net/skg-if/v1/topics?filter=cf.search.labels:biology&page=1&page_size=1",
                 "entity_type": "search_result_page"
             },
             "last_page": {
-                "local_identifier": "https://api-stg.opencitations.net/skg-if/v1/topics?filter=cf.search.labels:biology&page=1&page_size=1",
+                "local_identifier": "https://api.opencitations.net/skg-if/v1/topics?filter=cf.search.labels:biology&page=1&page_size=1",
                 "entity_type": "search_result_page"
             }
         }
