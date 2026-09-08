@@ -1,0 +1,269 @@
+.api-page {
+    --oc-blue: #2d22de;
+    --oc-purple: #9931fc;
+    --oc-ink: #1f2937;
+    --oc-muted: #64748b;
+
+    max-width: 1140px;
+    margin: 0 auto;
+    /* The bottom value clears the fixed "Back to OC Home Page" footer. */
+    padding: 0 1.25rem 4.5rem;
+}
+
+/* Hero */
+
+.api-hero {
+    margin: 2rem 0;
+    text-align: center;
+}
+
+.api-hero__logo {
+    max-height: 84px;
+    margin-bottom: 1rem;
+}
+
+.api-hero__title {
+    margin: 0;
+    font-size: 1.85rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* Card grid: one column on a phone, two from tablet up with the featured
+   card spanning the full width. */
+
+.api-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.api-link {
+    display: block;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+}
+
+.api-link:hover,
+.api-link:focus-visible {
+    color: inherit;
+}
+
+.api-link:focus-visible {
+    outline: none;
+}
+
+.api-link:focus-visible .api-card {
+    border-color: var(--oc-purple);
+    box-shadow: 0 0 0 3px rgba(153, 49, 252, 0.25);
+}
+
+/* Cards */
+
+.api-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    height: 100%;
+    padding: 1.25rem;
+    border: 1px solid rgba(15, 23, 42, 0.09);
+    border-radius: 16px;
+    background: #fff;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.api-card__icon {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: rgba(153, 49, 252, 0.1);
+    color: var(--oc-purple);
+}
+
+.api-card__icon svg {
+    width: 23px;
+    height: 23px;
+}
+
+.api-card__body {
+    min-width: 0;
+}
+
+.api-card__title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0 0 0.35rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--oc-ink);
+}
+
+.api-card__text {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--oc-muted);
+}
+
+/* The arrow is an affordance for cursors; it earns no room on a phone. */
+.api-card__arrow {
+    display: none;
+    flex: 0 0 auto;
+    align-self: center;
+    margin-left: auto;
+    color: rgba(15, 23, 42, 0.25);
+    transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.api-card__arrow svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* Featured card: the newest API gets the brand gradient. */
+
+.api-card--featured {
+    border-color: rgba(153, 49, 252, 0.3);
+    background-image: linear-gradient(135deg, rgba(45, 34, 222, 0.05), rgba(153, 49, 252, 0.06));
+}
+
+.api-card--featured .api-card__icon {
+    background: linear-gradient(135deg, var(--oc-blue), var(--oc-purple));
+    color: #fff;
+    box-shadow: 0 10px 20px -10px rgba(153, 49, 252, 0.9);
+}
+
+/* Badge */
+
+.api-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.3em 0.7em;
+    border: 1px solid rgba(22, 163, 74, 0.3);
+    border-radius: 50rem;
+    background: rgba(34, 197, 94, 0.12);
+    color: #15803d;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.api-badge__dot {
+    width: 0.45em;
+    height: 0.45em;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 0.18em rgba(34, 197, 94, 0.25);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .api-badge__dot {
+        animation: api-badge-pulse 2.4s ease-in-out infinite;
+    }
+}
+
+@keyframes api-badge-pulse {
+    0%, 100% { box-shadow: 0 0 0 0.18em rgba(34, 197, 94, 0.25); }
+    50% { box-shadow: 0 0 0 0.4em rgba(34, 197, 94, 0); }
+}
+
+/* Hover belongs to devices that have a pointer: on touch it sticks after a tap. */
+@media (hover: hover) {
+    .api-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(153, 49, 252, 0.45);
+        box-shadow: 0 18px 35px -18px rgba(45, 34, 222, 0.45);
+    }
+
+    .api-card:hover .api-card__arrow {
+        transform: translateX(3px);
+        color: var(--oc-purple);
+    }
+}
+
+/* >= 768px: two columns, roomier spacing and type. */
+@media (min-width: 768px) {
+    .api-page {
+        padding: 0 1.5rem 4.5rem;
+    }
+
+    .api-hero {
+        margin: 3rem 0;
+    }
+
+    .api-hero__logo {
+        max-height: 120px;
+        margin-bottom: 1.5rem;
+    }
+
+    .api-hero__title {
+        font-size: 2.5rem;
+    }
+
+    .api-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.5rem;
+    }
+
+    .api-cards__featured {
+        grid-column: 1 / -1;
+    }
+
+    .api-card {
+        gap: 1.25rem;
+        padding: 1.75rem;
+        border-radius: 18px;
+    }
+
+    .api-card__icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+    }
+
+    .api-card__icon svg {
+        width: 26px;
+        height: 26px;
+    }
+
+    .api-card__title {
+        gap: 0.6rem;
+        margin-bottom: 0.4rem;
+        font-size: 1.35rem;
+    }
+
+    .api-card__arrow {
+        display: block;
+    }
+
+    .api-card--featured .api-card__icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+    }
+
+    .api-card--featured .api-card__icon svg {
+        width: 30px;
+        height: 30px;
+    }
+
+    .api-card--featured .api-card__title {
+        font-size: 1.6rem;
+    }
+}
+
+@media (min-width: 992px) {
+    .api-hero__title {
+        font-size: 3rem;
+    }
+}
