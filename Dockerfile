@@ -32,8 +32,8 @@ WORKDIR /website
 # Copy dependency files first for better Docker layer caching
 COPY pyproject.toml uv.lock README.md ./
 
-# Install dependencies (frozen = use exact lockfile versions)
-RUN uv sync --frozen --no-dev --no-install-project
+# Install exact lockfile versions; --locked fails the build if uv.lock is out of sync with pyproject.toml
+RUN uv sync --locked --no-dev --no-install-project
 
 # Copy application code
 COPY . .

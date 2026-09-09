@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 import tempfile
 import time
@@ -18,7 +19,7 @@ DOCKER_USER = f"{os.getuid()}:{os.getgid()}"
 # v7.2.16
 VIRTUOSO_IMAGE = "openlink/virtuoso-opensource-7@sha256:e7a5cd1915569d70d8363503dc62f6bf818b485f1501b230c7608cde8528c72d"
 VIRTUOSO_CONTAINER = "oc-api-test-virtuoso"
-VIRTUOSO_HTTP_PORT = 8891
+VIRTUOSO_HTTP_PORT = 8893
 VIRTUOSO_ISQL_PORT = 1112
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -44,7 +45,16 @@ def _wait_for_virtuoso(container: str, timeout: int = 60) -> None:
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         result = subprocess.run(
-            ["docker", "exec", container, "isql", "1111", "dba", "dba", "exec=SELECT 1;"],
+            [
+                "docker",
+                "exec",
+                container,
+                "isql",
+                "1111",
+                "dba",
+                "dba",
+                "exec=SELECT 1;",
+            ],
             capture_output=True,
         )
         if result.returncode == 0:
@@ -53,18 +63,39 @@ def _wait_for_virtuoso(container: str, timeout: int = 60) -> None:
     raise TimeoutError(f"Virtuoso did not become ready within {timeout}s")
 
 
+def _enable_virtuoso_rdf_freetext(container: str) -> None:
+    commands = (
+        "DB.DBA.RDF_OBJ_FT_RULE_ADD(null, null, 'All');"
+        "DB.DBA.VT_INC_INDEX_DB_DBA_RDF_OBJ();"
+        "checkpoint;"
+    )
+    subprocess.run(
+        ["docker", "exec", container, "isql", "1111", "dba", "dba", f"exec={commands}"],
+        check=True,
+        capture_output=True,
+    )
+
+
 @pytest.fixture(scope="session")
 def qlever_endpoint():
     subprocess.run(["docker", "rm", "-f", QLEVER_CONTAINER], capture_output=True)
     subprocess.run(
         [
-            "docker", "run", "-d",
-            "--name", QLEVER_CONTAINER,
-            "--entrypoint", "bash",
-            "-u", DOCKER_USER,
-            "-v", f"{QLEVER_DATA_DIR}:/index:ro",
-            "-w", "/index",
-            "-p", f"{QLEVER_PORT}:{QLEVER_PORT}",
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            QLEVER_CONTAINER,
+            "--entrypoint",
+            "bash",
+            "-u",
+            DOCKER_USER,
+            "-v",
+            f"{QLEVER_DATA_DIR}:/index:ro",
+            "-w",
+            "/index",
+            "-p",
+            f"{QLEVER_PORT}:{QLEVER_PORT}",
             "--init",
             QLEVER_IMAGE,
             "-c",
@@ -81,28 +112,57 @@ def qlever_endpoint():
 
 @pytest.fixture(scope="session")
 def virtuoso_endpoint():
-    subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)
-    subprocess.run(
-        [
-            "docker", "run", "-d",
-            "--name", VIRTUOSO_CONTAINER,
-            "-p", f"{VIRTUOSO_HTTP_PORT}:8890",
-            "-p", f"{VIRTUOSO_ISQL_PORT}:1111",
-            "-e", "DBA_PASSWORD=dba",
-            "-v", f"{VIRTUOSO_DB_DIR}:/opt/virtuoso-opensource/database",
-            VIRTUOSO_IMAGE,
-        ],
-        check=True,
-        capture_output=True,
+    with tempfile.TemporaryDirectory() as temp_dir:
+        database_dir = os.path.join(temp_dir, "database")
+        os.mkdir(database_dir)
+        for entry in os.scandir(VIRTUOSO_DB_DIR):
+            if entry.is_file() and entry.name != "virtuoso.log":
+                shutil.copy2(entry.path, database_dir)
+
+        subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)
+        subprocess.run(
+            [
+                "docker",
+                "run",
+                "-d",
+                "--name",
+                VIRTUOSO_CONTAINER,
+                "-p",
+                f"{VIRTUOSO_HTTP_PORT}:8890",
+                "-p",
+                f"{VIRTUOSO_ISQL_PORT}:1111",
+                "-e",
+                "DBA_PASSWORD=dba",
+                "-v",
+                f"{database_dir}:/opt/virtuoso-opensource/database",
+                VIRTUOSO_IMAGE,
+            ],
+            check=True,
+            capture_output=True,
+        )
+        _wait_for_virtuoso(VIRTUOSO_CONTAINER)
+        _enable_virtuoso_rdf_freetext(VIRTUOSO_CONTAINER)
+        yield f"http://127.0.0.1:{VIRTUOSO_HTTP_PORT}/sparql"
+        subprocess.run(["docker", "stop", VIRTUOSO_CONTAINER], capture_output=True)
+        subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)
+
+
+@pytest.fixture(scope="session")
+def skgif_api_manager(virtuoso_endpoint, qlever_endpoint):
+    manager = APIManager(
+        [os.path.join(TEST_DIR, "..", "src", "api", "skgif_v1.hf")],
+        endpoint_override=virtuoso_endpoint,
     )
-    _wait_for_virtuoso(VIRTUOSO_CONTAINER)
-    yield f"http://127.0.0.1:{VIRTUOSO_HTTP_PORT}/sparql"
-    subprocess.run(["docker", "stop", VIRTUOSO_CONTAINER], capture_output=True)
-    subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)
+    for config in manager.all_conf.values():
+        config["sources_map"] = {"meta": virtuoso_endpoint, "index": qlever_endpoint}
+    return manager
 
 
 def normalize_citation(citation: dict[str, str]) -> dict[str, str]:
-    return {k: " ".join(sorted(v.split())) if k in ("citing", "cited") else v for k, v in citation.items()}
+    return {
+        k: " ".join(sorted(v.split())) if k in ("citing", "cited") else v
+        for k, v in citation.items()
+    }
 
 
 def normalize_citations(citations: list[dict[str, str]]) -> list[dict[str, str]]:
@@ -113,7 +173,7 @@ def execute_operation(api_manager: APIManager, operation_url: str) -> str:
     op = api_manager.get_op(operation_url)
     if isinstance(op, tuple):
         raise ValueError(f"Operation not found: {operation_url}")
-    status, result, _ = op.exec(method="get", content_type="application/json")
+    status, result, _, _ = op.exec(method="get", content_type="application/json")
     if status != 200:
         raise RuntimeError(f"API returned status {status}: {result}")
     return result

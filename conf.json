@@ -8,6 +8,7 @@
   "api_index": [ "src/api/index_v1.hf" ],
   "api_index_v2": [ "src/api/index_v2.hf" ],
   "api_meta": ["src/api/meta_v1.hf"],
+  "api_skgif": ["src/api/skgif_v1.hf"],
 
   "redis": {
     "enabled": "false",

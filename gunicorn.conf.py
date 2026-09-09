@@ -14,13 +14,14 @@ bind = "0.0.0.0:8080"
 max_requests = 800
 max_requests_jitter = 200
 
-#The number of seconds to wait for requests on a Keep-Alive connection.
+# The number of seconds to wait for requests on a Keep-Alive connection.
 keepalive = 20
 
 # Logging
 accesslog = None
 errorlog = "-"
 loglevel = "info"
+
 
 def on_starting(server):
     """
@@ -30,10 +31,10 @@ def on_starting(server):
     print("=" * 60)
     print("Gunicorn master process starting...")
     print("=" * 60)
-    
+
     # Check if sync is enabled
     sync_enabled = os.getenv("SYNC_ENABLED", "false").lower() == "true"
-    
+
     if sync_enabled:
         print("Static sync enabled - running sync before starting workers...")
         try:
@@ -45,10 +46,11 @@ def on_starting(server):
             print(f"ERROR: Unexpected error during sync: {e}")
     else:
         print("Static sync disabled")
-    
+
     print("=" * 60)
     print("Master process initialized - spawning workers...")
     print("=" * 60)
+
 
 def post_worker_init(worker):
     """

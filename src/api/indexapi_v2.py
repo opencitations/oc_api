@@ -14,7 +14,7 @@
 # ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 # SOFTWARE.
 
-__author__ = 'Arcangelo Massari & Ivan Heibi'
+__author__ = "Arcangelo Massari & Ivan Heibi"
 
 from requests import RequestException, post
 from json import loads
@@ -34,8 +34,9 @@ from indexapi_common import (
 
 def id2omids(s):
     if "omid" in s:
-        return s.replace("omid:br/","<https://w3id.org/oc/meta/br/") +">",
-    return __get_omid_of(s),
+        return (s.replace("omid:br/", "<https://w3id.org/oc/meta/br/") + ">",)
+    return (__get_omid_of(s),)
+
 
 def count_unique_cits(res, *args):
     header = res[0]
@@ -51,13 +52,18 @@ def count_unique_cits(res, *args):
             citing_to_dedup.extend(row[citing_idx])
             cited_to_dedup.extend(row[cited_idx])
 
-        citing_to_dedup_meta = get_unique_brs_metadata( list(set(citing_to_dedup)), ids_only=True )
-        cited_to_dedup_meta = get_unique_brs_metadata( list(set(cited_to_dedup)), ids_only=True )
+        citing_to_dedup_meta = get_unique_brs_metadata(
+            list(set(citing_to_dedup)), ids_only=True
+        )
+        cited_to_dedup_meta = get_unique_brs_metadata(
+            list(set(cited_to_dedup)), ids_only=True
+        )
         for _k_citing in citing_to_dedup_meta.keys():
             for _k_cited in cited_to_dedup_meta.keys():
-                set_oci.add( (_k_citing,_k_cited) )
+                set_oci.add((_k_citing, _k_cited))
 
-    return [["count"],[ len( set_oci ) ]], True
+    return [["count"], [len(set_oci)]], True
+
 
 # args must contain the <citing> and <cited>
 def citations_info(res, *args):
@@ -78,34 +84,34 @@ def citations_info(res, *args):
             citing_to_dedup.extend(row[citing_idx])
             cited_to_dedup.extend(row[cited_idx])
 
-        citing_to_dedup_meta = get_unique_brs_metadata( list(set(citing_to_dedup)) )
-        cited_to_dedup_meta = get_unique_brs_metadata( list(set(cited_to_dedup)) )
+        citing_to_dedup_meta = get_unique_brs_metadata(list(set(citing_to_dedup)))
+        cited_to_dedup_meta = get_unique_brs_metadata(list(set(cited_to_dedup)))
 
         for citing_entity in citing_to_dedup_meta:
             for cited_entity in cited_to_dedup_meta:
-
                 _citing = citing_to_dedup_meta[citing_entity]
                 _cited = cited_to_dedup_meta[cited_entity]
 
                 res_row = [
                     # oci value
-                    get_id_val(citing_entity)+"-"+get_id_val(cited_entity),
+                    get_id_val(citing_entity) + "-" + get_id_val(cited_entity),
                     # citing
-                    __get_all_pids(_citing,citing_entity),
+                    __get_all_pids(_citing, citing_entity),
                     # cited
-                    __get_all_pids(_cited,cited_entity),
+                    __get_all_pids(_cited, cited_entity),
                     # creation = citing[pub_date]
                     get_pub_date(_citing),
                     # timespan = citing[pub_date] - cited[pub_date]
-                    cit_duration(get_pub_date(_citing),get_pub_date(_cited)),
+                    cit_duration(get_pub_date(_citing), get_pub_date(_cited)),
                     # journal_sc = compare citing[source_id] and cited[source_id]
-                    cit_journal_sc(get_source(_citing),get_source(_cited)),
+                    cit_journal_sc(get_source(_citing), get_source(_cited)),
                     # author_sc = compare citing[source_id] and cited[source_id]
-                    cit_author_sc(get_author(_citing),get_author(_cited))
+                    cit_author_sc(get_author(_citing), get_author(_cited)),
                 ]
                 f_res.append(res_row)
 
     return f_res, True
+
 
 # args must contain the <count>
 def sum_all(res, *args):
@@ -125,52 +131,79 @@ def sum_all(res, *args):
 # Local methods
 # ---
 
+
 def __get_omid_of(s):
     MULTI_VAL_MAX = 9000
     sparql_endpoint = env_config["sparql_endpoint_meta"]
 
     # SPARQL query
     is_journal = False
-    br_pre_l = ["doi","issn","isbn","pmid","pmcid","url","wikidata","wikipedia","jid","arxiv"]
+    br_pre_l = [
+        "doi",
+        "issn",
+        "isbn",
+        "pmid",
+        "pmcid",
+        "url",
+        "wikidata",
+        "wikipedia",
+        "jid",
+        "arxiv",
+    ]
     for br_pre in br_pre_l:
-        if s.startswith(br_pre+":"):
-            s = s.replace(br_pre+":","")
+        if s.startswith(br_pre + ":"):
+            s = s.replace(br_pre + ":", "")
             # check if is journal
             is_journal = br_pre in ["issn"]
             break
 
-    sparql_query = """
+    sparql_query = (
+        """
         PREFIX datacite: <http://purl.org/spar/datacite/>
         PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
         SELECT ?br {
-            { ?identifier literal:hasLiteralValue '"""+s+"""'^^<http://www.w3.org/2001/XMLSchema#string>. }
+            { ?identifier literal:hasLiteralValue '"""
+        + s
+        + """'^^<http://www.w3.org/2001/XMLSchema#string>. }
             UNION
-            {?identifier literal:hasLiteralValue '"""+s+"""'.}
+            {?identifier literal:hasLiteralValue '"""
+        + s
+        + """'.}
             ?br datacite:hasIdentifier ?identifier
         }
     """
+    )
 
     # in case is a journal the SAPRQL query retrieves all associated BRs
     if is_journal:
-        sparql_query = """
+        sparql_query = (
+            """
             PREFIX datacite: <http://purl.org/spar/datacite/>
             PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
             PREFIX ns1: <http://purl.org/vocab/frbr/core#>
             PREFIX fabio: <http://purl.org/spar/fabio/>
             SELECT ?br {
-            	{ ?identifier literal:hasLiteralValue '"""+s+"""'^^<http://www.w3.org/2001/XMLSchema#string>. }
+            { ?identifier literal:hasLiteralValue '"""
+            + s
+            + """'^^<http://www.w3.org/2001/XMLSchema#string>. }
                 UNION
-                {?identifier literal:hasLiteralValue '"""+s+"""'.}
-            	?venue datacite:hasIdentifier ?identifier .
-              	{?br ns1:partOf ?venue .}
-              	UNION { ?br ns1:partOf/ns1:partOf ?venue . }
-              	UNION { ?br ns1:partOf/ns1:partOf/ns1:partOf ?venue . }
+                {?identifier literal:hasLiteralValue '"""
+            + s
+            + """'.}
+            ?venue datacite:hasIdentifier ?identifier .
+            {?br ns1:partOf ?venue .}
+            UNION { ?br ns1:partOf/ns1:partOf ?venue . }
+            UNION { ?br ns1:partOf/ns1:partOf/ns1:partOf ?venue . }
               	UNION { ?br ns1:partOf/ns1:partOf/ns1:partOf/ns1:partOf ?venue .}
               	?br a fabio:JournalArticle .
             }
         """
+        )
 
-    headers = {"Accept": "application/sparql-results+json", "Content-Type": "application/sparql-query"}
+    headers = {
+        "Accept": "application/sparql-results+json",
+        "Content-Type": "application/sparql-query",
+    }
     try:
         response = post(sparql_endpoint, headers=headers, data=sparql_query, timeout=45)
         response.raise_for_status()
@@ -185,11 +218,19 @@ def __get_omid_of(s):
 
     sparql_values = []
     for i in range(0, len(omid_l), MULTI_VAL_MAX):
-        sparql_values.append( " ".join(["<https://w3id.org/oc/meta/br/"+e+">" for e in omid_l[i:i + MULTI_VAL_MAX]]) )
+        sparql_values.append(
+            " ".join(
+                [
+                    "<https://w3id.org/oc/meta/br/" + e + ">"
+                    for e in omid_l[i : i + MULTI_VAL_MAX]
+                ]
+            )
+        )
     return sparql_values
 
+
 def __get_all_pids(elem, uri_omid):
-    str_omid = "omid:br/"+get_id_val(uri_omid)
+    str_omid = "omid:br/" + get_id_val(uri_omid)
     str_ids = [str_omid]
     if "ids" in elem:
         for id in elem["ids"].split(" __ "):

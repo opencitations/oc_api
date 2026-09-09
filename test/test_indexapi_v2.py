@@ -10,14 +10,18 @@ from ramose import APIManager
 
 @pytest.fixture(scope="session")
 def api_manager(qlever_endpoint: str, virtuoso_endpoint: str) -> APIManager:
-    return create_api_manager("src/api/index_v2.hf", {
-        "#base https://api.opencitations.net/index": f"#base {qlever_endpoint}",
-        "#endpoint http://qlever-service.default.svc.cluster.local:7011": f"#endpoint {qlever_endpoint}",
-        "#addon indexapi_v2": "#addon ../src/api/indexapi_v2",
-    }, env_vars={
-        "SPARQL_ENDPOINT_INDEX": qlever_endpoint,
-        "SPARQL_ENDPOINT_META": virtuoso_endpoint,
-    })
+    return create_api_manager(
+        "src/api/index_v2.hf",
+        {
+            "#base https://api.opencitations.net/index": f"#base {qlever_endpoint}",
+            "#endpoint http://qlever-service.default.svc.cluster.local:7011": f"#endpoint {qlever_endpoint}",
+            "#addon indexapi_v2": "#addon ../src/api/indexapi_v2",
+        },
+        env_vars={
+            "SPARQL_ENDPOINT_INDEX": qlever_endpoint,
+            "SPARQL_ENDPOINT_META": virtuoso_endpoint,
+        },
+    )
 
 
 MAIN_PAPER_OMID = "omid:br/062104388184"
@@ -537,107 +541,127 @@ EXPECTED_QSS_ARTICLE_CITATIONS = [
 
 
 def test_citation_by_oci_outgoing(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, "/v2/citation/062104388184-06103007140"))
+    result = json.loads(
+        execute_operation(api_manager, "/index/v2/citation/062104388184-06103007140")
+    )
     assert normalize_citations(result) == normalize_citations([EXPECTED_REFERENCES[0]])
 
 
 def test_citation_by_oci_incoming(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, "/v2/citation/06290518281-062104388184"))
+    result = json.loads(
+        execute_operation(api_manager, "/index/v2/citation/06290518281-062104388184")
+    )
     assert normalize_citations(result) == normalize_citations([EXPECTED_CITATIONS[3]])
 
 
 def test_citations_incoming(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, f"/v2/citations/{MAIN_PAPER_OMID}"))
+    result = json.loads(
+        execute_operation(api_manager, f"/index/v2/citations/{MAIN_PAPER_OMID}")
+    )
     assert normalize_citations(result) == normalize_citations(EXPECTED_CITATIONS)
 
 
 def test_citations_no_incoming(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, "/v2/citations/omid:br/06011163661"))
+    result = json.loads(
+        execute_operation(api_manager, "/index/v2/citations/omid:br/06011163661")
+    )
     assert result == []
 
 
 def test_citation_count(api_manager: APIManager) -> None:
     result = json.loads(
-        execute_operation(api_manager, f"/v2/citation-count/{MAIN_PAPER_OMID}")
+        execute_operation(api_manager, f"/index/v2/citation-count/{MAIN_PAPER_OMID}")
     )
     assert result == [{"count": "4"}]
 
 
 def test_citation_count_zero(api_manager: APIManager) -> None:
     result = json.loads(
-        execute_operation(api_manager, "/v2/citation-count/omid:br/06011163661")
+        execute_operation(api_manager, "/index/v2/citation-count/omid:br/06011163661")
     )
     assert result == [{"count": "0"}]
 
 
 def test_reference_count(api_manager: APIManager) -> None:
     result = json.loads(
-        execute_operation(api_manager, f"/v2/reference-count/{MAIN_PAPER_OMID}")
+        execute_operation(api_manager, f"/index/v2/reference-count/{MAIN_PAPER_OMID}")
     )
     assert result == [{"count": "45"}]
 
 
 def test_reference_count_zero(api_manager: APIManager) -> None:
     result = json.loads(
-        execute_operation(api_manager, "/v2/reference-count/omid:br/06103007140")
+        execute_operation(api_manager, "/index/v2/reference-count/omid:br/06103007140")
     )
     assert result == [{"count": "0"}]
 
 
 def test_references(api_manager: APIManager) -> None:
     result = json.loads(
-        execute_operation(api_manager, f"/v2/references/{MAIN_PAPER_OMID}")
+        execute_operation(api_manager, f"/index/v2/references/{MAIN_PAPER_OMID}")
     )
     assert normalize_citations(result) == normalize_citations(EXPECTED_REFERENCES)
 
 
 def test_references_no_outgoing(api_manager: APIManager) -> None:
     result = json.loads(
-        execute_operation(api_manager, "/v2/references/omid:br/06103007140")
+        execute_operation(api_manager, "/index/v2/references/omid:br/06103007140")
     )
     assert result == []
 
 
 def test_citations_by_doi(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, f"/v2/citations/{MAIN_PAPER_DOI}"))
+    result = json.loads(
+        execute_operation(api_manager, f"/index/v2/citations/{MAIN_PAPER_DOI}")
+    )
     assert normalize_citations(result) == normalize_citations(EXPECTED_CITATIONS)
 
 
 def test_references_by_doi(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, f"/v2/references/{MAIN_PAPER_DOI}"))
+    result = json.loads(
+        execute_operation(api_manager, f"/index/v2/references/{MAIN_PAPER_DOI}")
+    )
     assert normalize_citations(result) == normalize_citations(EXPECTED_REFERENCES)
 
 
 def test_citation_count_by_doi(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, f"/v2/citation-count/{MAIN_PAPER_DOI}"))
+    result = json.loads(
+        execute_operation(api_manager, f"/index/v2/citation-count/{MAIN_PAPER_DOI}")
+    )
     assert result == [{"count": "4"}]
 
 
 def test_reference_count_by_doi(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, f"/v2/reference-count/{MAIN_PAPER_DOI}"))
+    result = json.loads(
+        execute_operation(api_manager, f"/index/v2/reference-count/{MAIN_PAPER_DOI}")
+    )
     assert result == [{"count": "45"}]
 
 
 def test_citation_count_by_pmid(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, "/v2/citation-count/pmid:25378340"))
+    result = json.loads(
+        execute_operation(api_manager, "/index/v2/citation-count/pmid:25378340")
+    )
     assert result == [{"count": "1"}]
 
 
 def test_reference_count_by_pmid(api_manager: APIManager) -> None:
-    result = json.loads(execute_operation(api_manager, "/v2/reference-count/pmid:25378340"))
+    result = json.loads(
+        execute_operation(api_manager, "/index/v2/reference-count/pmid:25378340")
+    )
     assert result == [{"count": "0"}]
 
 
 def test_venue_citation_count(api_manager: APIManager) -> None:
     result = json.loads(
-        execute_operation(api_manager, "/v2/venue-citation-count/issn:2641-3337")
+        execute_operation(api_manager, "/index/v2/venue-citation-count/issn:2641-3337")
     )
     assert result == [{"count": "6"}]
 
 
 def test_citations_negative_timespan(api_manager: APIManager) -> None:
     result = json.loads(
-        execute_operation(api_manager, f"/v2/citations/{ZENODO_DMP_OMID}")
+        execute_operation(api_manager, f"/index/v2/citations/{ZENODO_DMP_OMID}")
     )
     assert normalize_citations(result) == normalize_citations(
         EXPECTED_ZENODO_DMP_CITATIONS
@@ -646,21 +670,23 @@ def test_citations_negative_timespan(api_manager: APIManager) -> None:
 
 def test_citation_count_zenodo_dmp(api_manager: APIManager) -> None:
     result = json.loads(
-        execute_operation(api_manager, f"/v2/citation-count/{ZENODO_DMP_OMID}")
+        execute_operation(api_manager, f"/index/v2/citation-count/{ZENODO_DMP_OMID}")
     )
     assert result == [{"count": "2"}]
 
 
 def test_citation_count_nonexistent_doi(api_manager: APIManager) -> None:
     result = json.loads(
-        execute_operation(api_manager, "/v2/citation-count/doi:10.9999/nonexistent")
+        execute_operation(
+            api_manager, "/index/v2/citation-count/doi:10.9999/nonexistent"
+        )
     )
     assert result == [{"count": "0"}]
 
 
 def test_citations_with_author_sc(api_manager: APIManager) -> None:
     result = json.loads(
-        execute_operation(api_manager, f"/v2/citations/{QSS_ARTICLE_OMID}")
+        execute_operation(api_manager, f"/index/v2/citations/{QSS_ARTICLE_OMID}")
     )
     assert normalize_citations(result) == normalize_citations(
         EXPECTED_QSS_ARTICLE_CITATIONS
@@ -670,24 +696,30 @@ def test_citations_with_author_sc(api_manager: APIManager) -> None:
 def test_citation_count_meta_anyids_failure(api_manager: APIManager) -> None:
     with patch("indexapi_common.post", side_effect=RequestException):
         result = json.loads(
-            execute_operation(api_manager, f"/v2/citation-count/{MAIN_PAPER_OMID}")
+            execute_operation(
+                api_manager, f"/index/v2/citation-count/{MAIN_PAPER_OMID}"
+            )
         )
     assert result == [{"count": "0"}]
 
 
 def test_citation_count_meta_sparql_failure(api_manager: APIManager) -> None:
-    with patch("indexapi_v2.post", side_effect=RequestException), \
-         patch("indexapi_common.post", side_effect=RequestException):
+    with (
+        patch("indexapi_v2.post", side_effect=RequestException),
+        patch("indexapi_common.post", side_effect=RequestException),
+    ):
         result = json.loads(
-            execute_operation(api_manager, f"/v2/citation-count/{MAIN_PAPER_DOI}")
+            execute_operation(api_manager, f"/index/v2/citation-count/{MAIN_PAPER_DOI}")
         )
     assert result == [{"count": "0"}]
 
 
 def test_citations_meta_sparql_failure(api_manager: APIManager) -> None:
-    with patch("indexapi_v2.post", side_effect=RequestException), \
-         patch("indexapi_common.post", side_effect=RequestException):
+    with (
+        patch("indexapi_v2.post", side_effect=RequestException),
+        patch("indexapi_common.post", side_effect=RequestException),
+    ):
         result = json.loads(
-            execute_operation(api_manager, f"/v2/citations/{MAIN_PAPER_OMID}")
+            execute_operation(api_manager, f"/index/v2/citations/{MAIN_PAPER_OMID}")
         )
     assert result == []
