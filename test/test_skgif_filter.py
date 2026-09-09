@@ -147,14 +147,14 @@ def _exec(skgif_api_manager: APIManager, url: str) -> list[dict]:
     page = 1
     while True:
         op = skgif_api_manager.get_op(f"{url}{sep}page={page}&page_size=100")
-        if isinstance(op, tuple):
+        if not isinstance(op, Operation):
             msg = f"Operation not found: {url}"
             raise TypeError(msg)
-        status, result, _, _ = op.exec(method="get", content_type="application/json")
-        if status != 200:
-            msg = f"API returned status {status}: {result}"
+        response = op.exec(method="get", content_type="application/json")
+        if response.status_code not in (200, 404):
+            msg = f"API returned status {response.status_code}: {response.body}"
             raise RuntimeError(msg)
-        parsed = json.loads(result)
+        parsed = json.loads(response.body)
         if not (isinstance(parsed, dict) and "@graph" in parsed):
             return list(parsed)
         collected.extend(parsed["@graph"])
@@ -165,11 +165,11 @@ def _exec(skgif_api_manager: APIManager, url: str) -> list[dict]:
 
 def _exec_raw(skgif_api_manager: APIManager, url: str) -> tuple[int, str]:
     op = skgif_api_manager.get_op(url)
-    if isinstance(op, tuple):
+    if not isinstance(op, Operation):
         msg = f"Operation not found: {url}"
         raise TypeError(msg)
-    status, result, _, _ = op.exec(method="get", content_type="application/json")
-    return status, result
+    response = op.exec(method="get", content_type="application/json")
+    return response.status_code, response.body
 
 
 def _canonical_entities(entities: list[dict]) -> list[dict]:
@@ -848,12 +848,14 @@ def _meta_url(path: str) -> str:
     return f"{SKGIF_PUBLIC_BASE_URL}{path}"
 
 
-def _envelope(skgif_api_manager: APIManager, url: str) -> dict:
+def _envelope(
+    skgif_api_manager: APIManager, url: str, expected_status: int = 200
+) -> dict:
     op = skgif_api_manager.get_op(url)
     assert isinstance(op, Operation)
-    status, result, _, _ = op.exec(method="get", content_type="application/json")
-    assert status == 200
-    return json.loads(result)
+    response = op.exec(method="get", content_type="application/json")
+    assert response.status_code == expected_status
+    return json.loads(response.body)
 
 
 class TestSkgifEnvelope:
@@ -968,12 +970,12 @@ class TestSkgifEnvelope:
     ) -> None:
         op = skgif_api_manager.get_op("/skg-if/v1/products?page=9999&page_size=10")
         assert isinstance(op, Operation)
-        status, result, ctype, _ = op.exec(
-            method="get", content_type="application/json"
+        response = op.exec(method="get", content_type="application/json")
+        assert response.status_code == 422
+        assert (
+            response.body == "HTTP status code 422: page 9999 exceeds total pages 135"
         )
-        assert status == 422
-        assert result == "HTTP status code 422: page 9999 exceeds total pages 135"
-        assert ctype == "text/plain"
+        assert response.content_type == "text/plain"
 
     def test_single_product_returns_single_entity_envelope(
         self, skgif_api_manager: APIManager
@@ -1061,12 +1063,12 @@ class TestSkgifEnvelope:
     ) -> None:
         op = skgif_api_manager.get_op("/skg-if/v1/products?page_size=100000")
         assert isinstance(op, Operation)
-        status, result, ctype, _ = op.exec(
-            method="get", content_type="application/json"
+        response = op.exec(method="get", content_type="application/json")
+        assert response.status_code == 422
+        assert response.body == (
+            "HTTP status code 422: page_size must be <= 100, got 100000"
         )
-        assert status == 422
-        assert result == "HTTP status code 422: page_size must be <= 100, got 100000"
-        assert ctype == "text/plain"
+        assert response.content_type == "text/plain"
 
     def test_empty_result_set_is_paginated_with_zero_total(
         self, skgif_api_manager: APIManager
@@ -1074,6 +1076,7 @@ class TestSkgifEnvelope:
         result = _envelope(
             skgif_api_manager,
             "/skg-if/v1/products?filter=cf.search.title:xyznonexistent999",
+            expected_status=404,
         )
         assert result["@graph"] == []
         assert result["meta"] == {

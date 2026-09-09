@@ -4,7 +4,6 @@ import json
 import requests
 import urllib.parse as urlparse
 import re
-import csv
 from urllib.parse import unquote
 from rdflib.plugins.sparql.parser import parseUpdate
 import subprocess
@@ -17,7 +16,6 @@ from ramose import (
     HTMLDocumentationHandler,
     OpenAPIDocumentationHandler,
 )
-from io import StringIO
 from redis import Redis
 
 session = requests.Session()
@@ -498,80 +496,61 @@ class Api:
                 operation_url = call + unquote(web.ctx.query)
                 op = man.get_op(operation_url)
 
-                if type(op) is Operation:
-                    status_code, res, response_content_type, extra_headers = op.exec(
-                        content_type=requested_content_type
-                    )
-                    if status_code == 200:
-                        # remember to remove the slash at the end
-                        org_ref = web.ctx.env.get("HTTP_REFERER")
-                        if org_ref is not None:
-                            org_ref = org_ref[:-1]
-                        else:
-                            org_ref = "*"
-
-                        web.header("Access-Control-Allow-Origin", org_ref)
-                        web.header("Access-Control-Allow-Credentials", "true")
-                        web.header("Content-Type", response_content_type)
-                        web.header("Access-Control-Allow-Methods", "*")
-                        web.header("Access-Control-Allow-Headers", "Authorization")
-                        for header_name, header_value in extra_headers.items():
-                            web.header(header_name, header_value)
-                        # web_logger.mes()
-                        return res
-                    else:
-                        if dataset == "skg-if":
-                            problem = {
-                                "type": "about:blank",
-                                "title": HTTPStatus(status_code).phrase,
-                                "status": status_code,
-                                "detail": re.sub(
-                                    r"^HTTP status code \d+:\s*", "", str(res)
-                                ),
-                                "instance": operation_url,
-                            }
-                            raise web.HTTPError(
-                                f"{status_code} {HTTPStatus(status_code).phrase}",
-                                {"Content-Type": "application/json"},
-                                json.dumps(problem, ensure_ascii=False),
-                            )
-                        try:
-                            with StringIO(res) as f:
-                                if requested_content_type == "text/csv":
-                                    mes = next(csv.reader(f))[0]
-                                else:
-                                    mes = json.dumps(
-                                        next(csv.DictReader(f)), ensure_ascii=False
-                                    )
-                            raise web.HTTPError(
-                                str(status_code) + " ",
-                                {"Content-Type": response_content_type},
-                                mes,
-                            )
-                        except Exception:
-                            raise web.HTTPError(
-                                str(status_code) + " ",
-                                {"Content-Type": response_content_type},
-                                str(res),
-                            )
+                if isinstance(op, Operation):
+                    response = op.exec(content_type=requested_content_type)
                 else:
-                    if dataset == "skg-if":
-                        problem = {
-                            "type": "about:blank",
-                            "title": "Not Found",
-                            "status": 404,
-                            "detail": "the operation requested does not exist",
-                            "instance": operation_url,
+                    response = op
+
+                status_code = response.status_code
+                res = response.body
+                response_content_type = response.content_type
+                extra_headers = response.headers
+                if status_code == 200:
+                    # remember to remove the slash at the end
+                    org_ref = web.ctx.env.get("HTTP_REFERER")
+                    if org_ref is not None:
+                        org_ref = org_ref[:-1]
+                    else:
+                        org_ref = "*"
+
+                    web.header("Access-Control-Allow-Origin", org_ref)
+                    web.header("Access-Control-Allow-Credentials", "true")
+                    web.header("Content-Type", response_content_type)
+                    web.header("Access-Control-Allow-Methods", "*")
+                    web.header("Access-Control-Allow-Headers", "Authorization")
+                    for header_name, header_value in extra_headers.items():
+                        web.header(header_name, header_value)
+                    # web_logger.mes()
+                    return res
+
+                if dataset == "skg-if":
+                    if not response.is_error_message:
+                        response_headers = {
+                            "Content-Type": response_content_type,
+                            **extra_headers,
                         }
                         raise web.HTTPError(
-                            "404 Not Found",
-                            {"Content-Type": "application/json"},
-                            json.dumps(problem, ensure_ascii=False),
+                            f"{status_code} {HTTPStatus(status_code).phrase}",
+                            response_headers,
+                            res,
                         )
+                    problem = {
+                        "type": "about:blank",
+                        "title": HTTPStatus(status_code).phrase,
+                        "status": status_code,
+                        "detail": re.sub(r"^HTTP status code \d+:\s*", "", str(res)),
+                        "instance": operation_url,
+                    }
                     raise web.HTTPError(
-                        "404 ",
-                        {"Content-Type": requested_content_type},
-                        "No API operation found at URL '%s'" % call,
+                        f"{status_code} {HTTPStatus(status_code).phrase}",
+                        {"Content-Type": "application/json"},
+                        json.dumps(problem, ensure_ascii=False),
+                    )
+                elif dataset in ("index", "meta"):
+                    raise web.HTTPError(
+                        str(status_code) + " ",
+                        {"Content-Type": response_content_type},
+                        str(res),
                     )
 
 

@@ -1854,7 +1854,7 @@ WHERE {
 #url /grants/{local_identifier}
 #type operation
 #method get
-#description Returns a single grant. Note: OpenCitations does not currently hold grant data; this endpoint always returns 404.
+#description Returns a single grant. OpenCitations does not currently hold grant data, so this endpoint returns 404 with an empty JSON-LD graph.
 #call /grants/example-grant-id
 #format skg_if,to_skg_if,application/json
 #default_format skg_if
@@ -1864,7 +1864,7 @@ WHERE {
 #url /grants
 #type operation
 #method get
-#description Returns a list of grants matching the given filters. Note: OpenCitations does not currently hold grant data; this endpoint always returns an empty result.
+#description Returns a list of grants matching the given filters. OpenCitations does not currently hold grant data, so this endpoint returns 404 with an empty JSON-LD graph.
 #custom_params filter,skgif_filters.grants.yaml,Search filter.
 Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 Filters in the first group use exact matching. For `cf.search.*`, matching is text contains.
@@ -1951,7 +1951,7 @@ All filters below are accepted but currently return no matches because OpenCitat
 #url /datasources/{local_identifier}
 #type operation
 #method get
-#description Returns a single data source. Note: OpenCitations does not currently hold data source records; this endpoint always returns 404.
+#description Returns a single data source. OpenCitations does not currently hold data source records, so this endpoint returns 404 with an empty JSON-LD graph.
 #call /datasources/example-datasource-id
 #format skg_if,to_skg_if,application/json
 #default_format skg_if
@@ -1960,7 +1960,7 @@ All filters below are accepted but currently return no matches because OpenCitat
 #url /datasources
 #type operation
 #method get
-#description Returns a list of data sources matching the given filters. Note: OpenCitations does not currently hold data source records; this endpoint always returns an empty result.
+#description Returns a list of data sources matching the given filters. OpenCitations does not currently hold data source records, so this endpoint returns 404 with an empty JSON-LD graph.
 #custom_params filter,skgif_filters.datasources.yaml,Search filter.
 Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 Filters in the first group use exact matching. For `cf.search.*`, matching is text contains.
@@ -2013,7 +2013,7 @@ All filters below are accepted but currently return no matches because OpenCitat
 #url /topics/{local_identifier}
 #type operation
 #method get
-#description Returns a single topic. Note: OpenCitations does not currently hold topic data; this endpoint always returns 404.
+#description Returns a single topic. OpenCitations does not currently hold topic data, so this endpoint returns 404 with an empty JSON-LD graph.
 #call /topics/example-topic-id
 #format skg_if,to_skg_if,application/json
 #default_format skg_if
@@ -2023,7 +2023,7 @@ All filters below are accepted but currently return no matches because OpenCitat
 #url /topics
 #type operation
 #method get
-#description Returns a list of topics matching the given filters. Note: OpenCitations does not currently hold topic data; this endpoint always returns an empty result.
+#description Returns a list of topics matching the given filters. OpenCitations does not currently hold topic data, so this endpoint returns 404 with an empty JSON-LD graph.
 #custom_params filter,skgif_filters.topics.yaml,Search filter.
 Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 Filters in the first group use exact matching. For `cf.search.*`, matching is text contains.
