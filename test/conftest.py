@@ -7,7 +7,7 @@ import time
 import pytest
 import requests
 
-from ramose import APIManager
+from ramose import APIManager, Operation
 
 # v0.5.45
 QLEVER_IMAGE = "adfreiburg/qlever@sha256:4672a53f0ff4e55ac921d25832a21ec0bb3ca08f54d7c1950d04ebf6af7b8c21"
@@ -171,12 +171,14 @@ def normalize_citations(citations: list[dict[str, str]]) -> list[dict[str, str]]
 
 def execute_operation(api_manager: APIManager, operation_url: str) -> str:
     op = api_manager.get_op(operation_url)
-    if isinstance(op, tuple):
+    if not isinstance(op, Operation):
         raise ValueError(f"Operation not found: {operation_url}")
-    status, result, _, _ = op.exec(method="get", content_type="application/json")
-    if status != 200:
-        raise RuntimeError(f"API returned status {status}: {result}")
-    return result
+    response = op.exec(method="get", content_type="application/json")
+    if response.status_code != 200:
+        raise RuntimeError(
+            f"API returned status {response.status_code}: {response.body}"
+        )
+    return response.body
 
 
 def create_api_manager(

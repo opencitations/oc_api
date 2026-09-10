@@ -4,7 +4,7 @@
 
 [project]
 name = "oc-api"
-version = "3.0.3"
+version = "4.0.1"
 description = "OpenCitations API"
 authors = [
     {name = "Mario Petrella", email = "mario.petrella@unibo.it"},
@@ -13,18 +13,18 @@ authors = [
 ]
 license = {text = "ISC"}
 readme = "README.md"
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.10,<3.15"
 dependencies = [
     "gevent>=1.4",
     "gitpython>=3.1.59",
     "gunicorn>=22.0.0",
     "idna>=3.15",
     "python-dateutil>=2.9.0.post0",
-    "ramose>=2.9.0",
+    "ramose>=2.9.1",
     "rdflib>=6.1.1",
     "redis>=7.0.1",
     "requests>=2.32.4",
-    "web-py>=0.62",
+    "web-py>=0.76",
 ]
 
 [dependency-groups]

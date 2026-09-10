@@ -8,6 +8,7 @@ import pyshacl
 import requests
 import yaml
 from jsonschema import validate
+from ramose import Operation
 from rdflib import Graph
 
 if TYPE_CHECKING:
@@ -82,14 +83,14 @@ def _execute_skgif(
     endpoint: str = "products",
 ) -> dict:
     operation = skgif_api_manager.get_op(f"/skg-if/v1/{endpoint}/{local_identifier}")
-    if isinstance(operation, tuple):
+    if not isinstance(operation, Operation):
         msg = f"Operation not found: {local_identifier}"
         raise TypeError(msg)
-    status, result, _, _ = operation.exec(method="get", content_type="application/json")
-    if status != 200:
-        msg = f"API returned status {status}: {result}"
+    response = operation.exec(method="get", content_type="application/json")
+    if response.status_code != 200:
+        msg = f"API returned status {response.status_code}: {response.body}"
         raise RuntimeError(msg)
-    return json.loads(result)
+    return json.loads(response.body)
 
 
 def _validate_skgif_response(response: dict, endpoint: str = "products") -> None:

@@ -1577,6 +1577,9 @@ WHERE {
   FILTER(BOUND(?family_name) || BOUND(?given_name))
   [[filter]]
 }
+ORDER BY ?local_identifier
+
+@@page ?local_identifier default_size=10 max_size=100
 
 #url /organisations/{local_identifier}
 #type operation
@@ -1697,6 +1700,9 @@ WHERE {
   }
   [[filter]]
 }
+ORDER BY ?local_identifier
+
+@@page ?local_identifier default_size=10 max_size=100
 
 #url /venues/{local_identifier}
 #type operation
@@ -1850,21 +1856,37 @@ WHERE {
   ) AS ?type)
   [[filter]]
 }
+ORDER BY ?local_identifier
+
+@@page ?local_identifier default_size=10 max_size=100
 
 #url /grants/{local_identifier}
 #type operation
 #method get
-#description Returns a single grant. Note: OpenCitations does not currently hold grant data; this endpoint always returns 404.
+#description Returns a single grant. OpenCitations does not currently hold grant data, so this endpoint returns 404 with an empty JSON-LD graph.
 #call /grants/example-grant-id
 #format skg_if,to_skg_if,application/json
 #default_format skg_if
-#output_json HTTP status code 404: entity not found
+#output_json {
+    "@context": [
+        "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
+        "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
+        {
+            "@base": "https://api.opencitations.net/"
+        }
+    ],
+    "meta": {
+        "local_identifier": "https://api.opencitations.net/skg-if/v1/grants/example-grant-id",
+        "entity_type": "single_entity"
+    },
+    "@graph": []
+}
 #sparql SELECT ?dummy WHERE { FILTER(false) }
 
 #url /grants
 #type operation
 #method get
-#description Returns a list of grants matching the given filters. Note: OpenCitations does not currently hold grant data; this endpoint always returns an empty result.
+#description Returns a list of grants matching the given filters. OpenCitations does not currently hold grant data, so this endpoint returns 404 with an empty JSON-LD graph.
 #custom_params filter,skgif_filters.grants.yaml,Search filter.
 Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 Filters in the first group use exact matching. For `cf.search.*`, matching is text contains.
@@ -1951,16 +1973,29 @@ All filters below are accepted but currently return no matches because OpenCitat
 #url /datasources/{local_identifier}
 #type operation
 #method get
-#description Returns a single data source. Note: OpenCitations does not currently hold data source records; this endpoint always returns 404.
+#description Returns a single data source. OpenCitations does not currently hold data source records, so this endpoint returns 404 with an empty JSON-LD graph.
 #call /datasources/example-datasource-id
 #format skg_if,to_skg_if,application/json
 #default_format skg_if
-#output_json HTTP status code 404: entity not found
+#output_json {
+    "@context": [
+        "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
+        "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
+        {
+            "@base": "https://api.opencitations.net/"
+        }
+    ],
+    "meta": {
+        "local_identifier": "https://api.opencitations.net/skg-if/v1/datasources/example-datasource-id",
+        "entity_type": "single_entity"
+    },
+    "@graph": []
+}
 #sparql SELECT ?dummy WHERE { FILTER(false) }
 #url /datasources
 #type operation
 #method get
-#description Returns a list of data sources matching the given filters. Note: OpenCitations does not currently hold data source records; this endpoint always returns an empty result.
+#description Returns a list of data sources matching the given filters. OpenCitations does not currently hold data source records, so this endpoint returns 404 with an empty JSON-LD graph.
 #custom_params filter,skgif_filters.datasources.yaml,Search filter.
 Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 Filters in the first group use exact matching. For `cf.search.*`, matching is text contains.
@@ -2013,17 +2048,30 @@ All filters below are accepted but currently return no matches because OpenCitat
 #url /topics/{local_identifier}
 #type operation
 #method get
-#description Returns a single topic. Note: OpenCitations does not currently hold topic data; this endpoint always returns 404.
+#description Returns a single topic. OpenCitations does not currently hold topic data, so this endpoint returns 404 with an empty JSON-LD graph.
 #call /topics/example-topic-id
 #format skg_if,to_skg_if,application/json
 #default_format skg_if
-#output_json HTTP status code 404: entity not found
+#output_json {
+    "@context": [
+        "https://w3id.org/skg-if/context/1.1.0/skg-if.json",
+        "https://w3id.org/skg-if/context/1.0.0/skg-if-api.json",
+        {
+            "@base": "https://api.opencitations.net/"
+        }
+    ],
+    "meta": {
+        "local_identifier": "https://api.opencitations.net/skg-if/v1/topics/example-topic-id",
+        "entity_type": "single_entity"
+    },
+    "@graph": []
+}
 #sparql SELECT ?dummy WHERE { FILTER(false) }
 
 #url /topics
 #type operation
 #method get
-#description Returns a list of topics matching the given filters. Note: OpenCitations does not currently hold topic data; this endpoint always returns an empty result.
+#description Returns a list of topics matching the given filters. OpenCitations does not currently hold topic data, so this endpoint returns 404 with an empty JSON-LD graph.
 #custom_params filter,skgif_filters.topics.yaml,Search filter.
 Format: comma-separated `filter_name:filter_value` pairs (AND logic).
 Filters in the first group use exact matching. For `cf.search.*`, matching is text contains.
