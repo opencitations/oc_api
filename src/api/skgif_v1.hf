@@ -1577,6 +1577,9 @@ WHERE {
   FILTER(BOUND(?family_name) || BOUND(?given_name))
   [[filter]]
 }
+ORDER BY ?local_identifier
+
+@@page ?local_identifier default_size=10 max_size=100
 
 #url /organisations/{local_identifier}
 #type operation
@@ -1697,6 +1700,9 @@ WHERE {
   }
   [[filter]]
 }
+ORDER BY ?local_identifier
+
+@@page ?local_identifier default_size=10 max_size=100
 
 #url /venues/{local_identifier}
 #type operation
@@ -1850,6 +1856,9 @@ WHERE {
   ) AS ?type)
   [[filter]]
 }
+ORDER BY ?local_identifier
+
+@@page ?local_identifier default_size=10 max_size=100
 
 #url /grants/{local_identifier}
 #type operation
