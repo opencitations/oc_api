@@ -4,6 +4,7 @@
 
 import importlib
 import json
+from http import HTTPStatus
 from typing import Protocol, cast
 from unittest.mock import patch
 
@@ -81,6 +82,7 @@ def test_skgif_resolves_percent_encoded_product_identifier(
 
 
 def test_skgif_invalid_filter_returns_rfc_7807_problem(api_module: ApiModule) -> None:
+    status_phrase = HTTPStatus.UNPROCESSABLE_ENTITY.phrase
     with patch.object(
         Operation,
         "exec",
@@ -93,11 +95,11 @@ def test_skgif_invalid_filter_returns_rfc_7807_problem(api_module: ApiModule) ->
             "/skg-if/v1/products?filter=unknown:value", host="localhost:8080"
         )
 
-    assert response.status == "422 Unprocessable Entity"
+    assert response.status == f"422 {status_phrase}"
     assert response.headers["Content-Type"] == "application/json"
     assert json.loads(response.data) == {
         "type": "about:blank",
-        "title": "Unprocessable Entity",
+        "title": status_phrase,
         "status": 422,
         "detail": "invalid filter 'unknown'",
         "instance": "/skg-if/v1/products?filter=unknown:value",

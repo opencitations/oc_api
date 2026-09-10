@@ -13,7 +13,7 @@ authors = [
 ]
 license = {text = "ISC"}
 readme = "README.md"
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.10,<3.15"
 dependencies = [
     "gevent>=1.4",
     "gitpython>=3.1.59",
@@ -24,7 +24,7 @@ dependencies = [
     "rdflib>=6.1.1",
     "redis>=7.0.1",
     "requests>=2.32.4",
-    "web-py>=0.62",
+    "web-py>=0.76",
 ]
 
 [dependency-groups]
