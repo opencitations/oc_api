@@ -68,10 +68,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -87,16 +87,16 @@
               "local_identifier": "https://w3id.org/oc/meta/br/06160781188",
               "identifiers": [
                 {
-                  "value": "S110615584",
-                  "scheme": "openalex"
+                  "value": "1432-1300",
+                  "scheme": "issn"
                 },
                 {
                   "value": "1432-5012",
                   "scheme": "issn"
                 },
                 {
-                  "value": "1432-1300",
-                  "scheme": "issn"
+                  "value": "S110615584",
+                  "scheme": "openalex"
                 }
               ]
             }
@@ -120,12 +120,12 @@
       },
       "identifiers": [
         {
-          "value": "W2938946739",
-          "scheme": "openalex"
-        },
-        {
           "value": "10.1007/s11192-019-03217-6",
           "scheme": "doi"
+        },
+        {
+          "value": "W2938946739",
+          "scheme": "openalex"
         }
       ],
       "contributions": [
@@ -194,10 +194,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -217,16 +217,16 @@
               "local_identifier": "https://w3id.org/oc/meta/br/0626055628",
               "identifiers": [
                 {
+                  "value": "0138-9130",
+                  "scheme": "issn"
+                },
+                {
                   "value": "1588-2861",
                   "scheme": "issn"
                 },
                 {
                   "value": "S148561398",
                   "scheme": "openalex"
-                },
-                {
-                  "value": "0138-9130",
-                  "scheme": "issn"
                 }
               ]
             }
@@ -349,10 +349,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -445,12 +445,12 @@
       },
       "identifiers": [
         {
-          "value": "W3106215946",
-          "scheme": "openalex"
-        },
-        {
           "value": "10.1162/qss_a_00023",
           "scheme": "doi"
+        },
+        {
+          "value": "W3106215946",
+          "scheme": "openalex"
         }
       ],
       "contributions": [
@@ -502,10 +502,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -525,12 +525,12 @@
               "local_identifier": "https://w3id.org/oc/meta/br/062501778099",
               "identifiers": [
                 {
-                  "value": "S4210195326",
-                  "scheme": "openalex"
-                },
-                {
                   "value": "2641-3337",
                   "scheme": "issn"
+                },
+                {
+                  "value": "S4210195326",
+                  "scheme": "openalex"
                 }
               ]
             }
@@ -636,10 +636,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -653,11 +653,11 @@
               "local_identifier": "https://w3id.org/oc/meta/br/0626055628",
               "identifiers": [
                 {
-                  "value": "1588-2861",
+                  "value": "0138-9130",
                   "scheme": "issn"
                 },
                 {
-                  "value": "0138-9130",
+                  "value": "1588-2861",
                   "scheme": "issn"
                 },
                 {
@@ -686,12 +686,12 @@
       },
       "identifiers": [
         {
-          "value": "W4285173206",
-          "scheme": "openalex"
-        },
-        {
           "value": "10.1007/978-3-031-06981-9_18",
           "scheme": "doi"
+        },
+        {
+          "value": "W4285173206",
+          "scheme": "openalex"
         }
       ],
       "contributions": [
@@ -754,10 +754,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/BookChapter",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "book chapter"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -775,11 +775,11 @@
               "local_identifier": "https://w3id.org/oc/meta/br/06401297735",
               "identifiers": [
                 {
-                  "value": "9783031069819",
+                  "value": "9783031069802",
                   "scheme": "isbn"
                 },
                 {
-                  "value": "9783031069802",
+                  "value": "9783031069819",
                   "scheme": "isbn"
                 }
               ]
@@ -920,10 +920,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -972,12 +972,12 @@
           "scheme": "isbn"
         },
         {
-          "value": "W3115553721",
-          "scheme": "openalex"
-        },
-        {
           "value": "9783319580685",
           "scheme": "isbn"
+        },
+        {
+          "value": "W3115553721",
+          "scheme": "openalex"
         }
       ],
       "contributions": [
@@ -1061,10 +1061,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/Book",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "book"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -1078,15 +1078,7 @@
               "local_identifier": "https://w3id.org/oc/meta/br/069066063",
               "identifiers": [
                 {
-                  "value": "1864-3035",
-                  "scheme": "issn"
-                },
-                {
-                  "value": "1861-2067",
-                  "scheme": "issn"
-                },
-                {
-                  "value": "1867-7754",
+                  "value": "0302-9743",
                   "scheme": "issn"
                 },
                 {
@@ -1094,11 +1086,7 @@
                   "scheme": "issn"
                 },
                 {
-                  "value": "1861-2059",
-                  "scheme": "issn"
-                },
-                {
-                  "value": "0302-9743",
+                  "value": "1861-2032",
                   "scheme": "issn"
                 },
                 {
@@ -1106,7 +1094,19 @@
                   "scheme": "issn"
                 },
                 {
-                  "value": "1861-2032",
+                  "value": "1861-2059",
+                  "scheme": "issn"
+                },
+                {
+                  "value": "1861-2067",
+                  "scheme": "issn"
+                },
+                {
+                  "value": "1864-3035",
+                  "scheme": "issn"
+                },
+                {
+                  "value": "1867-7754",
                   "scheme": "issn"
                 }
               ]
@@ -1126,20 +1126,20 @@
       },
       "identifiers": [
         {
-          "value": "9783319476025",
-          "scheme": "isbn"
+          "value": "10.1007/978-3-319-47602-5",
+          "scheme": "doi"
         },
         {
           "value": "9783319476018",
           "scheme": "isbn"
         },
         {
-          "value": "W4245488324",
-          "scheme": "openalex"
+          "value": "9783319476025",
+          "scheme": "isbn"
         },
         {
-          "value": "10.1007/978-3-319-47602-5",
-          "scheme": "doi"
+          "value": "W4245488324",
+          "scheme": "openalex"
         }
       ],
       "contributions": [
@@ -1235,10 +1235,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/Book",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "book"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -1252,15 +1252,7 @@
               "local_identifier": "https://w3id.org/oc/meta/br/069066063",
               "identifiers": [
                 {
-                  "value": "1864-3035",
-                  "scheme": "issn"
-                },
-                {
-                  "value": "1861-2067",
-                  "scheme": "issn"
-                },
-                {
-                  "value": "1867-7754",
+                  "value": "0302-9743",
                   "scheme": "issn"
                 },
                 {
@@ -1268,11 +1260,7 @@
                   "scheme": "issn"
                 },
                 {
-                  "value": "1861-2059",
-                  "scheme": "issn"
-                },
-                {
-                  "value": "0302-9743",
+                  "value": "1861-2032",
                   "scheme": "issn"
                 },
                 {
@@ -1280,7 +1268,19 @@
                   "scheme": "issn"
                 },
                 {
-                  "value": "1861-2032",
+                  "value": "1861-2059",
+                  "scheme": "issn"
+                },
+                {
+                  "value": "1861-2067",
+                  "scheme": "issn"
+                },
+                {
+                  "value": "1864-3035",
+                  "scheme": "issn"
+                },
+                {
+                  "value": "1867-7754",
                   "scheme": "issn"
                 }
               ]
@@ -1300,20 +1300,20 @@
       },
       "identifiers": [
         {
-          "value": "W2784292677",
-          "scheme": "openalex"
+          "value": "10.1007/978-3-319-11955-7",
+          "scheme": "doi"
         },
         {
           "value": "9783319119540",
           "scheme": "isbn"
         },
         {
-          "value": "10.1007/978-3-319-11955-7",
-          "scheme": "doi"
-        },
-        {
           "value": "9783319119557",
           "scheme": "isbn"
+        },
+        {
+          "value": "W2784292677",
+          "scheme": "openalex"
         }
       ],
       "contributions": [
@@ -1397,10 +1397,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/Book",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "book"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -1414,15 +1414,7 @@
               "local_identifier": "https://w3id.org/oc/meta/br/069066063",
               "identifiers": [
                 {
-                  "value": "1864-3035",
-                  "scheme": "issn"
-                },
-                {
-                  "value": "1861-2067",
-                  "scheme": "issn"
-                },
-                {
-                  "value": "1867-7754",
+                  "value": "0302-9743",
                   "scheme": "issn"
                 },
                 {
@@ -1430,11 +1422,7 @@
                   "scheme": "issn"
                 },
                 {
-                  "value": "1861-2059",
-                  "scheme": "issn"
-                },
-                {
-                  "value": "0302-9743",
+                  "value": "1861-2032",
                   "scheme": "issn"
                 },
                 {
@@ -1442,7 +1430,19 @@
                   "scheme": "issn"
                 },
                 {
-                  "value": "1861-2032",
+                  "value": "1861-2059",
+                  "scheme": "issn"
+                },
+                {
+                  "value": "1861-2067",
+                  "scheme": "issn"
+                },
+                {
+                  "value": "1864-3035",
+                  "scheme": "issn"
+                },
+                {
+                  "value": "1867-7754",
                   "scheme": "issn"
                 }
               ]
@@ -1462,10 +1462,6 @@
       },
       "identifiers": [
         {
-          "value": "W4249829199",
-          "scheme": "openalex"
-        },
-        {
           "value": "10.1007/978-1-4020-9632-7",
           "scheme": "doi"
         },
@@ -1476,6 +1472,10 @@
         {
           "value": "9789048127108",
           "scheme": "isbn"
+        },
+        {
+          "value": "W4249829199",
+          "scheme": "openalex"
         }
       ],
       "contributions": [
@@ -1521,10 +1521,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/Book",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "book"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -1545,20 +1545,20 @@
       },
       "identifiers": [
         {
-          "value": "9783642308598",
-          "scheme": "isbn"
-        },
-        {
-          "value": "W2221102889",
-          "scheme": "openalex"
-        },
-        {
           "value": "10.1007/978-3-642-30859-8",
           "scheme": "doi"
         },
         {
           "value": "9783642308581",
           "scheme": "isbn"
+        },
+        {
+          "value": "9783642308598",
+          "scheme": "isbn"
+        },
+        {
+          "value": "W2221102889",
+          "scheme": "openalex"
         }
       ],
       "contributions": [
@@ -1632,10 +1632,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/Book",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "book"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -1689,10 +1689,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/Book",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "book"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           }
         }
       ],
@@ -1720,10 +1720,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/Book",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "book"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           }
         }
       ],
@@ -1751,10 +1751,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/Book",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "book"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           }
         }
       ],
@@ -1770,10 +1770,6 @@
       },
       "identifiers": [
         {
-          "value": "9789264799318",
-          "scheme": "isbn"
-        },
-        {
           "value": "10.1787/b0e499cf-en",
           "scheme": "doi"
         },
@@ -1786,12 +1782,16 @@
           "scheme": "isbn"
         },
         {
-          "value": "W4221051054",
-          "scheme": "openalex"
+          "value": "9789264799318",
+          "scheme": "isbn"
         },
         {
           "value": "9789264960114",
           "scheme": "isbn"
+        },
+        {
+          "value": "W4221051054",
+          "scheme": "openalex"
         }
       ],
       "contributions": [
@@ -1818,10 +1818,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/Book",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "book"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -1861,20 +1861,20 @@
       },
       "identifiers": [
         {
-          "value": "9781402096327",
-          "scheme": "isbn"
+          "value": "10.1007/978-1-4020-9632-7",
+          "scheme": "doi"
         },
         {
-          "value": "W4249829199",
-          "scheme": "openalex"
+          "value": "9781402096327",
+          "scheme": "isbn"
         },
         {
           "value": "9789048127108",
           "scheme": "isbn"
         },
         {
-          "value": "10.1007/978-1-4020-9632-7",
-          "scheme": "doi"
+          "value": "W4249829199",
+          "scheme": "openalex"
         }
       ],
       "contributions": [
@@ -1920,10 +1920,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/Book",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "book"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -2004,10 +2004,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -2023,16 +2023,16 @@
               "local_identifier": "https://w3id.org/oc/meta/br/06160781188",
               "identifiers": [
                 {
-                  "value": "S110615584",
-                  "scheme": "openalex"
+                  "value": "1432-1300",
+                  "scheme": "issn"
                 },
                 {
                   "value": "1432-5012",
                   "scheme": "issn"
                 },
                 {
-                  "value": "1432-1300",
-                  "scheme": "issn"
+                  "value": "S110615584",
+                  "scheme": "openalex"
                 }
               ]
             }
@@ -2056,12 +2056,12 @@
       },
       "identifiers": [
         {
-          "value": "W2938946739",
-          "scheme": "openalex"
-        },
-        {
           "value": "10.1007/s11192-019-03217-6",
           "scheme": "doi"
+        },
+        {
+          "value": "W2938946739",
+          "scheme": "openalex"
         }
       ],
       "contributions": [
@@ -2130,10 +2130,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -2153,16 +2153,16 @@
               "local_identifier": "https://w3id.org/oc/meta/br/0626055628",
               "identifiers": [
                 {
+                  "value": "0138-9130",
+                  "scheme": "issn"
+                },
+                {
                   "value": "1588-2861",
                   "scheme": "issn"
                 },
                 {
                   "value": "S148561398",
                   "scheme": "openalex"
-                },
-                {
-                  "value": "0138-9130",
-                  "scheme": "issn"
                 }
               ]
             }
@@ -2285,10 +2285,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -2381,12 +2381,12 @@
       },
       "identifiers": [
         {
-          "value": "W3106215946",
-          "scheme": "openalex"
-        },
-        {
           "value": "10.1162/qss_a_00023",
           "scheme": "doi"
+        },
+        {
+          "value": "W3106215946",
+          "scheme": "openalex"
         }
       ],
       "contributions": [
@@ -2438,10 +2438,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -2461,12 +2461,12 @@
               "local_identifier": "https://w3id.org/oc/meta/br/062501778099",
               "identifiers": [
                 {
-                  "value": "S4210195326",
-                  "scheme": "openalex"
-                },
-                {
                   "value": "2641-3337",
                   "scheme": "issn"
+                },
+                {
+                  "value": "S4210195326",
+                  "scheme": "openalex"
                 }
               ]
             }
@@ -2572,10 +2572,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -2589,11 +2589,11 @@
               "local_identifier": "https://w3id.org/oc/meta/br/0626055628",
               "identifiers": [
                 {
-                  "value": "1588-2861",
+                  "value": "0138-9130",
                   "scheme": "issn"
                 },
                 {
-                  "value": "0138-9130",
+                  "value": "1588-2861",
                   "scheme": "issn"
                 },
                 {
@@ -2622,12 +2622,12 @@
       },
       "identifiers": [
         {
-          "value": "W4285173206",
-          "scheme": "openalex"
-        },
-        {
           "value": "10.1007/978-3-031-06981-9_18",
           "scheme": "doi"
+        },
+        {
+          "value": "W4285173206",
+          "scheme": "openalex"
         }
       ],
       "contributions": [
@@ -2690,10 +2690,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/BookChapter",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "book chapter"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -2711,11 +2711,11 @@
               "local_identifier": "https://w3id.org/oc/meta/br/06401297735",
               "identifiers": [
                 {
-                  "value": "9783031069819",
+                  "value": "9783031069802",
                   "scheme": "isbn"
                 },
                 {
-                  "value": "9783031069802",
+                  "value": "9783031069819",
                   "scheme": "isbn"
                 }
               ]
@@ -2856,10 +2856,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -2941,10 +2941,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -2964,15 +2964,15 @@
               "local_identifier": "https://w3id.org/oc/meta/br/06101018",
               "identifiers": [
                 {
-                  "value": "1096-9926",
-                  "scheme": "issn"
-                },
-                {
                   "value": "10.1002/(issn)1096-9926",
                   "scheme": "doi"
                 },
                 {
                   "value": "0040-3709",
+                  "scheme": "issn"
+                },
+                {
+                  "value": "1096-9926",
                   "scheme": "issn"
                 }
               ]
@@ -3040,10 +3040,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -3063,15 +3063,15 @@
               "local_identifier": "https://w3id.org/oc/meta/br/06101018",
               "identifiers": [
                 {
-                  "value": "1096-9926",
-                  "scheme": "issn"
-                },
-                {
                   "value": "10.1002/(issn)1096-9926",
                   "scheme": "doi"
                 },
                 {
                   "value": "0040-3709",
+                  "scheme": "issn"
+                },
+                {
+                  "value": "1096-9926",
                   "scheme": "issn"
                 }
               ]
@@ -3393,10 +3393,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/ReportDocument",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "report document"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -3460,10 +3460,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -3483,15 +3483,15 @@
               "local_identifier": "https://w3id.org/oc/meta/br/06101018",
               "identifiers": [
                 {
-                  "value": "1096-9926",
-                  "scheme": "issn"
-                },
-                {
                   "value": "10.1002/(issn)1096-9926",
                   "scheme": "doi"
                 },
                 {
                   "value": "0040-3709",
+                  "scheme": "issn"
+                },
+                {
+                  "value": "1096-9926",
                   "scheme": "issn"
                 }
               ]
@@ -3620,10 +3620,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -3643,15 +3643,15 @@
               "local_identifier": "https://w3id.org/oc/meta/br/0622015443",
               "identifiers": [
                 {
-                  "value": "1097-0215",
-                  "scheme": "issn"
-                },
-                {
                   "value": "10.1002/(issn)1097-0215",
                   "scheme": "doi"
                 },
                 {
                   "value": "0020-7136",
+                  "scheme": "issn"
+                },
+                {
+                  "value": "1097-0215",
                   "scheme": "issn"
                 }
               ]
@@ -3719,10 +3719,10 @@
         {
           "type": {
             "class": "http://purl.org/spar/fabio/JournalArticle",
-            "defined_in": "http://purl.org/spar/fabio",
             "labels": {
               "en": "journal article"
-            }
+            },
+            "defined_in": "http://purl.org/spar/fabio"
           },
           "dates": {
             "publication": [
@@ -3742,15 +3742,15 @@
               "local_identifier": "https://w3id.org/oc/meta/br/06101018",
               "identifiers": [
                 {
-                  "value": "1096-9926",
-                  "scheme": "issn"
-                },
-                {
                   "value": "10.1002/(issn)1096-9926",
                   "scheme": "doi"
                 },
                 {
                   "value": "0040-3709",
+                  "scheme": "issn"
+                },
+                {
+                  "value": "1096-9926",
                   "scheme": "issn"
                 }
               ]
@@ -5403,48 +5403,54 @@
   "identifiers.id:0000-0002-7562-5203": [
     {
       "local_identifier": "https://w3id.org/oc/meta/ra/0622011040459",
-      "entity_type": "person",
+      "name": "Fabio Vitali",
+      "family_name": "Vitali",
+      "given_name": "Fabio",
       "identifiers": [
         {
-          "scheme": "orcid",
-          "value": "0000-0002-7562-5203"
+          "value": "0000-0002-7562-5203",
+          "scheme": "orcid"
         }
       ],
-      "given_name": "Fabio",
-      "family_name": "Vitali",
-      "name": "Fabio Vitali"
+      "entity_type": "person"
     }
   ],
   "given_name:Greg": [
     {
-      "entity_type": "person",
+      "local_identifier": "https://w3id.org/oc/meta/ra/06150114519",
       "family_name": "Kearsley",
       "given_name": "Greg",
-      "local_identifier": "https://w3id.org/oc/meta/ra/06150114519"
+      "entity_type": "person"
     }
   ],
   "cf.search.given_name:Greg": [
     {
-      "entity_type": "person",
+      "local_identifier": "https://w3id.org/oc/meta/ra/06150114519",
       "family_name": "Kearsley",
       "given_name": "Greg",
-      "local_identifier": "https://w3id.org/oc/meta/ra/06150114519"
+      "entity_type": "person"
+    },
+    {
+      "local_identifier": "https://w3id.org/oc/meta/ra/06150115060",
+      "family_name": "O'Brien",
+      "given_name": "Gregory",
+      "entity_type": "person"
     }
   ],
   "family_name:Nakamura": [
     {
-      "entity_type": "person",
+      "local_identifier": "https://w3id.org/oc/meta/ra/060176",
       "family_name": "Nakamura",
       "given_name": "Takashi",
-      "local_identifier": "https://w3id.org/oc/meta/ra/060176"
+      "entity_type": "person"
     }
   ],
   "cf.search.family_name:Nakamura": [
     {
-      "entity_type": "person",
+      "local_identifier": "https://w3id.org/oc/meta/ra/060176",
       "family_name": "Nakamura",
       "given_name": "Takashi",
-      "local_identifier": "https://w3id.org/oc/meta/ra/060176"
+      "entity_type": "person"
     }
   ],
   "cf.search.given_name:Silvio,cf.search.family_name:Peroni": [
@@ -5501,14 +5507,14 @@
   "identifiers.id:140": [
     {
       "local_identifier": "https://w3id.org/oc/meta/ra/0610116002",
-      "entity_type": "organisation",
+      "name": "Emerald",
       "identifiers": [
         {
-          "scheme": "crossref",
-          "value": "140"
+          "value": "140",
+          "scheme": "crossref"
         }
       ],
-      "name": "Emerald"
+      "entity_type": "organisation"
     }
   ],
   "identifiers.scheme:crossref": [
@@ -5747,109 +5753,89 @@
   "cf.search.name:Mit Press": [
     {
       "local_identifier": "https://w3id.org/oc/meta/ra/0610116105",
-      "entity_type": "organisation",
+      "name": "Mit Press",
       "identifiers": [
         {
-          "scheme": "crossref",
-          "value": "281"
+          "value": "281",
+          "scheme": "crossref"
         }
       ],
-      "name": "Mit Press"
+      "entity_type": "organisation"
     }
   ],
   "type:conference": [
     {
       "local_identifier": "https://w3id.org/oc/meta/br/0607163623",
-      "entity_type": "venue",
       "name": "Proceedings Of The 24Th ACM/IEEE Joint Conference On Digital Libraries",
-      "type": "conference"
+      "type": "conference",
+      "entity_type": "venue"
     },
     {
       "local_identifier": "https://w3id.org/oc/meta/br/061703214020",
-      "entity_type": "venue",
       "name": "2009 Fourth International Conference On Cooperation And Promotion Of Information Resources In Science And Technology",
-      "type": "conference"
+      "type": "conference",
+      "entity_type": "venue"
     },
     {
       "local_identifier": "https://w3id.org/oc/meta/br/061703368436",
-      "entity_type": "venue",
       "name": "Proceedings Of The 14Th International Conference On World Wide Web - WWW '05",
-      "type": "conference"
+      "type": "conference",
+      "entity_type": "venue"
     },
     {
       "local_identifier": "https://w3id.org/oc/meta/br/06401936298",
-      "entity_type": "venue",
       "name": "Proceedings Of The 25Th International Conference On World Wide Web",
-      "type": "conference"
+      "type": "conference",
+      "entity_type": "venue"
     },
     {
       "local_identifier": "https://w3id.org/oc/meta/br/06603395157",
-      "entity_type": "venue",
       "name": "Proceedings Of The 8Th International Conference On Semantic Systems - I-SEMANTICS '12",
-      "type": "conference"
+      "type": "conference",
+      "entity_type": "venue"
     },
     {
       "local_identifier": "https://w3id.org/oc/meta/br/06902363257",
-      "entity_type": "venue",
       "name": "2021 ACM/IEEE Joint Conference On Digital Libraries (JCDL)",
-      "type": "conference"
+      "type": "conference",
+      "entity_type": "venue"
     }
   ],
   "identifiers.value:2059-481X": [
     {
       "local_identifier": "https://w3id.org/oc/meta/br/06160186133",
-      "entity_type": "venue",
-      "identifiers": [
-        {
-          "scheme": "issn",
-          "value": "2059-481X"
-        },
-        {
-          "scheme": "openalex",
-          "value": "S4210240912"
-        }
-      ],
       "name": "Journal Of Open Humanities Data",
-      "type": "journal"
-    }
-  ],
-  "identifiers.scheme:issn": [
-    {
-      "local_identifier": "https://w3id.org/oc/meta/br/062502076212",
-      "name": "Data Technologies And Applications",
       "type": "journal",
       "identifiers": [
         {
-          "value": "S4210171756",
+          "value": "2059-481X",
+          "scheme": "issn"
+        },
+        {
+          "value": "S4210240912",
           "scheme": "openalex"
-        },
-        {
-          "value": "2514-9318",
-          "scheme": "issn"
-        },
-        {
-          "value": "2514-9288",
-          "scheme": "issn"
         }
       ],
       "entity_type": "venue"
-    },
+    }
+  ],
+  "identifiers.scheme:issn": [
     {
       "local_identifier": "https://w3id.org/oc/meta/br/06101018",
       "name": "Teratology",
       "type": "journal",
       "identifiers": [
         {
-          "value": "1096-9926",
-          "scheme": "issn"
+          "value": "10.1002/(issn)1096-9926",
+          "scheme": "doi"
         },
         {
           "value": "0040-3709",
           "scheme": "issn"
         },
         {
-          "value": "10.1002/(issn)1096-9926",
-          "scheme": "doi"
+          "value": "1096-9926",
+          "scheme": "issn"
         }
       ],
       "entity_type": "venue"
@@ -5900,16 +5886,16 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "S146304353",
-          "scheme": "openalex"
-        },
-        {
           "value": "1536-5050",
           "scheme": "issn"
         },
         {
           "value": "1558-9439",
           "scheme": "issn"
+        },
+        {
+          "value": "S146304353",
+          "scheme": "openalex"
         }
       ],
       "entity_type": "venue"
@@ -5920,11 +5906,11 @@
       "type": "other",
       "identifiers": [
         {
-          "value": "2194-5365",
+          "value": "2194-5357",
           "scheme": "issn"
         },
         {
-          "value": "2194-5357",
+          "value": "2194-5365",
           "scheme": "issn"
         },
         {
@@ -5940,16 +5926,16 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "1521-3757",
-          "scheme": "issn"
+          "value": "10.1002/(issn)1521-3757",
+          "scheme": "doi"
         },
         {
           "value": "0044-8249",
           "scheme": "issn"
         },
         {
-          "value": "10.1002/(issn)1521-3757",
-          "scheme": "doi"
+          "value": "1521-3757",
+          "scheme": "issn"
         }
       ],
       "entity_type": "venue"
@@ -5960,12 +5946,12 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "S2607323502",
-          "scheme": "openalex"
-        },
-        {
           "value": "2052-4463",
           "scheme": "issn"
+        },
+        {
+          "value": "S2607323502",
+          "scheme": "openalex"
         }
       ],
       "entity_type": "venue"
@@ -5976,12 +5962,12 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "S4210172589",
-          "scheme": "openalex"
-        },
-        {
           "value": "1556-5068",
           "scheme": "issn"
+        },
+        {
+          "value": "S4210172589",
+          "scheme": "openalex"
         }
       ],
       "entity_type": "venue"
@@ -6008,12 +5994,12 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "S2738007992",
-          "scheme": "openalex"
-        },
-        {
           "value": "2304-6775",
           "scheme": "issn"
+        },
+        {
+          "value": "S2738007992",
+          "scheme": "openalex"
         }
       ],
       "entity_type": "venue"
@@ -6024,16 +6010,36 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "1096-987X",
-          "scheme": "issn"
-        },
-        {
           "value": "10.1002/(issn)1096-987x",
           "scheme": "doi"
         },
         {
           "value": "0192-8651",
           "scheme": "issn"
+        },
+        {
+          "value": "1096-987X",
+          "scheme": "issn"
+        }
+      ],
+      "entity_type": "venue"
+    },
+    {
+      "local_identifier": "https://w3id.org/oc/meta/br/061502934",
+      "name": "Nucleic Acids Research",
+      "type": "journal",
+      "identifiers": [
+        {
+          "value": "0305-1048",
+          "scheme": "issn"
+        },
+        {
+          "value": "1362-4962",
+          "scheme": "issn"
+        },
+        {
+          "value": "S134668137",
+          "scheme": "openalex"
         }
       ],
       "entity_type": "venue"
@@ -6059,30 +6065,14 @@
       "entity_type": "venue"
     },
     {
-      "local_identifier": "https://w3id.org/oc/meta/br/061502934",
-      "name": "Nucleic Acids Research",
-      "type": "journal",
-      "identifiers": [
-        {
-          "value": "S134668137",
-          "scheme": "openalex"
-        },
-        {
-          "value": "0305-1048",
-          "scheme": "issn"
-        },
-        {
-          "value": "1362-4962",
-          "scheme": "issn"
-        }
-      ],
-      "entity_type": "venue"
-    },
-    {
       "local_identifier": "https://w3id.org/oc/meta/br/06150879644",
       "name": "The Charleston Advisor",
       "type": "journal",
       "identifiers": [
+        {
+          "value": "1525-4003",
+          "scheme": "issn"
+        },
         {
           "value": "1525-4011",
           "scheme": "issn"
@@ -6090,10 +6080,6 @@
         {
           "value": "S82568730",
           "scheme": "openalex"
-        },
-        {
-          "value": "1525-4003",
-          "scheme": "issn"
         }
       ],
       "entity_type": "venue"
@@ -6140,16 +6126,16 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "S29676049",
-          "scheme": "openalex"
-        },
-        {
           "value": "0953-1513",
           "scheme": "issn"
         },
         {
           "value": "1741-4857",
           "scheme": "issn"
+        },
+        {
+          "value": "S29676049",
+          "scheme": "openalex"
         }
       ],
       "entity_type": "venue"
@@ -6164,12 +6150,12 @@
           "scheme": "issn"
         },
         {
-          "value": "S2739153651",
-          "scheme": "openalex"
-        },
-        {
           "value": "2288-8063",
           "scheme": "issn"
+        },
+        {
+          "value": "S2739153651",
+          "scheme": "openalex"
         }
       ],
       "entity_type": "venue"
@@ -6180,16 +6166,16 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "1097-4571",
-          "scheme": "issn"
+          "value": "10.1002/(issn)1097-4571",
+          "scheme": "doi"
         },
         {
           "value": "0002-8231",
           "scheme": "issn"
         },
         {
-          "value": "10.1002/(issn)1097-4571",
-          "scheme": "doi"
+          "value": "1097-4571",
+          "scheme": "issn"
         }
       ],
       "entity_type": "venue"
@@ -6200,16 +6186,16 @@
       "type": "journal",
       "identifiers": [
         {
+          "value": "1751-1577",
+          "scheme": "issn"
+        },
+        {
           "value": "1875-5879",
           "scheme": "issn"
         },
         {
           "value": "S205292342",
           "scheme": "openalex"
-        },
-        {
-          "value": "1751-1577",
-          "scheme": "issn"
         }
       ],
       "entity_type": "venue"
@@ -6220,12 +6206,12 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "S155967237",
-          "scheme": "openalex"
-        },
-        {
           "value": "0952-8180",
           "scheme": "issn"
+        },
+        {
+          "value": "S155967237",
+          "scheme": "openalex"
         }
       ],
       "entity_type": "venue"
@@ -6236,16 +6222,16 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "1097-0215",
-          "scheme": "issn"
+          "value": "10.1002/(issn)1097-0215",
+          "scheme": "doi"
         },
         {
           "value": "0020-7136",
           "scheme": "issn"
         },
         {
-          "value": "10.1002/(issn)1097-0215",
-          "scheme": "doi"
+          "value": "1097-0215",
+          "scheme": "issn"
         }
       ],
       "entity_type": "venue"
@@ -6256,12 +6242,12 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "S4210206302",
-          "scheme": "openalex"
-        },
-        {
           "value": "2662-9992",
           "scheme": "issn"
+        },
+        {
+          "value": "S4210206302",
+          "scheme": "openalex"
         }
       ],
       "entity_type": "venue"
@@ -6292,12 +6278,32 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "S4210195326",
-          "scheme": "openalex"
-        },
-        {
           "value": "2641-3337",
           "scheme": "issn"
+        },
+        {
+          "value": "S4210195326",
+          "scheme": "openalex"
+        }
+      ],
+      "entity_type": "venue"
+    },
+    {
+      "local_identifier": "https://w3id.org/oc/meta/br/062502076212",
+      "name": "Data Technologies And Applications",
+      "type": "journal",
+      "identifiers": [
+        {
+          "value": "2514-9288",
+          "scheme": "issn"
+        },
+        {
+          "value": "2514-9318",
+          "scheme": "issn"
+        },
+        {
+          "value": "S4210171756",
+          "scheme": "openalex"
         }
       ],
       "entity_type": "venue"
@@ -6344,11 +6350,11 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "1865-7648",
+          "value": "0341-4183",
           "scheme": "issn"
         },
         {
-          "value": "0341-4183",
+          "value": "1865-7648",
           "scheme": "issn"
         },
         {
@@ -6364,12 +6370,12 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "S1983995261",
-          "scheme": "openalex"
-        },
-        {
           "value": "2167-8359",
           "scheme": "issn"
+        },
+        {
+          "value": "S1983995261",
+          "scheme": "openalex"
         }
       ],
       "entity_type": "venue"
@@ -6380,15 +6386,15 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "1097-0142",
-          "scheme": "issn"
-        },
-        {
           "value": "10.1002/(issn)1097-0142",
           "scheme": "doi"
         },
         {
           "value": "0008-543X",
+          "scheme": "issn"
+        },
+        {
+          "value": "1097-0142",
           "scheme": "issn"
         }
       ],
@@ -6400,11 +6406,11 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "1557-7317",
+          "value": "0001-0782",
           "scheme": "issn"
         },
         {
-          "value": "0001-0782",
+          "value": "1557-7317",
           "scheme": "issn"
         },
         {
@@ -6420,12 +6426,12 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "0021-8995",
-          "scheme": "issn"
-        },
-        {
           "value": "10.1002/(issn)1097-4628",
           "scheme": "doi"
+        },
+        {
+          "value": "0021-8995",
+          "scheme": "issn"
         },
         {
           "value": "1097-4628",
@@ -6440,55 +6446,15 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "1521-4095",
-          "scheme": "issn"
+          "value": "10.1002/(issn)1521-4095",
+          "scheme": "doi"
         },
         {
           "value": "0935-9648",
           "scheme": "issn"
         },
         {
-          "value": "10.1002/(issn)1521-4095",
-          "scheme": "doi"
-        }
-      ],
-      "entity_type": "venue"
-    },
-    {
-      "local_identifier": "https://w3id.org/oc/meta/br/069066063",
-      "name": "Journal On Data Semantics",
-      "type": "journal",
-      "identifiers": [
-        {
-          "value": "1861-2032",
-          "scheme": "issn"
-        },
-        {
-          "value": "1861-2067",
-          "scheme": "issn"
-        },
-        {
-          "value": "1867-7754",
-          "scheme": "issn"
-        },
-        {
-          "value": "1864-3035",
-          "scheme": "issn"
-        },
-        {
-          "value": "1861-2059",
-          "scheme": "issn"
-        },
-        {
-          "value": "0302-9743",
-          "scheme": "issn"
-        },
-        {
-          "value": "1611-3349",
-          "scheme": "issn"
-        },
-        {
-          "value": "1861-2040",
+          "value": "1521-4095",
           "scheme": "issn"
         }
       ],
@@ -6500,11 +6466,11 @@
       "type": "journal",
       "identifiers": [
         {
-          "value": "0014-8962",
-          "scheme": "issn"
+          "value": "10.1002/(issn)1522-239x",
+          "scheme": "doi"
         },
         {
-          "value": "1522-239X",
+          "value": "0014-8962",
           "scheme": "issn"
         },
         {
@@ -6512,8 +6478,48 @@
           "scheme": "issn"
         },
         {
-          "value": "10.1002/(issn)1522-239x",
-          "scheme": "doi"
+          "value": "1522-239X",
+          "scheme": "issn"
+        }
+      ],
+      "entity_type": "venue"
+    },
+    {
+      "local_identifier": "https://w3id.org/oc/meta/br/069066063",
+      "name": "Journal On Data Semantics",
+      "type": "journal",
+      "identifiers": [
+        {
+          "value": "0302-9743",
+          "scheme": "issn"
+        },
+        {
+          "value": "1611-3349",
+          "scheme": "issn"
+        },
+        {
+          "value": "1861-2032",
+          "scheme": "issn"
+        },
+        {
+          "value": "1861-2040",
+          "scheme": "issn"
+        },
+        {
+          "value": "1861-2059",
+          "scheme": "issn"
+        },
+        {
+          "value": "1861-2067",
+          "scheme": "issn"
+        },
+        {
+          "value": "1864-3035",
+          "scheme": "issn"
+        },
+        {
+          "value": "1867-7754",
+          "scheme": "issn"
         }
       ],
       "entity_type": "venue"
@@ -6522,35 +6528,35 @@
   "cf.search.name:Digital Libraries": [
     {
       "local_identifier": "https://w3id.org/oc/meta/br/0607163623",
-      "entity_type": "venue",
       "name": "Proceedings Of The 24Th ACM/IEEE Joint Conference On Digital Libraries",
-      "type": "conference"
+      "type": "conference",
+      "entity_type": "venue"
     },
     {
       "local_identifier": "https://w3id.org/oc/meta/br/06160781188",
-      "entity_type": "venue",
+      "name": "International Journal On Digital Libraries",
+      "type": "journal",
       "identifiers": [
         {
-          "scheme": "issn",
-          "value": "1432-1300"
+          "value": "1432-1300",
+          "scheme": "issn"
         },
         {
-          "scheme": "issn",
-          "value": "1432-5012"
+          "value": "1432-5012",
+          "scheme": "issn"
         },
         {
-          "scheme": "openalex",
-          "value": "S110615584"
+          "value": "S110615584",
+          "scheme": "openalex"
         }
       ],
-      "name": "International Journal On Digital Libraries",
-      "type": "journal"
+      "entity_type": "venue"
     },
     {
       "local_identifier": "https://w3id.org/oc/meta/br/06902363257",
-      "entity_type": "venue",
       "name": "2021 ACM/IEEE Joint Conference On Digital Libraries (JCDL)",
-      "type": "conference"
+      "type": "conference",
+      "entity_type": "venue"
     }
   ]
 }

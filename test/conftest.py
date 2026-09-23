@@ -9,11 +9,11 @@ import requests
 
 from ramose import APIManager, Operation
 
-# v0.5.45
-QLEVER_IMAGE = "adfreiburg/qlever@sha256:4672a53f0ff4e55ac921d25832a21ec0bb3ca08f54d7c1950d04ebf6af7b8c21"
+# v0.6.0
+QLEVER_IMAGE = "adfreiburg/qlever@sha256:37d5ede193f1bffb6aebf734d15d2a4c2a3228ee102858b0c6c2e65c149a78ec"
 QLEVER_CONTAINER = "oc-api-test-qlever"
 QLEVER_PORT = 7011
-INDEX_NAME = "oc-index-test"
+INDEX_NAME = "oc-test"
 DOCKER_USER = f"{os.getuid()}:{os.getgid()}"
 
 # v7.2.16
@@ -23,7 +23,7 @@ VIRTUOSO_HTTP_PORT = 8893
 VIRTUOSO_ISQL_PORT = 1112
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
-QLEVER_DATA_DIR = os.path.join(TEST_DIR, "qlever-index-data")
+QLEVER_DATA_DIR = os.path.join(TEST_DIR, "qlever-data")
 VIRTUOSO_DATA_DIR = os.path.join(TEST_DIR, "virtuoso-meta-data")
 VIRTUOSO_DB_DIR = os.path.join(VIRTUOSO_DATA_DIR, "database")
 
@@ -63,19 +63,6 @@ def _wait_for_virtuoso(container: str, timeout: int = 60) -> None:
     raise TimeoutError(f"Virtuoso did not become ready within {timeout}s")
 
 
-def _enable_virtuoso_rdf_freetext(container: str) -> None:
-    commands = (
-        "DB.DBA.RDF_OBJ_FT_RULE_ADD(null, null, 'All');"
-        "DB.DBA.VT_INC_INDEX_DB_DBA_RDF_OBJ();"
-        "checkpoint;"
-    )
-    subprocess.run(
-        ["docker", "exec", container, "isql", "1111", "dba", "dba", f"exec={commands}"],
-        check=True,
-        capture_output=True,
-    )
-
-
 @pytest.fixture(scope="session")
 def qlever_endpoint():
     subprocess.run(["docker", "rm", "-f", QLEVER_CONTAINER], capture_output=True)
@@ -99,7 +86,7 @@ def qlever_endpoint():
             "--init",
             QLEVER_IMAGE,
             "-c",
-            f"qlever-server -i {INDEX_NAME} -j 4 -p {QLEVER_PORT} -m 1G -c 500M -e 500M -k 50 -s 30s",
+            f"qlever-server -i {INDEX_NAME} -j 4 -p {QLEVER_PORT} -m 1G -c 500M -e 500M -k 50 -s 30s --no-metrics-log --no-resource-usage-log",
         ],
         check=True,
         capture_output=True,
@@ -141,20 +128,19 @@ def virtuoso_endpoint():
             capture_output=True,
         )
         _wait_for_virtuoso(VIRTUOSO_CONTAINER)
-        _enable_virtuoso_rdf_freetext(VIRTUOSO_CONTAINER)
         yield f"http://127.0.0.1:{VIRTUOSO_HTTP_PORT}/sparql"
         subprocess.run(["docker", "stop", VIRTUOSO_CONTAINER], capture_output=True)
         subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)
 
 
 @pytest.fixture(scope="session")
-def skgif_api_manager(virtuoso_endpoint, qlever_endpoint):
+def skgif_api_manager(qlever_endpoint):
     manager = APIManager(
         [os.path.join(TEST_DIR, "..", "src", "api", "skgif_v1.hf")],
-        endpoint_override=virtuoso_endpoint,
+        endpoint_override=qlever_endpoint,
     )
     for config in manager.all_conf.values():
-        config["sources_map"] = {"meta": virtuoso_endpoint, "index": qlever_endpoint}
+        config["sources_map"] = {"meta": qlever_endpoint, "index": qlever_endpoint}
     return manager
 
 
