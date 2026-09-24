@@ -141,7 +141,7 @@ You can customize the Gunicorn server configuration by modifying the `gunicorn.c
 
 ### Running Tests Locally
 
-The tests require Docker. Pytest fixtures in `test/conftest.py` automatically start and stop the QLever and Virtuoso containers.
+The tests require Docker. Pytest fixtures in `test/conftest.py` automatically start and stop the QLever container.
 
 1. Install dependencies:
 ```bash

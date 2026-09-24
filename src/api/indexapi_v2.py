@@ -162,13 +162,9 @@ def __get_omid_of(s):
         PREFIX datacite: <http://purl.org/spar/datacite/>
         PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
         SELECT ?br {
-            { ?identifier literal:hasLiteralValue '"""
+            ?identifier literal:hasLiteralValue '"""
         + s
-        + """'^^<http://www.w3.org/2001/XMLSchema#string>. }
-            UNION
-            {?identifier literal:hasLiteralValue '"""
-        + s
-        + """'.}
+        + """'.
             ?br datacite:hasIdentifier ?identifier
         }
     """
@@ -182,20 +178,13 @@ def __get_omid_of(s):
             PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
             PREFIX ns1: <http://purl.org/vocab/frbr/core#>
             PREFIX fabio: <http://purl.org/spar/fabio/>
-            SELECT ?br {
-            { ?identifier literal:hasLiteralValue '"""
+            SELECT DISTINCT ?br {
+            ?identifier literal:hasLiteralValue '"""
             + s
-            + """'^^<http://www.w3.org/2001/XMLSchema#string>. }
-                UNION
-                {?identifier literal:hasLiteralValue '"""
-            + s
-            + """'.}
+            + """'.
             ?venue datacite:hasIdentifier ?identifier .
-            {?br ns1:partOf ?venue .}
-            UNION { ?br ns1:partOf/ns1:partOf ?venue . }
-            UNION { ?br ns1:partOf/ns1:partOf/ns1:partOf ?venue . }
-              	UNION { ?br ns1:partOf/ns1:partOf/ns1:partOf/ns1:partOf ?venue .}
-              	?br a fabio:JournalArticle .
+            ?br ns1:partOf+ ?venue .
+            ?br a fabio:JournalArticle .
             }
         """
         )

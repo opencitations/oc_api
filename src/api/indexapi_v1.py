@@ -41,13 +41,9 @@ def id2omids(s):
         PREFIX datacite: <http://purl.org/spar/datacite/>
         PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
         SELECT ?br {
-            { ?identifier literal:hasLiteralValue '"""
+            ?identifier literal:hasLiteralValue '"""
         + s
-        + """'^^<http://www.w3.org/2001/XMLSchema#string>. }
-            UNION
-            { ?identifier literal:hasLiteralValue '"""
-        + s
-        + """'. }
+        + """'.
             ?br datacite:hasIdentifier ?identifier
         }
     """

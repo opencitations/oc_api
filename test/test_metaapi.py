@@ -7,13 +7,12 @@ from ramose import APIManager
 
 
 @pytest.fixture(scope="session")
-def api_manager(virtuoso_endpoint: str) -> APIManager:
-    virtuoso_base = virtuoso_endpoint.rsplit("/", 1)[0]
+def api_manager(qlever_endpoint: str) -> APIManager:
     return create_api_manager(
         "src/api/meta_v1.hf",
         {
-            "#base https://api.opencitations.net/meta": f"#base {virtuoso_base}",
-            "#endpoint http://virtuoso-service.default.svc.cluster.local:8890/sparql": f"#endpoint {virtuoso_endpoint}",
+            "#base https://api.opencitations.net/meta": f"#base {qlever_endpoint}",
+            "#endpoint http://virtuoso-service.default.svc.cluster.local:8890/sparql": f"#endpoint {qlever_endpoint}",
             "#addon metaapi": "#addon ../src/api/metaapi",
         },
     )

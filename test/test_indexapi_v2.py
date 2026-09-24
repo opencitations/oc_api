@@ -9,7 +9,7 @@ from ramose import APIManager
 
 
 @pytest.fixture(scope="session")
-def api_manager(qlever_endpoint: str, virtuoso_endpoint: str) -> APIManager:
+def api_manager(qlever_endpoint: str) -> APIManager:
     return create_api_manager(
         "src/api/index_v2.hf",
         {
@@ -19,7 +19,7 @@ def api_manager(qlever_endpoint: str, virtuoso_endpoint: str) -> APIManager:
         },
         env_vars={
             "SPARQL_ENDPOINT_INDEX": qlever_endpoint,
-            "SPARQL_ENDPOINT_META": virtuoso_endpoint,
+            "SPARQL_ENDPOINT_META": qlever_endpoint,
         },
     )
 

@@ -24,6 +24,10 @@ def lower(s):
     return (s.lower(),)
 
 
+def values_clause(values):
+    return "VALUES ?val { " + " ".join(values) + " }"
+
+
 def br_meta_metadata(values):
     sparql_endpoint = env_config["sparql_endpoint_meta"]
 
@@ -35,19 +39,25 @@ def br_meta_metadata(values):
     PREFIX datacite: <http://purl.org/spar/datacite/>
     PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
     PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
-    SELECT DISTINCT ?val ?pubDate (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=' __ ') AS ?ids) (GROUP_CONCAT(?venue; separator="; ") as ?source) (GROUP_CONCAT(?raAuthor; separator="; ") as ?author)
+    SELECT ?val ?pubDate (COALESCE(GROUP_CONCAT(DISTINCT ?id; SEPARATOR=' __ '), "") AS ?ids) (GROUP_CONCAT(STR(?venue); separator="; ") as ?source) (GROUP_CONCAT(STR(?raAuthor); separator="; ") as ?author)
     WHERE {
-          VALUES ?val { """
-        + " ".join(values)
-        + """ }
+          """
+        + values_clause(values)
+        + """
           OPTIONAL { ?val prism:publicationDate ?pubDate. }
           OPTIONAL {
+              """
+        + values_clause(values)
+        + """
               ?val datacite:hasIdentifier ?identifier.
               ?identifier datacite:usesIdentifierScheme ?scheme;
                   literal:hasLiteralValue ?literalValue.
               BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literalValue) AS ?id)
           }
           OPTIONAL {
+              """
+        + values_clause(values)
+        + """
               ?val a fabio:JournalArticle;
                     frbr:partOf+ ?venue.
               ?venue a fabio:Journal.
@@ -56,6 +66,9 @@ def br_meta_metadata(values):
               ?val frbr:partOf ?venue.
           }
           OPTIONAL {
+              """
+        + values_clause(values)
+        + """
               ?val pro:isDocumentContextFor ?arAuthor.
                   ?arAuthor pro:withRole pro:author;
                             pro:isHeldBy ?raAuthor.
@@ -70,7 +83,7 @@ def br_meta_metadata(values):
     }
 
     try:
-        response = post(sparql_endpoint, headers=headers, data=sparql_query)
+        response = post(sparql_endpoint, headers=headers, data=sparql_query, timeout=45)
         response.raise_for_status()
     except RequestException:
         return {}, []
@@ -87,12 +100,15 @@ def br_meta_anyids(values):
         """
     PREFIX datacite: <http://purl.org/spar/datacite/>
     PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
-    SELECT DISTINCT ?val (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=' __ ') AS ?ids)
+    SELECT ?val (COALESCE(GROUP_CONCAT(DISTINCT ?id; SEPARATOR=' __ '), "") AS ?ids)
     WHERE {
-          VALUES ?val { """
-        + " ".join(values)
-        + """ }
+          """
+        + values_clause(values)
+        + """
           OPTIONAL {
+              """
+        + values_clause(values)
+        + """
               ?val datacite:hasIdentifier ?identifier.
               ?identifier datacite:usesIdentifierScheme ?scheme;
                   literal:hasLiteralValue ?literalValue.
@@ -108,7 +124,7 @@ def br_meta_anyids(values):
     }
 
     try:
-        response = post(sparql_endpoint, headers=headers, data=sparql_query)
+        response = post(sparql_endpoint, headers=headers, data=sparql_query, timeout=45)
         response.raise_for_status()
     except RequestException:
         return {}, []

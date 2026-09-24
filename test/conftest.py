@@ -1,5 +1,4 @@
 import os
-import shutil
 import subprocess
 import tempfile
 import time
@@ -16,16 +15,8 @@ QLEVER_PORT = 7011
 INDEX_NAME = "oc-test"
 DOCKER_USER = f"{os.getuid()}:{os.getgid()}"
 
-# v7.2.16
-VIRTUOSO_IMAGE = "openlink/virtuoso-opensource-7@sha256:e7a5cd1915569d70d8363503dc62f6bf818b485f1501b230c7608cde8528c72d"
-VIRTUOSO_CONTAINER = "oc-api-test-virtuoso"
-VIRTUOSO_HTTP_PORT = 8893
-VIRTUOSO_ISQL_PORT = 1112
-
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 QLEVER_DATA_DIR = os.path.join(TEST_DIR, "qlever-data")
-VIRTUOSO_DATA_DIR = os.path.join(TEST_DIR, "virtuoso-meta-data")
-VIRTUOSO_DB_DIR = os.path.join(VIRTUOSO_DATA_DIR, "database")
 
 
 def _wait_for_http(port: int, timeout: int = 60) -> None:
@@ -39,28 +30,6 @@ def _wait_for_http(port: int, timeout: int = 60) -> None:
             pass
         time.sleep(1)
     raise TimeoutError(f"Service did not become ready on port {port} within {timeout}s")
-
-
-def _wait_for_virtuoso(container: str, timeout: int = 60) -> None:
-    deadline = time.monotonic() + timeout
-    while time.monotonic() < deadline:
-        result = subprocess.run(
-            [
-                "docker",
-                "exec",
-                container,
-                "isql",
-                "1111",
-                "dba",
-                "dba",
-                "exec=SELECT 1;",
-            ],
-            capture_output=True,
-        )
-        if result.returncode == 0:
-            return
-        time.sleep(1)
-    raise TimeoutError(f"Virtuoso did not become ready within {timeout}s")
 
 
 @pytest.fixture(scope="session")
@@ -95,42 +64,6 @@ def qlever_endpoint():
     yield f"http://127.0.0.1:{QLEVER_PORT}"
     subprocess.run(["docker", "stop", QLEVER_CONTAINER], capture_output=True)
     subprocess.run(["docker", "rm", "-f", QLEVER_CONTAINER], capture_output=True)
-
-
-@pytest.fixture(scope="session")
-def virtuoso_endpoint():
-    with tempfile.TemporaryDirectory() as temp_dir:
-        database_dir = os.path.join(temp_dir, "database")
-        os.mkdir(database_dir)
-        for entry in os.scandir(VIRTUOSO_DB_DIR):
-            if entry.is_file() and entry.name != "virtuoso.log":
-                shutil.copy2(entry.path, database_dir)
-
-        subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)
-        subprocess.run(
-            [
-                "docker",
-                "run",
-                "-d",
-                "--name",
-                VIRTUOSO_CONTAINER,
-                "-p",
-                f"{VIRTUOSO_HTTP_PORT}:8890",
-                "-p",
-                f"{VIRTUOSO_ISQL_PORT}:1111",
-                "-e",
-                "DBA_PASSWORD=dba",
-                "-v",
-                f"{database_dir}:/opt/virtuoso-opensource/database",
-                VIRTUOSO_IMAGE,
-            ],
-            check=True,
-            capture_output=True,
-        )
-        _wait_for_virtuoso(VIRTUOSO_CONTAINER)
-        yield f"http://127.0.0.1:{VIRTUOSO_HTTP_PORT}/sparql"
-        subprocess.run(["docker", "stop", VIRTUOSO_CONTAINER], capture_output=True)
-        subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)
 
 
 @pytest.fixture(scope="session")

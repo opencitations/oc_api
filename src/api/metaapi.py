@@ -85,18 +85,10 @@ def generate_id_search(ids: str) -> Tuple[str]:
             other_values.append(
                 '''
                 {{
-                    {
-                      ?identifier literal:hasLiteralValue "'''
+                    ?identifier literal:hasLiteralValue "'''
                 + literal_value
-                + '''"
-                    }
-                    UNION
-                    {
-                      ?identifier literal:hasLiteralValue "'''
-                + literal_value
-                + """"^^<http://www.w3.org/2001/XMLSchema#string>
-                    }
-                    ?identifier datacite:usesIdentifierScheme datacite:"""
+                + """";
+                        datacite:usesIdentifierScheme datacite:"""
                 + scheme
                 + """;
                         ^datacite:hasIdentifier ?res.
@@ -132,21 +124,13 @@ def generate_ra_search(identifier: str) -> Tuple[str]:
     else:
         return (
             '''
-            {
-                ?knownPersonIdentifier literal:hasLiteralValue "'''
+            ?knownPersonIdentifier literal:hasLiteralValue "'''
             + literal_value
-            + '''"
-            }
-            UNION
-            {
-                ?knownPersonIdentifier literal:hasLiteralValue "'''
-            + literal_value
-            + """"^^<http://www.w3.org/2001/XMLSchema#string>
-            }
-            ?knownPersonIdentifier datacite:usesIdentifierScheme datacite:"""
+            + """";
+                datacite:usesIdentifierScheme datacite:"""
             + scheme
             + """;
-                                ^datacite:hasIdentifier ?knownPerson.
+                ^datacite:hasIdentifier ?knownPerson.
             ?knownPerson ^pro:isHeldBy ?knownRole.
         """,
         )
@@ -158,7 +142,13 @@ def create_metadata_output(results):
     for result in results[1:]:
         output_result = list()
         for i, data in enumerate(result):
-            if i == header.index("type"):
+            if i == header.index("id"):
+                sorted_ids = __sort_ids(data[1])
+                output_result.append((sorted_ids, sorted_ids))
+            elif i == header.index("venue"):
+                sorted_venue = __sort_venue_ids(data[1])
+                output_result.append((sorted_venue, sorted_venue))
+            elif i == header.index("type"):
                 beautiful_type = __postprocess_type(data[1])
                 output_result.append((data[0], beautiful_type))
             elif (
@@ -172,6 +162,18 @@ def create_metadata_output(results):
                 output_result.append(data)
         output_results.append(output_result)
     return output_results, True
+
+
+def __sort_ids(ids: str) -> str:
+    *external_ids, omid = ids.split(" ")
+    return " ".join(sorted(external_ids) + [omid])
+
+
+def __sort_venue_ids(venue: str) -> str:
+    if not venue:
+        return venue
+    name, ids = venue.rsplit(" [", 1)
+    return f"{name} [{__sort_ids(ids.removesuffix(']'))}]"
 
 
 def __postprocess_type(type_uri: str) -> str:

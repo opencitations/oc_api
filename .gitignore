@@ -27,10 +27,6 @@ var/
 .DS_Store
 
 # Tests
-test/virtuoso-test-data/
-test/virtuoso-meta-data/database/virtuoso.lck
-test/virtuoso-meta-data/database/virtuoso.log
-test/virtuoso-meta-data/index_entities.txt
 test/qlever-data/oc-test.server-log.txt
 .coverage
 
