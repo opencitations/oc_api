@@ -12,7 +12,7 @@ def api_manager(qlever_endpoint: str) -> APIManager:
         "src/api/meta_v1.hf",
         {
             "#base https://api.opencitations.net/meta": f"#base {qlever_endpoint}",
-            "#endpoint http://virtuoso-service.default.svc.cluster.local:8890/sparql": f"#endpoint {qlever_endpoint}",
+            "#endpoint http://meta-qlever-service.default.svc.cluster.local:7011": f"#endpoint {qlever_endpoint}",
             "#addon metaapi": "#addon ../src/api/metaapi",
         },
     )

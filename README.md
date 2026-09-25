@@ -37,7 +37,7 @@ For instance:
 BASE_URL=api.opencitations.net
 LOG_DIR=/home/dir/log/
 SPARQL_ENDPOINT_INDEX=http://qlever-service.default.svc.cluster.local:7011  
-SPARQL_ENDPOINT_META=http://virtuoso-service.default.svc.cluster.local:8890/sparql
+SPARQL_ENDPOINT_META=http://meta-qlever-service.default.svc.cluster.local:7011
 SYNC_ENABLED=true
 
 # Redis Configuration
@@ -127,7 +127,7 @@ VERSION=$(grep -m1 '^version' pyproject.toml | cut -d'"' -f2)
 docker build -t opencitations/oc_api:$VERSION .
 docker run -p 8080:8080 \
   -e SPARQL_ENDPOINT_INDEX=http://qlever:7011 \
-  -e SPARQL_ENDPOINT_META=http://virtuoso:8890/sparql \
+  -e SPARQL_ENDPOINT_META=http://meta-qlever:7011 \
   opencitations/oc_api:$VERSION
 ```
 
