@@ -1,185 +1,64 @@
-import json
-import os
-from requests import RequestException, post
-from json import loads
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-
-with open("conf.json") as f:
-    c = json.load(f)
-
-env_config = {
-    "base_url": os.getenv("BASE_URL", c["base_url"]),
-    "sparql_endpoint_index": os.getenv(
-        "SPARQL_ENDPOINT_INDEX", c["sparql_endpoint_index"]
-    ),
-    "sparql_endpoint_meta": os.getenv(
-        "SPARQL_ENDPOINT_META", c["sparql_endpoint_meta"]
-    ),
-    "sync_enabled": os.getenv("SYNC_ENABLED", "false").lower() == "true",
-}
 
 
 def lower(s):
     return (s.lower(),)
 
 
-def br_meta_metadata(values):
-    sparql_endpoint = env_config["sparql_endpoint_meta"]
-
-    sparql_query = (
-        """
-    PREFIX pro: <http://purl.org/spar/pro/>
-    PREFIX frbr: <http://purl.org/vocab/frbr/core#>
-    PREFIX fabio: <http://purl.org/spar/fabio/>
-    PREFIX datacite: <http://purl.org/spar/datacite/>
-    PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
-    PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
-    SELECT DISTINCT ?val ?pubDate (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=' __ ') AS ?ids) (GROUP_CONCAT(?venue; separator="; ") as ?source) (GROUP_CONCAT(?raAuthor; separator="; ") as ?author)
-    WHERE {
-          VALUES ?val { """
-        + " ".join(values)
-        + """ }
-          OPTIONAL { ?val prism:publicationDate ?pubDate. }
-          OPTIONAL {
-              ?val datacite:hasIdentifier ?identifier.
-              ?identifier datacite:usesIdentifierScheme ?scheme;
-                  literal:hasLiteralValue ?literalValue.
-              BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literalValue) AS ?id)
-          }
-          OPTIONAL {
-              ?val a fabio:JournalArticle;
-                    frbr:partOf+ ?venue.
-              ?venue a fabio:Journal.
-          }
-          OPTIONAL {
-              ?val frbr:partOf ?venue.
-          }
-          OPTIONAL {
-              ?val pro:isDocumentContextFor ?arAuthor.
-                  ?arAuthor pro:withRole pro:author;
-                            pro:isHeldBy ?raAuthor.
-          }
-     } GROUP BY ?val ?pubDate
-    """
+def oci_search(oci):
+    citing, cited = oci.split("-")
+    return (
+        f"VALUES ?citation {{ <https://w3id.org/oc/index/ci/{oci}> }} "
+        f"VALUES ?citing_br {{ <https://w3id.org/oc/meta/br/{citing}> }} "
+        f"VALUES ?cited_br {{ <https://w3id.org/oc/meta/br/{cited}> }}",
     )
 
-    headers = {
-        "Accept": "application/sparql-results+json",
-        "Content-Type": "application/sparql-query",
-    }
 
-    try:
-        response = post(sparql_endpoint, headers=headers, data=sparql_query)
-        response.raise_for_status()
-    except RequestException:
-        return {}, []
-    r = loads(response.text)
-    results = r["results"]["bindings"]
-    res_json = {elem["val"]["value"]: elem for elem in results}
-    return res_json, ["val", "pubDate", "ids", "source", "author"]
-
-
-def br_meta_anyids(values):
-    sparql_endpoint = env_config["sparql_endpoint_meta"]
-
-    sparql_query = (
-        """
-    PREFIX datacite: <http://purl.org/spar/datacite/>
-    PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
-    SELECT DISTINCT ?val (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=' __ ') AS ?ids)
-    WHERE {
-          VALUES ?val { """
-        + " ".join(values)
-        + """ }
-          OPTIONAL {
-              ?val datacite:hasIdentifier ?identifier.
-              ?identifier datacite:usesIdentifierScheme ?scheme;
-                  literal:hasLiteralValue ?literalValue.
-              BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literalValue) AS ?id)
-          }
-     } GROUP BY ?val
-    """
+def literal_search(value, variable):
+    return (
+        f'?resolved_identifier literal:hasLiteralValue "{value}" . '
+        f"?{variable} datacite:hasIdentifier ?resolved_identifier ."
     )
 
-    headers = {
-        "Accept": "application/sparql-results+json",
-        "Content-Type": "application/sparql-query",
-    }
 
-    try:
-        response = post(sparql_endpoint, headers=headers, data=sparql_query)
-        response.raise_for_status()
-    except RequestException:
-        return {}, []
-    r = loads(response.text)
-    results = r["results"]["bindings"]
-    res_json = {elem["val"]["value"]: elem for elem in results}
-    return res_json, ["val", "ids"]
+def unique_citations(res):
+    citing_groups: dict[str, str] = {}
+    cited_groups: dict[str, str] = {}
+    citations: dict[tuple[str, str], dict[str, str]] = {}
+    for row in sorted(__rows(res), key=lambda row: (row["citing_br"], row["cited_br"])):
+        key = (
+            __group(row["citing_br"], row["citing_ids"], citing_groups),
+            __group(row["cited_br"], row["cited_ids"], cited_groups),
+        )
+        citations.setdefault(key, row)
+    return list(citations.values())
 
 
-def get_unique_brs_metadata(l_url_brs, ids_only=False):
-    res: list[list[str]] = []
-    l_brs = ["<" + _url_br + ">" for _url_br in l_url_brs]
-
-    fetch = br_meta_anyids if ids_only else br_meta_metadata
-    i = 0
-    chunk_size = 3000
-    brs_meta: dict[str, dict[str, dict[str, str]]] = {}
-    while i < len(l_brs):
-        chunk = l_brs[i : i + chunk_size]
-        m_br = fetch(chunk)
-        brs_meta.update(m_br[0])
-        if i == 0:
-            res.append(m_br[1])
-        i += chunk_size
-
-    unique_brs_anyid: list[set[str]] = []
-    for k_val in brs_meta.values():
-        br_ids = k_val["ids"]["value"]
-        if br_ids:
-            s = set(br_ids.split(" __ "))
-            _c_intersection = 0
-            for __unique in unique_brs_anyid:
-                _c_intersection += len(__unique.intersection(s))
-            if _c_intersection == 0:
-                unique_brs_anyid.append(s)
-                br_values = [k_val[k]["value"] if k in k_val else "" for k in res[0]]
-                res.append(br_values)
-
-    f_res = {}
-    for row in res[1:]:
-        f_res[row[0]] = {k_val: row[i] for i, k_val in enumerate(res[0])}
-
-    return f_res
+def count_unique_cits(res):
+    return [["count"], [len(unique_citations(res))]], True
 
 
-def get_pub_date(elem):
-    return elem["pubDate"]
+def count_groups(res, side):
+    entities = sorted({(row[f"{side}_br"], row[f"{side}_ids"]) for row in __rows(res)})
+    groups: dict[str, str] = {}
+    return [["count"], [len({__group(*entity, groups) for entity in entities})]], True
 
 
-def get_source(elem):
-    return elem["source"].split("; ")
-
-
-def get_author(elem):
-    return elem["author"].split("; ")
+def citation_row(citation, citing, cited):
+    return [
+        citation["oci"],
+        citing,
+        cited,
+        citation["citing_date"],
+        cit_duration(citation["citing_date"], citation["cited_date"]),
+        __yes_no(citation, "same_journal"),
+        __yes_no(citation, "same_author"),
+    ]
 
 
 def get_id_val(val):
     return val.replace("https://w3id.org/oc/meta/br/", "")
-
-
-def cit_journal_sc(citing_source_ids, cited_source_ids):
-    if len(set(citing_source_ids).intersection(set(cited_source_ids))) > 0:
-        return "yes"
-    return "no"
-
-
-def cit_author_sc(citing_authors, cited_authors):
-    if len(set(citing_authors).intersection(set(cited_authors))) > 0:
-        return "yes"
-    return "no"
 
 
 def cit_duration(citing_complete_pub_date, cited_complete_pub_date):
@@ -230,3 +109,25 @@ def cit_duration(citing_complete_pub_date, cited_complete_pub_date):
         result += "%sD" % abs(delta.days)
 
     return result
+
+
+def __rows(res):
+    header = res[0]
+    return [
+        {field: value for field, (_, value) in zip(header, typed_row)}
+        for typed_row in res[1:]
+    ]
+
+
+def __group(br, ids, groups):
+    identifiers = ids.split(" __ ")
+    for identifier in identifiers:
+        if identifier in groups:
+            return groups[identifier]
+    for identifier in identifiers:
+        groups[identifier] = br
+    return br
+
+
+def __yes_no(citation, column):
+    return "yes" if citation.get(column) == "yes" else "no"

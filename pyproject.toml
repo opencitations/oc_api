@@ -4,7 +4,7 @@
 
 [project]
 name = "oc-api"
-version = "4.0.1"
+version = "4.1.2"
 description = "OpenCitations API"
 authors = [
     {name = "Mario Petrella", email = "mario.petrella@unibo.it"},
@@ -20,7 +20,7 @@ dependencies = [
     "gunicorn>=22.0.0",
     "idna>=3.15",
     "python-dateutil>=2.9.0.post0",
-    "ramose>=2.9.1",
+    "ramose>=2.10.1",
     "rdflib>=6.1.1",
     "redis>=7.0.1",
     "requests>=2.32.4",

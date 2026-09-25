@@ -21,7 +21,7 @@ get(API_CALL, headers=HTTP_HEADERS)
 #version Version 1.1.1 (2022-12-22)
 #contacts [contact@opencitations.net](mailto:contact@opencitations.net)
 #license This document is licensed with a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/legalcode), while the REST API itself has been created using [RAMOSE](https://github.com/opencitations/ramose), the *Restful API Manager Over SPARQL Endpoints* created by [Silvio Peroni](https://orcid.org/0000-0003-0530-4305), which is licensed with an [ISC license](https://opensource.org/licenses/ISC).
-#endpoint http://virtuoso-service.default.svc.cluster.local:8890/sparql
+#endpoint http://meta-qlever-service.default.svc.cluster.local:7011
 #method post
 #addon metaapi
 
@@ -65,247 +65,243 @@ It is possible to specify one or more IDs as input of this operation. In this ca
         "editor": "Allan, Catherine [orcid:0000-0003-2098-4759 omid:ra/069012996]; Stankey, George H. [omid:ra/061808486861]"
     }
 ]
-#sparql PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-PREFIX pro: <http://purl.org/spar/pro/>
+#sparql PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX fabio: <http://purl.org/spar/fabio/>
 PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+
+SELECT DISTINCT ?res
+WHERE {
+    [[ids]]
+}
+
+@@join ?res ?res type=left
+@@values ?res
 PREFIX datacite: <http://purl.org/spar/datacite/>
 PREFIX dcterm: <http://purl.org/dc/terms/>
-PREFIX frbr: <http://purl.org/vocab/frbr/core#>
-PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
 PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
-PREFIX oco: <https://w3id.org/oc/ontology/>
 
-SELECT DISTINCT
-?id
-(STR(?title) AS ?title)
-(GROUP_CONCAT(DISTINCT ?author_info; SEPARATOR="|") AS ?author)
-(STR(?pub_date) AS ?pub_date)
-(STR(?issue) AS ?issue)
-(STR(?volume) AS ?volume)
-?venue
-?type
-?page
-(GROUP_CONCAT(DISTINCT ?publisher_info; SEPARATOR="|") AS ?publisher)
-(GROUP_CONCAT(DISTINCT ?combined_editor_info; SEPARATOR="|") AS ?editor)
+SELECT ?res ?title ?pub_date
+(CONCAT(COALESCE(GROUP_CONCAT(DISTINCT ?external_id; SEPARATOR=""), ""), "omid:br/", STRAFTER(STR(?res), "/br/")) AS ?id)
 WHERE {
-    {
-        SELECT ?res ?title ?author_info ?combined_editor_info ?publisher_info ?type ?pub_date ?page ?issue ?volume ?venueName ?venueMetaid
-        (GROUP_CONCAT(DISTINCT ?id ; SEPARATOR=" ") AS ?ids)
-        (GROUP_CONCAT(DISTINCT ?venue_ids_; SEPARATOR=' ') AS ?venue_ids)
-        WHERE {
-            [[ids]]
-            OPTIONAL {
-                ?res datacite:hasIdentifier ?allIdentifiers.
-                ?allIdentifiers datacite:usesIdentifierScheme ?allSchemes;
-                                literal:hasLiteralValue ?allLiteralValues.
-                BIND(CONCAT(STRAFTER(STR(?allSchemes), "http://purl.org/spar/datacite/"), ":", ?allLiteralValues) AS ?id)
-            }
-            OPTIONAL {
-                ?res pro:isDocumentContextFor ?arAuthor.
-                ?arAuthor pro:withRole pro:author;
-                        pro:isHeldBy ?raAuthor.
-                OPTIONAL {
-                    ?arAuthor oco:hasNext ?nextAuthorRole .
-                }
-                BIND(STRAFTER(STR(?arAuthor), "https://w3id.org/oc/meta/ar/") AS ?roleUri)
-                BIND(STRAFTER(STR(?nextAuthorRole), "https://w3id.org/oc/meta/ar/") AS ?nextRoleUri)
-                BIND(CONCAT("omid:ra/", STRAFTER(STR(?raAuthor), "/ra/")) AS ?author_metaid)
-                OPTIONAL {?raAuthor foaf:familyName ?familyName.}
-                OPTIONAL {?raAuthor foaf:givenName ?givenName.}
-                OPTIONAL {?raAuthor foaf:name ?name.}
-                OPTIONAL {
-                    ?raAuthor datacite:hasIdentifier ?authorIdentifier.
-                    ?authorIdentifier datacite:usesIdentifierScheme ?authorIdSchema;
-                                        literal:hasLiteralValue ?authorIdLiteralValue.
-                    BIND(CONCAT(STRAFTER(STR(?authorIdSchema), "http://purl.org/spar/datacite/"), ":", ?authorIdLiteralValue) AS ?author_id)
-                }
-                BIND(
-                    IF(
-                        STRLEN(STR(?familyName)) > 0 && STRLEN(STR(?givenName)) > 0,
-                        CONCAT(?familyName, ", ", ?givenName),
-                        IF(
-                            STRLEN(STR(?familyName)) > 0,
-                            CONCAT(?familyName, ","),
-                            ?name
-                        )
-                    )
-                AS ?authorName)
-                BIND(
-                    IF(
-                        STRLEN(STR(?author_id)) > 0,
-                        CONCAT(?authorName, " [", ?author_id, " ", ?author_metaid, "]"),
-                        CONCAT(?authorName, " [", ?author_metaid, "]")
-                    )
-                AS ?author_)
-                BIND(CONCAT(?author_, ":", ?roleUri, ":", COALESCE(?nextRoleUri, "")) AS ?author_info)
-            }
-            OPTIONAL {
-                ?res pro:isDocumentContextFor ?arEditor.
-                ?arEditor pro:withRole pro:editor;
-                            pro:isHeldBy ?raEditor.
-                OPTIONAL {
-                    ?arEditor oco:hasNext ?nextEditorRole .
-                }
-                BIND(STRAFTER(STR(?arEditor), "https://w3id.org/oc/meta/ar/") AS ?editorRoleUri)
-                BIND(STRAFTER(STR(?nextEditorRole), "https://w3id.org/oc/meta/ar/") AS ?nextEditorRoleUri)
-                BIND(CONCAT("omid:ra/", STRAFTER(STR(?raEditor), "/ra/")) AS ?editor_metaid)
-                OPTIONAL {?raEditor foaf:familyName ?editorFamilyName.}
-                OPTIONAL {?raEditor foaf:givenName ?editorGivenName.}
-                OPTIONAL {?raEditor foaf:name ?editor_name.}
-                OPTIONAL {
-                    ?raEditor datacite:hasIdentifier ?editorIdentifier.
-                    ?editorIdentifier datacite:usesIdentifierScheme ?editorIdSchema;
-                                    literal:hasLiteralValue ?editorIdLiteralValue.
-                    BIND(CONCAT(STRAFTER(STR(?editorIdSchema), "http://purl.org/spar/datacite/"), ":", ?editorIdLiteralValue) AS ?editor_id)
-                }
-                BIND(
-                    IF(
-                        STRLEN(STR(?editorFamilyName)) > 0 && STRLEN(STR(?editorGivenName)) > 0,
-                        CONCAT(?editorFamilyName, ", ", ?editorGivenName),
-                        IF(
-                            STRLEN(STR(?editorFamilyName)) > 0,
-                            CONCAT(?editorFamilyName, ","),
-                            ?editor_name
-                        )
-                    )
-                AS ?editorName)
-                BIND(
-                    IF(
-                        STRLEN(STR(?editor_id)) > 0,
-                        CONCAT(?editorName, " [", ?editor_id, " ", ?editor_metaid, "]"),
-                        CONCAT(?editorName, " [", ?editor_metaid, "]")
-                    )
-                AS ?editor_)
-                BIND(CONCAT(?editor_, ":", ?editorRoleUri, ":", COALESCE(?nextEditorRoleUri, "")) AS ?editor_info)
-            }
-            OPTIONAL {
-                ?res frbr:partOf ?container.
-                ?container pro:isDocumentContextFor ?arContainerEditor.
-                ?arContainerEditor pro:withRole pro:editor;
-                                pro:isHeldBy ?raContainerEditor.
-                OPTIONAL {
-                    ?arContainerEditor oco:hasNext ?nextContainerEditorRole .
-                }
-                BIND(STRAFTER(STR(?arContainerEditor), "https://w3id.org/oc/meta/ar/") AS ?containerEditorRoleUri)
-                BIND(STRAFTER(STR(?nextContainerEditorRole), "https://w3id.org/oc/meta/ar/") AS ?nextContainerEditorRoleUri)
-                BIND(CONCAT("omid:ra/", STRAFTER(STR(?raContainerEditor), "/ra/")) AS ?container_editor_metaid)
-                OPTIONAL {?raContainerEditor foaf:familyName ?containerEditorFamilyName.}
-                OPTIONAL {?raContainerEditor foaf:givenName ?containerEditorGivenName.}
-                OPTIONAL {?raContainerEditor foaf:name ?container_editor_name.}
-                OPTIONAL {
-                    ?raContainerEditor datacite:hasIdentifier ?containerEditorIdentifier.
-                    ?containerEditorIdentifier datacite:usesIdentifierScheme ?containerEditorIdSchema;
-                                                literal:hasLiteralValue ?containerEditorIdLiteralValue.
-                    BIND(CONCAT(STRAFTER(STR(?containerEditorIdSchema), "http://purl.org/spar/datacite/"), ":", ?containerEditorIdLiteralValue) AS ?container_editor_id)
-                }
-                BIND(
-                    IF(
-                        STRLEN(STR(?containerEditorFamilyName)) > 0 && STRLEN(STR(?containerEditorGivenName)) > 0,
-                        CONCAT(?containerEditorFamilyName, ", ", ?containerEditorGivenName),
-                        IF(
-                            STRLEN(STR(?containerEditorFamilyName)) > 0,
-                            CONCAT(?containerEditorFamilyName, ","),
-                            ?container_editor_name
-                        )
-                    )
-                AS ?containerEditorName)
-                BIND(
-                    IF(
-                        STRLEN(STR(?container_editor_id)) > 0,
-                        CONCAT(?containerEditorName, " [", ?container_editor_id, " ", ?container_editor_metaid, "]"),
-                        CONCAT(?containerEditorName, " [", ?container_editor_metaid, "]")
-                    )
-                AS ?container_editor_)
-                BIND(CONCAT(?container_editor_, ":", ?containerEditorRoleUri, ":", COALESCE(?nextContainerEditorRoleUri, "")) AS ?container_editor_info)
-            }
-            BIND(
-                IF(BOUND(?editor_info),
-                IF(BOUND(?container_editor_info),
-                    CONCAT(?editor_info, "|", ?container_editor_info),
-                    ?editor_info),
-                IF(BOUND(?container_editor_info),
-                    ?container_editor_info,
-                    "")
-                )
-            AS ?combined_editor_info)
-            OPTIONAL {
-                ?res pro:isDocumentContextFor ?arPublisher.
-                ?arPublisher pro:withRole pro:publisher;
-                            pro:isHeldBy ?raPublisher.
-                OPTIONAL {
-                    ?arPublisher oco:hasNext ?nextPublisherRole .
-                }
-                BIND(STRAFTER(STR(?arPublisher), "https://w3id.org/oc/meta/ar/") AS ?publisherRoleUri)
-                BIND(STRAFTER(STR(?nextPublisherRole), "https://w3id.org/oc/meta/ar/") AS ?nextPublisherRoleUri)
-                ?raPublisher foaf:name ?publisherName_.
-                BIND(CONCAT("omid:ra/", STRAFTER(STR(?raPublisher), "/ra/")) AS ?publisher_metaid)
-                ?raPublisher foaf:name ?publisher_name.
-                OPTIONAL {
-                    ?raPublisher datacite:hasIdentifier ?publisherIdentifier__.
-                    ?publisherIdentifier__ datacite:usesIdentifierScheme ?publisherIdSchema;
-                                        literal:hasLiteralValue ?publisherIdLiteralValue.
-                    BIND(CONCAT(STRAFTER(STR(?publisherIdSchema), "http://purl.org/spar/datacite/"), ":", ?publisherIdLiteralValue) AS ?publisher_id)
-                }
-                BIND(
-                    IF(
-                        STRLEN(STR(?publisher_id)) > 0,
-                        CONCAT(?publisher_name, " [", ?publisher_id, " ", ?publisher_metaid, "]"),
-                        CONCAT(?publisher_name, " [", ?publisher_metaid, "]")
-                    )
-                AS ?publisher_)
-                BIND(CONCAT(?publisher_, ":", ?publisherRoleUri, ":", COALESCE(?nextPublisherRoleUri, "")) AS ?publisher_info)
-            }
-            OPTIONAL {
-                {
-                    ?res a fabio:JournalArticle;
-                        frbr:partOf+ ?journal.
-                        BIND(CONCAT("omid:br/", STRAFTER(STR(?journal), "/br/")) AS ?venueMetaid)
-                    ?journal a fabio:Journal.
-                } UNION {
-                    ?res frbr:partOf ?journal.
-                    BIND(CONCAT("omid:br/", STRAFTER(STR(?journal), "/br/")) AS ?venueMetaid)
-                }
-                ?journal dcterm:title ?venueName.
-                OPTIONAL {
-                    ?journal datacite:hasIdentifier ?journalIdentifier__.
-                    ?journalIdentifier__ datacite:usesIdentifierScheme ?journalIdScheme;
-                                literal:hasLiteralValue ?journalIdLiteralValue.
-                    BIND(CONCAT(STRAFTER(STR(?journalIdScheme), "http://purl.org/spar/datacite/"), ":", ?journalIdLiteralValue) AS ?venue_ids_)
-                }
-            }
-            OPTIONAL {?res a ?type. FILTER (?type != fabio:Expression)}
-            OPTIONAL {?res dcterm:title ?title.}
-            OPTIONAL {?res prism:publicationDate ?pub_date.}
-            OPTIONAL {
-                ?res frbr:embodiment ?re.
-                ?re prism:startingPage ?startingPage;
-                    prism:endingPage ?endingPage.
-                BIND(IF(STR(?startingPage) = STR(?endingPage), STR(?startingPage), CONCAT(?startingPage, '-', ?endingPage)) AS ?page)
-            }
-            OPTIONAL {
-                ?res frbr:partOf ?resIssue.
-                ?resIssue a fabio:JournalIssue;
-                            fabio:hasSequenceIdentifier ?issue.
-            }
-            OPTIONAL {
-                ?res frbr:partOf+ ?resVolume.
-                ?resVolume a fabio:JournalVolume;
-                            fabio:hasSequenceIdentifier ?volume.
-            }
-        } GROUP BY ?res ?title ?author_info ?combined_editor_info ?publisher_info ?type ?issue ?volume ?pub_date ?page  ?venueName ?venueMetaid
-    }
-    BIND(CONCAT(?ids, IF(STR(?ids) != "", " ", ""), "omid:br/", STRAFTER(STR(?res), "/br/")) AS ?id)
+    OPTIONAL { ?res dcterm:title ?title }
+    OPTIONAL { ?res prism:publicationDate ?pub_date }
+    OPTIONAL { ?res datacite:hasIdentifier ?identifier }
+    BIND(COALESCE(?identifier, <urn:none>) AS ?identifier_node)
+    OPTIONAL { ?identifier_node datacite:usesIdentifierScheme ?scheme }
+    OPTIONAL { ?identifier_node literal:hasLiteralValue ?literal_value }
+    BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literal_value, " ") AS ?external_id)
+}
+GROUP BY ?res ?title ?pub_date
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX fabio: <http://purl.org/spar/fabio/>
+
+SELECT DISTINCT ?res ?type
+WHERE {
+    ?res a ?type.
+    FILTER(?type != fabio:Expression)
+}
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
+
+SELECT DISTINCT ?res ?page
+WHERE {
+    ?res frbr:embodiment ?embodiment.
+    ?embodiment prism:startingPage ?starting_page;
+        prism:endingPage ?ending_page.
+    BIND(IF(STR(?starting_page) = STR(?ending_page), STR(?starting_page), CONCAT(?starting_page, "-", ?ending_page)) AS ?page)
+}
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+
+SELECT DISTINCT ?res ?issue
+WHERE {
+    ?res frbr:partOf ?journal_issue.
+    ?journal_issue a fabio:JournalIssue;
+        fabio:hasSequenceIdentifier ?issue.
+}
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+
+SELECT DISTINCT ?res ?volume
+WHERE {
+    ?res frbr:partOf+ ?journal_volume.
+    ?journal_volume a fabio:JournalVolume;
+        fabio:hasSequenceIdentifier ?volume.
+}
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX dcterm: <http://purl.org/dc/terms/>
+PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+
+SELECT ?res
+(CONCAT(?venue_name, " [", COALESCE(GROUP_CONCAT(DISTINCT ?venue_external_id; SEPARATOR=""), ""), "omid:br/", STRAFTER(STR(?venue_resource), "/br/"), "]") AS ?venue)
+WHERE {
+    ?res frbr:partOf ?direct_container;
+        frbr:partOf+ ?venue_resource.
+    ?venue_resource dcterm:title ?venue_name.
+    FILTER(?venue_resource = ?direct_container || (EXISTS { ?res a fabio:JournalArticle } && EXISTS { ?venue_resource a fabio:Journal }))
+    OPTIONAL { ?venue_resource datacite:hasIdentifier ?venue_identifier }
+    BIND(COALESCE(?venue_identifier, <urn:none>) AS ?venue_identifier_node)
+    OPTIONAL { ?venue_identifier_node datacite:usesIdentifierScheme ?venue_scheme }
+    OPTIONAL { ?venue_identifier_node literal:hasLiteralValue ?venue_literal_value }
+    BIND(CONCAT(STRAFTER(STR(?venue_scheme), "http://purl.org/spar/datacite/"), ":", ?venue_literal_value, " ") AS ?venue_external_id)
+}
+GROUP BY ?res ?venue_resource ?venue_name
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX oco: <https://w3id.org/oc/ontology/>
+PREFIX pro: <http://purl.org/spar/pro/>
+
+SELECT ?res (GROUP_CONCAT(DISTINCT ?agent_info; SEPARATOR="|") AS ?author)
+WHERE {
+    ?res pro:isDocumentContextFor ?agent_role.
+    ?agent_role pro:withRole pro:author;
+        pro:isHeldBy ?agent.
+    OPTIONAL { ?agent_role oco:hasNext ?next_agent_role }
+    OPTIONAL { ?agent foaf:familyName ?family_name }
+    OPTIONAL { ?agent foaf:givenName ?given_name }
+    OPTIONAL { ?agent foaf:name ?name }
+    OPTIONAL { ?agent datacite:hasIdentifier ?agent_identifier }
+    BIND(COALESCE(?agent_identifier, <urn:none>) AS ?agent_identifier_node)
+    OPTIONAL { ?agent_identifier_node datacite:usesIdentifierScheme ?agent_scheme }
+    OPTIONAL { ?agent_identifier_node literal:hasLiteralValue ?agent_literal_value }
+    BIND(CONCAT(STRAFTER(STR(?agent_scheme), "http://purl.org/spar/datacite/"), ":", ?agent_literal_value) AS ?agent_id)
+    BIND(CONCAT("omid:ra/", STRAFTER(STR(?agent), "/ra/")) AS ?agent_omid)
     BIND(
-        IF(BOUND(?venueMetaid),
-           IF(STR(?venue_ids) != "",
-              CONCAT(" [", ?venue_ids, " ", ?venueMetaid, "]"),
-              CONCAT(" [", ?venueMetaid, "]")
-           ),
-           ""
+        IF(
+            BOUND(?family_name) && BOUND(?given_name),
+            CONCAT(?family_name, ", ", ?given_name),
+            IF(
+                BOUND(?family_name),
+                CONCAT(?family_name, ","),
+                ?name
+            )
         )
-    AS ?venueIdentifiers)
-    BIND(CONCAT(?venueName, ?venueIdentifiers) AS ?venue)
-} GROUP BY ?id ?title ?type ?issue ?volume ?venue ?pub_date ?page
+    AS ?agent_name)
+    BIND(
+        IF(
+            BOUND(?agent_id),
+            CONCAT(?agent_name, " [", ?agent_id, " ", ?agent_omid, "]"),
+            CONCAT(?agent_name, " [", ?agent_omid, "]")
+        )
+    AS ?agent_label)
+    BIND(CONCAT(?agent_label, ":", STRAFTER(STR(?agent_role), "/ar/"), ":", COALESCE(STRAFTER(STR(?next_agent_role), "/ar/"), "")) AS ?agent_info)
+}
+GROUP BY ?res
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX oco: <https://w3id.org/oc/ontology/>
+PREFIX pro: <http://purl.org/spar/pro/>
+
+SELECT ?res (GROUP_CONCAT(DISTINCT ?agent_info; SEPARATOR="|") AS ?editor)
+WHERE {
+    OPTIONAL { ?res frbr:partOf ?container }
+    VALUES ?of_container { false true }
+    BIND(IF(?of_container, COALESCE(?container, <urn:none>), ?res) AS ?context)
+    ?context pro:isDocumentContextFor ?agent_role.
+    ?agent_role pro:withRole pro:editor;
+        pro:isHeldBy ?agent.
+    OPTIONAL { ?agent_role oco:hasNext ?next_agent_role }
+    OPTIONAL { ?agent foaf:familyName ?family_name }
+    OPTIONAL { ?agent foaf:givenName ?given_name }
+    OPTIONAL { ?agent foaf:name ?name }
+    OPTIONAL { ?agent datacite:hasIdentifier ?agent_identifier }
+    BIND(COALESCE(?agent_identifier, <urn:none>) AS ?agent_identifier_node)
+    OPTIONAL { ?agent_identifier_node datacite:usesIdentifierScheme ?agent_scheme }
+    OPTIONAL { ?agent_identifier_node literal:hasLiteralValue ?agent_literal_value }
+    BIND(CONCAT(STRAFTER(STR(?agent_scheme), "http://purl.org/spar/datacite/"), ":", ?agent_literal_value) AS ?agent_id)
+    BIND(CONCAT("omid:ra/", STRAFTER(STR(?agent), "/ra/")) AS ?agent_omid)
+    BIND(
+        IF(
+            BOUND(?family_name) && BOUND(?given_name),
+            CONCAT(?family_name, ", ", ?given_name),
+            IF(
+                BOUND(?family_name),
+                CONCAT(?family_name, ","),
+                ?name
+            )
+        )
+    AS ?agent_name)
+    BIND(
+        IF(
+            BOUND(?agent_id),
+            CONCAT(?agent_name, " [", ?agent_id, " ", ?agent_omid, "]"),
+            CONCAT(?agent_name, " [", ?agent_omid, "]")
+        )
+    AS ?agent_label)
+    BIND(CONCAT(?agent_label, ":", STRAFTER(STR(?agent_role), "/ar/"), ":", COALESCE(STRAFTER(STR(?next_agent_role), "/ar/"), "")) AS ?agent_info)
+}
+GROUP BY ?res
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX oco: <https://w3id.org/oc/ontology/>
+PREFIX pro: <http://purl.org/spar/pro/>
+
+SELECT ?res (GROUP_CONCAT(DISTINCT ?agent_info; SEPARATOR="|") AS ?publisher)
+WHERE {
+    ?res pro:isDocumentContextFor ?agent_role.
+    ?agent_role pro:withRole pro:publisher;
+        pro:isHeldBy ?agent.
+    OPTIONAL { ?agent_role oco:hasNext ?next_agent_role }
+    OPTIONAL { ?agent foaf:familyName ?family_name }
+    OPTIONAL { ?agent foaf:givenName ?given_name }
+    OPTIONAL { ?agent foaf:name ?name }
+    OPTIONAL { ?agent datacite:hasIdentifier ?agent_identifier }
+    BIND(COALESCE(?agent_identifier, <urn:none>) AS ?agent_identifier_node)
+    OPTIONAL { ?agent_identifier_node datacite:usesIdentifierScheme ?agent_scheme }
+    OPTIONAL { ?agent_identifier_node literal:hasLiteralValue ?agent_literal_value }
+    BIND(CONCAT(STRAFTER(STR(?agent_scheme), "http://purl.org/spar/datacite/"), ":", ?agent_literal_value) AS ?agent_id)
+    BIND(CONCAT("omid:ra/", STRAFTER(STR(?agent), "/ra/")) AS ?agent_omid)
+    BIND(
+        IF(
+            BOUND(?family_name) && BOUND(?given_name),
+            CONCAT(?family_name, ", ", ?given_name),
+            IF(
+                BOUND(?family_name),
+                CONCAT(?family_name, ","),
+                ?name
+            )
+        )
+    AS ?agent_name)
+    BIND(
+        IF(
+            BOUND(?agent_id),
+            CONCAT(?agent_name, " [", ?agent_id, " ", ?agent_omid, "]"),
+            CONCAT(?agent_name, " [", ?agent_omid, "]")
+        )
+    AS ?agent_label)
+    BIND(CONCAT(?agent_label, ":", STRAFTER(STR(?agent_role), "/ar/"), ":", COALESCE(STRAFTER(STR(?next_agent_role), "/ar/"), "")) AS ?agent_info)
+}
+GROUP BY ?res
 
 #url /author/{id}
 #type operation
@@ -371,254 +367,248 @@ The fields returned by this operation are:
         "editor": ""
     }
 ]
-#sparql PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-PREFIX pro: <http://purl.org/spar/pro/>
+#sparql PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX fabio: <http://purl.org/spar/fabio/>
 PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX pro: <http://purl.org/spar/pro/>
+
+SELECT DISTINCT ?res
+WHERE {
+    [[id]]
+    ?knownRole pro:withRole pro:author.
+    ?res pro:isDocumentContextFor ?knownRole;
+        a fabio:Expression.
+}
+LIMIT 1000
+
+@@join ?res ?res type=left
+@@values ?res
 PREFIX datacite: <http://purl.org/spar/datacite/>
 PREFIX dcterm: <http://purl.org/dc/terms/>
-PREFIX frbr: <http://purl.org/vocab/frbr/core#>
-PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
 PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
-PREFIX oco: <https://w3id.org/oc/ontology/>
 
-SELECT DISTINCT
-?id
-(STR(?title) AS ?title)
-(GROUP_CONCAT(DISTINCT ?author_info; SEPARATOR="|") AS ?author)
-(STR(?pub_date) AS ?pub_date)
-(STR(?issue) AS ?issue)
-(STR(?volume) AS ?volume)
-?venue
-?type
-?page
-(GROUP_CONCAT(DISTINCT ?publisher_info; SEPARATOR="|") AS ?publisher)
-(GROUP_CONCAT(DISTINCT ?combined_editor_info; SEPARATOR="|") AS ?editor)
+SELECT ?res ?title ?pub_date
+(CONCAT(COALESCE(GROUP_CONCAT(DISTINCT ?external_id; SEPARATOR=""), ""), "omid:br/", STRAFTER(STR(?res), "/br/")) AS ?id)
 WHERE {
-    {
-        SELECT ?res ?title ?author_info ?combined_editor_info ?publisher_info ?type ?pub_date ?page ?issue ?volume ?venueName ?venueMetaid
-        (GROUP_CONCAT(DISTINCT ?id ; SEPARATOR=" ") AS ?ids)
-        (GROUP_CONCAT(DISTINCT ?venue_ids_; SEPARATOR=' ') AS ?venue_ids)
-        WHERE {
-            {
-              SELECT DISTINCT ?res
-              WHERE {
-                [[id]]
-                ?knownRole pro:withRole pro:author.
-                ?res pro:isDocumentContextFor ?knownRole;
-                      a fabio:Expression.
-              } LIMIT 1000
-            }
-            OPTIONAL {
-                ?res datacite:hasIdentifier ?identifier.
-                ?identifier datacite:usesIdentifierScheme ?scheme;
-                            literal:hasLiteralValue ?literalValue.
-                BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literalValue) AS ?id)
-            }
-            OPTIONAL {
-                ?res pro:isDocumentContextFor ?arAuthor.
-                ?arAuthor pro:withRole pro:author;
-                        pro:isHeldBy ?raAuthor.
-                OPTIONAL {
-                    ?arAuthor oco:hasNext ?nextAuthorRole .
-                }
-                BIND(STRAFTER(STR(?arAuthor), "https://w3id.org/oc/meta/ar/") AS ?roleUri)
-                BIND(STRAFTER(STR(?nextAuthorRole), "https://w3id.org/oc/meta/ar/") AS ?nextRoleUri)
-                BIND(CONCAT("omid:ra/", STRAFTER(STR(?raAuthor), "/ra/")) AS ?author_metaid)
-                OPTIONAL {?raAuthor foaf:familyName ?familyName.}
-                OPTIONAL {?raAuthor foaf:givenName ?givenName.}
-                OPTIONAL {?raAuthor foaf:name ?name.}
-                OPTIONAL {
-                    ?raAuthor datacite:hasIdentifier ?authorIdentifier.
-                    ?authorIdentifier datacite:usesIdentifierScheme ?authorIdSchema;
-                                        literal:hasLiteralValue ?authorIdLiteralValue.
-                    BIND(CONCAT(STRAFTER(STR(?authorIdSchema), "http://purl.org/spar/datacite/"), ":", ?authorIdLiteralValue) AS ?author_id)
-                }
-                BIND(
-                    IF(
-                        STRLEN(STR(?familyName)) > 0 && STRLEN(STR(?givenName)) > 0,
-                        CONCAT(?familyName, ", ", ?givenName),
-                        IF(
-                            STRLEN(STR(?familyName)) > 0,
-                            CONCAT(?familyName, ","),
-                            ?name
-                        )
-                    )
-                AS ?authorName)
-                BIND(
-                    IF(
-                        STRLEN(STR(?author_id)) > 0,
-                        CONCAT(?authorName, " [", ?author_id, " ", ?author_metaid, "]"),
-                        CONCAT(?authorName, " [", ?author_metaid, "]")
-                    )
-                AS ?author_)
-                BIND(CONCAT(?author_, ":", ?roleUri, ":", COALESCE(?nextRoleUri, "")) AS ?author_info)
-            }
-            OPTIONAL {
-                ?res pro:isDocumentContextFor ?arEditor.
-                ?arEditor pro:withRole pro:editor;
-                            pro:isHeldBy ?raEditor.
-                OPTIONAL {
-                    ?arEditor oco:hasNext ?nextEditorRole .
-                }
-                BIND(STRAFTER(STR(?arEditor), "https://w3id.org/oc/meta/ar/") AS ?editorRoleUri)
-                BIND(STRAFTER(STR(?nextEditorRole), "https://w3id.org/oc/meta/ar/") AS ?nextEditorRoleUri)
-                BIND(CONCAT("omid:ra/", STRAFTER(STR(?raEditor), "/ra/")) AS ?editor_metaid)
-                OPTIONAL {?raEditor foaf:familyName ?editorFamilyName.}
-                OPTIONAL {?raEditor foaf:givenName ?editorGivenName.}
-                OPTIONAL {?raEditor foaf:name ?editor_name.}
-                OPTIONAL {
-                    ?raEditor datacite:hasIdentifier ?editorIdentifier.
-                    ?editorIdentifier datacite:usesIdentifierScheme ?editorIdSchema;
-                                    literal:hasLiteralValue ?editorIdLiteralValue.
-                    BIND(CONCAT(STRAFTER(STR(?editorIdSchema), "http://purl.org/spar/datacite/"), ":", ?editorIdLiteralValue) AS ?editor_id)
-                }
-                BIND(
-                    IF(
-                        STRLEN(STR(?editorFamilyName)) > 0 && STRLEN(STR(?editorGivenName)) > 0,
-                        CONCAT(?editorFamilyName, ", ", ?editorGivenName),
-                        IF(
-                            STRLEN(STR(?editorFamilyName)) > 0,
-                            CONCAT(?editorFamilyName, ","),
-                            ?editor_name
-                        )
-                    )
-                AS ?editorName)
-                BIND(
-                    IF(
-                        STRLEN(STR(?editor_id)) > 0,
-                        CONCAT(?editorName, " [", ?editor_id, " ", ?editor_metaid, "]"),
-                        CONCAT(?editorName, " [", ?editor_metaid, "]")
-                    )
-                AS ?editor_)
-                BIND(CONCAT(?editor_, ":", ?editorRoleUri, ":", COALESCE(?nextEditorRoleUri, "")) AS ?editor_info)
-            }
-            OPTIONAL {
-                ?res frbr:partOf ?container.
-                ?container pro:isDocumentContextFor ?arContainerEditor.
-                ?arContainerEditor pro:withRole pro:editor;
-                                   pro:isHeldBy ?raContainerEditor.
-                OPTIONAL {
-                    ?arContainerEditor oco:hasNext ?nextContainerEditorRole .
-                }
-                BIND(STRAFTER(STR(?arContainerEditor), "https://w3id.org/oc/meta/ar/") AS ?containerEditorRoleUri)
-                BIND(STRAFTER(STR(?nextContainerEditorRole), "https://w3id.org/oc/meta/ar/") AS ?nextContainerEditorRoleUri)
-                BIND(CONCAT("omid:ra/", STRAFTER(STR(?raContainerEditor), "/ra/")) AS ?container_editor_metaid)
-                OPTIONAL {?raContainerEditor foaf:familyName ?containerEditorFamilyName.}
-                OPTIONAL {?raContainerEditor foaf:givenName ?containerEditorGivenName.}
-                OPTIONAL {?raContainerEditor foaf:name ?container_editor_name.}
-                OPTIONAL {
-                    ?raContainerEditor datacite:hasIdentifier ?containerEditorIdentifier.
-                    ?containerEditorIdentifier datacite:usesIdentifierScheme ?containerEditorIdSchema;
-                                                literal:hasLiteralValue ?containerEditorIdLiteralValue.
-                    BIND(CONCAT(STRAFTER(STR(?containerEditorIdSchema), "http://purl.org/spar/datacite/"), ":", ?containerEditorIdLiteralValue) AS ?container_editor_id)
-                }
-                BIND(
-                    IF(
-                        STRLEN(STR(?containerEditorFamilyName)) > 0 && STRLEN(STR(?containerEditorGivenName)) > 0,
-                        CONCAT(?containerEditorFamilyName, ", ", ?containerEditorGivenName),
-                        IF(
-                            STRLEN(STR(?containerEditorFamilyName)) > 0,
-                            CONCAT(?containerEditorFamilyName, ","),
-                            ?container_editor_name
-                        )
-                    )
-                AS ?containerEditorName)
-                BIND(
-                    IF(
-                        STRLEN(STR(?container_editor_id)) > 0,
-                        CONCAT(?containerEditorName, " [", ?container_editor_id, " ", ?container_editor_metaid, "]"),
-                        CONCAT(?containerEditorName, " [", ?container_editor_metaid, "]")
-                    )
-                AS ?container_editor_)
-                BIND(CONCAT(?container_editor_, ":", ?containerEditorRoleUri, ":", COALESCE(?nextContainerEditorRoleUri, "")) AS ?container_editor_info)
-            }
-            BIND(
-                IF(BOUND(?editor_info),
-                   IF(BOUND(?container_editor_info),
-                      CONCAT(?editor_info, "|", ?container_editor_info),
-                      ?editor_info),
-                   IF(BOUND(?container_editor_info),
-                      ?container_editor_info,
-                      "")
-                )
-            AS ?combined_editor_info)
-            OPTIONAL {
-                ?res pro:isDocumentContextFor ?arPublisher.
-                ?arPublisher pro:withRole pro:publisher;
-                            pro:isHeldBy ?raPublisher.
-                OPTIONAL {
-                    ?arPublisher oco:hasNext ?nextPublisherRole .
-                }
-                BIND(STRAFTER(STR(?arPublisher), "https://w3id.org/oc/meta/ar/") AS ?publisherRoleUri)
-                BIND(STRAFTER(STR(?nextPublisherRole), "https://w3id.org/oc/meta/ar/") AS ?nextPublisherRoleUri)
-                BIND(CONCAT("omid:ra/", STRAFTER(STR(?raPublisher), "/ra/")) AS ?publisher_metaid)
-                ?raPublisher foaf:name ?publisher_name.
-                OPTIONAL {
-                    ?raPublisher datacite:hasIdentifier ?publisherIdentifier__.
-                    ?publisherIdentifier__ datacite:usesIdentifierScheme ?publisherIdSchema;
-                                        literal:hasLiteralValue ?publisherIdLiteralValue.
-                    BIND(CONCAT(STRAFTER(STR(?publisherIdSchema), "http://purl.org/spar/datacite/"), ":", ?publisherIdLiteralValue) AS ?publisher_id)
-                }
-                BIND(
-                    IF(
-                        STRLEN(STR(?publisher_id)) > 0,
-                        CONCAT(?publisher_name, " [", ?publisher_id, " ", ?publisher_metaid, "]"),
-                        CONCAT(?publisher_name, " [", ?publisher_metaid, "]")
-                    )
-                AS ?publisher_)
-                BIND(CONCAT(?publisher_, ":", ?publisherRoleUri, ":", COALESCE(?nextPublisherRoleUri, "")) AS ?publisher_info)
-            }
-            OPTIONAL {
-                {
-                    ?res a fabio:JournalArticle;
-                        frbr:partOf+ ?journal.
-                        BIND(CONCAT("omid:br/", STRAFTER(STR(?journal), "/br/")) AS ?venueMetaid)
-                    ?journal a fabio:Journal.
-                } UNION {
-                    ?res frbr:partOf ?journal.
-                    BIND(CONCAT("omid:br/", STRAFTER(STR(?journal), "/br/")) AS ?venueMetaid)
-                }
-                ?journal dcterm:title ?venueName.
-                OPTIONAL {
-                    ?journal datacite:hasIdentifier ?journalIdentifier__.
-                    ?journalIdentifier__ datacite:usesIdentifierScheme ?journalIdScheme;
-                                literal:hasLiteralValue ?journalIdLiteralValue.
-                    BIND(CONCAT(STRAFTER(STR(?journalIdScheme), "http://purl.org/spar/datacite/"), ":", ?journalIdLiteralValue) AS ?venue_ids_)
-                }
-            }
-            OPTIONAL {?res a ?type. FILTER (?type != fabio:Expression)}
-            OPTIONAL {?res dcterm:title ?title.}
-            OPTIONAL {?res prism:publicationDate ?pub_date.}
-            OPTIONAL {
-                ?res frbr:embodiment ?re.
-                ?re prism:startingPage ?startingPage;
-                    prism:endingPage ?endingPage.
-                BIND(IF(STR(?startingPage) = STR(?endingPage), STR(?startingPage), CONCAT(?startingPage, '-', ?endingPage)) AS ?page)
-            }
-            OPTIONAL {
-                ?res frbr:partOf ?resIssue.
-                ?resIssue a fabio:JournalIssue;
-                            fabio:hasSequenceIdentifier ?issue.
-            }
-            OPTIONAL {
-                ?res frbr:partOf+ ?resVolume.
-                ?resVolume a fabio:JournalVolume;
-                            fabio:hasSequenceIdentifier ?volume.
-            }
-        } GROUP BY ?res ?title ?author_info ?combined_editor_info ?publisher_info ?type ?issue ?volume ?pub_date ?page ?venueName ?venueMetaid
-    }
-    BIND(CONCAT(?ids, IF(STR(?ids) != "", " ", ""), "omid:br/", STRAFTER(STR(?res), "/br/")) AS ?id)
+    OPTIONAL { ?res dcterm:title ?title }
+    OPTIONAL { ?res prism:publicationDate ?pub_date }
+    OPTIONAL { ?res datacite:hasIdentifier ?identifier }
+    BIND(COALESCE(?identifier, <urn:none>) AS ?identifier_node)
+    OPTIONAL { ?identifier_node datacite:usesIdentifierScheme ?scheme }
+    OPTIONAL { ?identifier_node literal:hasLiteralValue ?literal_value }
+    BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literal_value, " ") AS ?external_id)
+}
+GROUP BY ?res ?title ?pub_date
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX fabio: <http://purl.org/spar/fabio/>
+
+SELECT DISTINCT ?res ?type
+WHERE {
+    ?res a ?type.
+    FILTER(?type != fabio:Expression)
+}
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
+
+SELECT DISTINCT ?res ?page
+WHERE {
+    ?res frbr:embodiment ?embodiment.
+    ?embodiment prism:startingPage ?starting_page;
+        prism:endingPage ?ending_page.
+    BIND(IF(STR(?starting_page) = STR(?ending_page), STR(?starting_page), CONCAT(?starting_page, "-", ?ending_page)) AS ?page)
+}
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+
+SELECT DISTINCT ?res ?issue
+WHERE {
+    ?res frbr:partOf ?journal_issue.
+    ?journal_issue a fabio:JournalIssue;
+        fabio:hasSequenceIdentifier ?issue.
+}
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+
+SELECT DISTINCT ?res ?volume
+WHERE {
+    ?res frbr:partOf+ ?journal_volume.
+    ?journal_volume a fabio:JournalVolume;
+        fabio:hasSequenceIdentifier ?volume.
+}
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX dcterm: <http://purl.org/dc/terms/>
+PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+
+SELECT ?res
+(CONCAT(?venue_name, " [", COALESCE(GROUP_CONCAT(DISTINCT ?venue_external_id; SEPARATOR=""), ""), "omid:br/", STRAFTER(STR(?venue_resource), "/br/"), "]") AS ?venue)
+WHERE {
+    ?res frbr:partOf ?direct_container;
+        frbr:partOf+ ?venue_resource.
+    ?venue_resource dcterm:title ?venue_name.
+    FILTER(?venue_resource = ?direct_container || (EXISTS { ?res a fabio:JournalArticle } && EXISTS { ?venue_resource a fabio:Journal }))
+    OPTIONAL { ?venue_resource datacite:hasIdentifier ?venue_identifier }
+    BIND(COALESCE(?venue_identifier, <urn:none>) AS ?venue_identifier_node)
+    OPTIONAL { ?venue_identifier_node datacite:usesIdentifierScheme ?venue_scheme }
+    OPTIONAL { ?venue_identifier_node literal:hasLiteralValue ?venue_literal_value }
+    BIND(CONCAT(STRAFTER(STR(?venue_scheme), "http://purl.org/spar/datacite/"), ":", ?venue_literal_value, " ") AS ?venue_external_id)
+}
+GROUP BY ?res ?venue_resource ?venue_name
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX oco: <https://w3id.org/oc/ontology/>
+PREFIX pro: <http://purl.org/spar/pro/>
+
+SELECT ?res (GROUP_CONCAT(DISTINCT ?agent_info; SEPARATOR="|") AS ?author)
+WHERE {
+    ?res pro:isDocumentContextFor ?agent_role.
+    ?agent_role pro:withRole pro:author;
+        pro:isHeldBy ?agent.
+    OPTIONAL { ?agent_role oco:hasNext ?next_agent_role }
+    OPTIONAL { ?agent foaf:familyName ?family_name }
+    OPTIONAL { ?agent foaf:givenName ?given_name }
+    OPTIONAL { ?agent foaf:name ?name }
+    OPTIONAL { ?agent datacite:hasIdentifier ?agent_identifier }
+    BIND(COALESCE(?agent_identifier, <urn:none>) AS ?agent_identifier_node)
+    OPTIONAL { ?agent_identifier_node datacite:usesIdentifierScheme ?agent_scheme }
+    OPTIONAL { ?agent_identifier_node literal:hasLiteralValue ?agent_literal_value }
+    BIND(CONCAT(STRAFTER(STR(?agent_scheme), "http://purl.org/spar/datacite/"), ":", ?agent_literal_value) AS ?agent_id)
+    BIND(CONCAT("omid:ra/", STRAFTER(STR(?agent), "/ra/")) AS ?agent_omid)
     BIND(
-        IF(BOUND(?venueMetaid),
-           IF(STR(?venue_ids) != "",
-              CONCAT(" [", ?venue_ids, " ", ?venueMetaid, "]"),
-              CONCAT(" [", ?venueMetaid, "]")
-           ),
-           ""
+        IF(
+            BOUND(?family_name) && BOUND(?given_name),
+            CONCAT(?family_name, ", ", ?given_name),
+            IF(
+                BOUND(?family_name),
+                CONCAT(?family_name, ","),
+                ?name
+            )
         )
-    AS ?venueIdentifiers)
-    BIND(CONCAT(?venueName, ?venueIdentifiers) AS ?venue)
-} GROUP BY ?id ?title ?type ?issue ?volume ?venue ?pub_date ?page
+    AS ?agent_name)
+    BIND(
+        IF(
+            BOUND(?agent_id),
+            CONCAT(?agent_name, " [", ?agent_id, " ", ?agent_omid, "]"),
+            CONCAT(?agent_name, " [", ?agent_omid, "]")
+        )
+    AS ?agent_label)
+    BIND(CONCAT(?agent_label, ":", STRAFTER(STR(?agent_role), "/ar/"), ":", COALESCE(STRAFTER(STR(?next_agent_role), "/ar/"), "")) AS ?agent_info)
+}
+GROUP BY ?res
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX oco: <https://w3id.org/oc/ontology/>
+PREFIX pro: <http://purl.org/spar/pro/>
+
+SELECT ?res (GROUP_CONCAT(DISTINCT ?agent_info; SEPARATOR="|") AS ?editor)
+WHERE {
+    OPTIONAL { ?res frbr:partOf ?container }
+    VALUES ?of_container { false true }
+    BIND(IF(?of_container, COALESCE(?container, <urn:none>), ?res) AS ?context)
+    ?context pro:isDocumentContextFor ?agent_role.
+    ?agent_role pro:withRole pro:editor;
+        pro:isHeldBy ?agent.
+    OPTIONAL { ?agent_role oco:hasNext ?next_agent_role }
+    OPTIONAL { ?agent foaf:familyName ?family_name }
+    OPTIONAL { ?agent foaf:givenName ?given_name }
+    OPTIONAL { ?agent foaf:name ?name }
+    OPTIONAL { ?agent datacite:hasIdentifier ?agent_identifier }
+    BIND(COALESCE(?agent_identifier, <urn:none>) AS ?agent_identifier_node)
+    OPTIONAL { ?agent_identifier_node datacite:usesIdentifierScheme ?agent_scheme }
+    OPTIONAL { ?agent_identifier_node literal:hasLiteralValue ?agent_literal_value }
+    BIND(CONCAT(STRAFTER(STR(?agent_scheme), "http://purl.org/spar/datacite/"), ":", ?agent_literal_value) AS ?agent_id)
+    BIND(CONCAT("omid:ra/", STRAFTER(STR(?agent), "/ra/")) AS ?agent_omid)
+    BIND(
+        IF(
+            BOUND(?family_name) && BOUND(?given_name),
+            CONCAT(?family_name, ", ", ?given_name),
+            IF(
+                BOUND(?family_name),
+                CONCAT(?family_name, ","),
+                ?name
+            )
+        )
+    AS ?agent_name)
+    BIND(
+        IF(
+            BOUND(?agent_id),
+            CONCAT(?agent_name, " [", ?agent_id, " ", ?agent_omid, "]"),
+            CONCAT(?agent_name, " [", ?agent_omid, "]")
+        )
+    AS ?agent_label)
+    BIND(CONCAT(?agent_label, ":", STRAFTER(STR(?agent_role), "/ar/"), ":", COALESCE(STRAFTER(STR(?next_agent_role), "/ar/"), "")) AS ?agent_info)
+}
+GROUP BY ?res
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX oco: <https://w3id.org/oc/ontology/>
+PREFIX pro: <http://purl.org/spar/pro/>
+
+SELECT ?res (GROUP_CONCAT(DISTINCT ?agent_info; SEPARATOR="|") AS ?publisher)
+WHERE {
+    ?res pro:isDocumentContextFor ?agent_role.
+    ?agent_role pro:withRole pro:publisher;
+        pro:isHeldBy ?agent.
+    OPTIONAL { ?agent_role oco:hasNext ?next_agent_role }
+    OPTIONAL { ?agent foaf:familyName ?family_name }
+    OPTIONAL { ?agent foaf:givenName ?given_name }
+    OPTIONAL { ?agent foaf:name ?name }
+    OPTIONAL { ?agent datacite:hasIdentifier ?agent_identifier }
+    BIND(COALESCE(?agent_identifier, <urn:none>) AS ?agent_identifier_node)
+    OPTIONAL { ?agent_identifier_node datacite:usesIdentifierScheme ?agent_scheme }
+    OPTIONAL { ?agent_identifier_node literal:hasLiteralValue ?agent_literal_value }
+    BIND(CONCAT(STRAFTER(STR(?agent_scheme), "http://purl.org/spar/datacite/"), ":", ?agent_literal_value) AS ?agent_id)
+    BIND(CONCAT("omid:ra/", STRAFTER(STR(?agent), "/ra/")) AS ?agent_omid)
+    BIND(
+        IF(
+            BOUND(?family_name) && BOUND(?given_name),
+            CONCAT(?family_name, ", ", ?given_name),
+            IF(
+                BOUND(?family_name),
+                CONCAT(?family_name, ","),
+                ?name
+            )
+        )
+    AS ?agent_name)
+    BIND(
+        IF(
+            BOUND(?agent_id),
+            CONCAT(?agent_name, " [", ?agent_id, " ", ?agent_omid, "]"),
+            CONCAT(?agent_name, " [", ?agent_omid, "]")
+        )
+    AS ?agent_label)
+    BIND(CONCAT(?agent_label, ":", STRAFTER(STR(?agent_role), "/ar/"), ":", COALESCE(STRAFTER(STR(?next_agent_role), "/ar/"), "")) AS ?agent_info)
+}
+GROUP BY ?res
 
 #url /editor/{id}
 #type operation
@@ -658,251 +648,245 @@ The fields returned by this operation are:
         "editor": "Allan, Catherine [orcid:0000-0003-2098-4759 omid:ra/069012996]; Stankey, George H. [omid:ra/061808486861]"
     }
 ]
-#sparql PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-PREFIX pro: <http://purl.org/spar/pro/>
+#sparql PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX fabio: <http://purl.org/spar/fabio/>
 PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX pro: <http://purl.org/spar/pro/>
+
+SELECT DISTINCT ?res
+WHERE {
+    [[id]]
+    ?knownRole pro:withRole pro:editor.
+    ?res pro:isDocumentContextFor ?knownRole;
+        a fabio:Expression.
+}
+LIMIT 1000
+
+@@join ?res ?res type=left
+@@values ?res
 PREFIX datacite: <http://purl.org/spar/datacite/>
 PREFIX dcterm: <http://purl.org/dc/terms/>
-PREFIX frbr: <http://purl.org/vocab/frbr/core#>
-PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
 PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
-PREFIX oco: <https://w3id.org/oc/ontology/>
 
-SELECT DISTINCT
-?id
-(STR(?title) AS ?title)
-(GROUP_CONCAT(DISTINCT ?author_info; SEPARATOR="|") AS ?author)
-(STR(?pub_date) AS ?pub_date)
-(STR(?issue) AS ?issue)
-(STR(?volume) AS ?volume)
-?venue
-?type
-?page
-(GROUP_CONCAT(DISTINCT ?publisher_info; SEPARATOR="|") AS ?publisher)
-(GROUP_CONCAT(DISTINCT ?combined_editor_info; SEPARATOR="|") AS ?editor)
+SELECT ?res ?title ?pub_date
+(CONCAT(COALESCE(GROUP_CONCAT(DISTINCT ?external_id; SEPARATOR=""), ""), "omid:br/", STRAFTER(STR(?res), "/br/")) AS ?id)
 WHERE {
-    {
-        SELECT ?res ?title ?author_info ?combined_editor_info ?publisher_info ?type ?pub_date ?page ?issue ?volume ?venueName ?venueMetaid
-        (GROUP_CONCAT(DISTINCT ?id ; SEPARATOR=" ") AS ?ids)
-        (GROUP_CONCAT(DISTINCT ?venue_ids_; SEPARATOR=' ') AS ?venue_ids)
-        WHERE {
-            {
-              SELECT DISTINCT ?res
-              WHERE {
-                [[id]]
-                ?knownRole pro:withRole pro:editor.
-                ?res pro:isDocumentContextFor ?knownRole;
-                      a fabio:Expression.
-              } LIMIT 1000
-            }
-            OPTIONAL {
-                ?res datacite:hasIdentifier ?identifier.
-                ?identifier datacite:usesIdentifierScheme ?scheme;
-                            literal:hasLiteralValue ?literalValue.
-                BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literalValue) AS ?id)
-            }
-            OPTIONAL {
-                ?res pro:isDocumentContextFor ?arAuthor.
-                ?arAuthor pro:withRole pro:author;
-                        pro:isHeldBy ?raAuthor.
-                OPTIONAL {
-                    ?arAuthor oco:hasNext ?nextAuthorRole .
-                }
-                BIND(STRAFTER(STR(?arAuthor), "https://w3id.org/oc/meta/ar/") AS ?roleUri)
-                BIND(STRAFTER(STR(?nextAuthorRole), "https://w3id.org/oc/meta/ar/") AS ?nextRoleUri)
-                BIND(CONCAT("omid:ra/", STRAFTER(STR(?raAuthor), "/ra/")) AS ?author_metaid)
-                OPTIONAL {?raAuthor foaf:familyName ?familyName.}
-                OPTIONAL {?raAuthor foaf:givenName ?givenName.}
-                OPTIONAL {?raAuthor foaf:name ?name.}
-                OPTIONAL {
-                    ?raAuthor datacite:hasIdentifier ?authorIdentifier.
-                    ?authorIdentifier datacite:usesIdentifierScheme ?authorIdSchema;
-                                        literal:hasLiteralValue ?authorIdLiteralValue.
-                    BIND(CONCAT(STRAFTER(STR(?authorIdSchema), "http://purl.org/spar/datacite/"), ":", ?authorIdLiteralValue) AS ?author_id)
-                }
-                BIND(
-                    IF(
-                        STRLEN(STR(?familyName)) > 0 && STRLEN(STR(?givenName)) > 0,
-                        CONCAT(?familyName, ", ", ?givenName),
-                        IF(
-                            STRLEN(STR(?familyName)) > 0,
-                            CONCAT(?familyName, ","),
-                            ?name
-                        )
-                    )
-                AS ?authorName)
-                BIND(
-                    IF(
-                        STRLEN(STR(?author_id)) > 0,
-                        CONCAT(?authorName, " [", ?author_id, " ", ?author_metaid, "]"),
-                        CONCAT(?authorName, " [", ?author_metaid, "]")
-                    )
-                AS ?author_)
-                BIND(CONCAT(?author_, ":", ?roleUri, ":", COALESCE(?nextRoleUri, "")) AS ?author_info)
-            }
-            OPTIONAL {
-                ?res pro:isDocumentContextFor ?arEditor.
-                ?arEditor pro:withRole pro:editor;
-                            pro:isHeldBy ?raEditor.
-                OPTIONAL {
-                    ?arEditor oco:hasNext ?nextEditorRole .
-                }
-                BIND(STRAFTER(STR(?arEditor), "https://w3id.org/oc/meta/ar/") AS ?editorRoleUri)
-                BIND(STRAFTER(STR(?nextEditorRole), "https://w3id.org/oc/meta/ar/") AS ?nextEditorRoleUri)
-                BIND(CONCAT("omid:ra/", STRAFTER(STR(?raEditor), "/ra/")) AS ?editor_metaid)
-                OPTIONAL {?raEditor foaf:familyName ?editorFamilyName.}
-                OPTIONAL {?raEditor foaf:givenName ?editorGivenName.}
-                OPTIONAL {?raEditor foaf:name ?editor_name.}
-                OPTIONAL {
-                    ?raEditor datacite:hasIdentifier ?editorIdentifier.
-                    ?editorIdentifier datacite:usesIdentifierScheme ?editorIdSchema;
-                                    literal:hasLiteralValue ?editorIdLiteralValue.
-                    BIND(CONCAT(STRAFTER(STR(?editorIdSchema), "http://purl.org/spar/datacite/"), ":", ?editorIdLiteralValue) AS ?editor_id)
-                }
-                BIND(
-                    IF(
-                        STRLEN(STR(?editorFamilyName)) > 0 && STRLEN(STR(?editorGivenName)) > 0,
-                        CONCAT(?editorFamilyName, ", ", ?editorGivenName),
-                        IF(
-                            STRLEN(STR(?editorFamilyName)) > 0,
-                            CONCAT(?editorFamilyName, ","),
-                            ?editor_name
-                        )
-                    )
-                AS ?editorName)
-                BIND(
-                    IF(
-                        STRLEN(STR(?editor_id)) > 0,
-                        CONCAT(?editorName, " [", ?editor_id, " ", ?editor_metaid, "]"),
-                        CONCAT(?editorName, " [", ?editor_metaid, "]")
-                    )
-                AS ?editor_)
-                BIND(CONCAT(?editor_, ":", ?editorRoleUri, ":", COALESCE(?nextEditorRoleUri, "")) AS ?editor_info)
-            }
-            OPTIONAL {
-                ?res frbr:partOf ?container.
-                ?container pro:isDocumentContextFor ?arContainerEditor.
-                ?arContainerEditor pro:withRole pro:editor;
-                                   pro:isHeldBy ?raContainerEditor.
-                OPTIONAL {
-                    ?arContainerEditor oco:hasNext ?nextContainerEditorRole .
-                }
-                BIND(STRAFTER(STR(?arContainerEditor), "https://w3id.org/oc/meta/ar/") AS ?containerEditorRoleUri)
-                BIND(STRAFTER(STR(?nextContainerEditorRole), "https://w3id.org/oc/meta/ar/") AS ?nextContainerEditorRoleUri)
-                BIND(CONCAT("omid:ra/", STRAFTER(STR(?raContainerEditor), "/ra/")) AS ?container_editor_metaid)
-                OPTIONAL {?raContainerEditor foaf:familyName ?containerEditorFamilyName.}
-                OPTIONAL {?raContainerEditor foaf:givenName ?containerEditorGivenName.}
-                OPTIONAL {?raContainerEditor foaf:name ?container_editor_name.}
-                OPTIONAL {
-                    ?raContainerEditor datacite:hasIdentifier ?containerEditorIdentifier.
-                    ?containerEditorIdentifier datacite:usesIdentifierScheme ?containerEditorIdSchema;
-                                                literal:hasLiteralValue ?containerEditorIdLiteralValue.
-                    BIND(CONCAT(STRAFTER(STR(?containerEditorIdSchema), "http://purl.org/spar/datacite/"), ":", ?containerEditorIdLiteralValue) AS ?container_editor_id)
-                }
-                BIND(
-                    IF(
-                        STRLEN(STR(?containerEditorFamilyName)) > 0 && STRLEN(STR(?containerEditorGivenName)) > 0,
-                        CONCAT(?containerEditorFamilyName, ", ", ?containerEditorGivenName),
-                        IF(
-                            STRLEN(STR(?containerEditorFamilyName)) > 0,
-                            CONCAT(?containerEditorFamilyName, ","),
-                            ?container_editor_name
-                        )
-                    )
-                AS ?containerEditorName)
-                BIND(
-                    IF(
-                        STRLEN(STR(?container_editor_id)) > 0,
-                        CONCAT(?containerEditorName, " [", ?container_editor_id, " ", ?container_editor_metaid, "]"),
-                        CONCAT(?containerEditorName, " [", ?container_editor_metaid, "]")
-                    )
-                AS ?container_editor_)
-                BIND(CONCAT(?container_editor_, ":", ?containerEditorRoleUri, ":", COALESCE(?nextContainerEditorRoleUri, "")) AS ?container_editor_info)
-            }
-            BIND(
-                IF(BOUND(?editor_info),
-                   IF(BOUND(?container_editor_info),
-                      CONCAT(?editor_info, "|", ?container_editor_info),
-                      ?editor_info),
-                   IF(BOUND(?container_editor_info),
-                      ?container_editor_info,
-                      "")
-                )
-            AS ?combined_editor_info)
-            OPTIONAL {
-                ?res pro:isDocumentContextFor ?arPublisher.
-                ?arPublisher pro:withRole pro:publisher;
-                            pro:isHeldBy ?raPublisher.
-                OPTIONAL {
-                    ?arPublisher oco:hasNext ?nextPublisherRole .
-                }
-                BIND(STRAFTER(STR(?arPublisher), "https://w3id.org/oc/meta/ar/") AS ?publisherRoleUri)
-                BIND(STRAFTER(STR(?nextPublisherRole), "https://w3id.org/oc/meta/ar/") AS ?nextPublisherRoleUri)
-                BIND(CONCAT("omid:ra/", STRAFTER(STR(?raPublisher), "/ra/")) AS ?publisher_metaid)
-                ?raPublisher foaf:name ?publisher_name.
-                OPTIONAL {
-                    ?raPublisher datacite:hasIdentifier ?publisherIdentifier__.
-                    ?publisherIdentifier__ datacite:usesIdentifierScheme ?publisherIdSchema;
-                                        literal:hasLiteralValue ?publisherIdLiteralValue.
-                    BIND(CONCAT(STRAFTER(STR(?publisherIdSchema), "http://purl.org/spar/datacite/"), ":", ?publisherIdLiteralValue) AS ?publisher_id)
-                }
-                BIND(
-                    IF(
-                        STRLEN(STR(?publisher_id)) > 0,
-                        CONCAT(?publisher_name, " [", ?publisher_id, " ", ?publisher_metaid, "]"),
-                        CONCAT(?publisher_name, " [", ?publisher_metaid, "]")
-                    )
-                AS ?publisher_)
-                BIND(CONCAT(?publisher_, ":", ?publisherRoleUri, ":", COALESCE(?nextPublisherRoleUri, "")) AS ?publisher_info)
-            }
-            OPTIONAL {
-                {
-                    ?res a fabio:JournalArticle;
-                        frbr:partOf+ ?journal.
-                        BIND(CONCAT("omid:br/", STRAFTER(STR(?journal), "/br/")) AS ?venueMetaid)
-                    ?journal a fabio:Journal.
-                } UNION {
-                    ?res frbr:partOf ?journal.
-                    BIND(CONCAT("omid:br/", STRAFTER(STR(?journal), "/br/")) AS ?venueMetaid)
-                }
-                ?journal dcterm:title ?venueName.
-                OPTIONAL {
-                    ?journal datacite:hasIdentifier ?journalIdentifier__.
-                    ?journalIdentifier__ datacite:usesIdentifierScheme ?journalIdScheme;
-                                literal:hasLiteralValue ?journalIdLiteralValue.
-                    BIND(CONCAT(STRAFTER(STR(?journalIdScheme), "http://purl.org/spar/datacite/"), ":", ?journalIdLiteralValue) AS ?venue_ids_)
-                }
-            }
-            OPTIONAL {?res a ?type. FILTER (?type != fabio:Expression)}
-            OPTIONAL {?res dcterm:title ?title.}
-            OPTIONAL {?res prism:publicationDate ?pub_date.}
-            OPTIONAL {
-                ?res frbr:embodiment ?re.
-                ?re prism:startingPage ?startingPage;
-                    prism:endingPage ?endingPage.
-                BIND(IF(STR(?startingPage) = STR(?endingPage), STR(?startingPage), CONCAT(?startingPage, '-', ?endingPage)) AS ?page)
-            }
-            OPTIONAL {
-                ?res frbr:partOf ?resIssue.
-                ?resIssue a fabio:JournalIssue;
-                            fabio:hasSequenceIdentifier ?issue.
-            }
-            OPTIONAL {
-                ?res frbr:partOf+ ?resVolume.
-                ?resVolume a fabio:JournalVolume;
-                            fabio:hasSequenceIdentifier ?volume.
-            }
-        } GROUP BY ?res ?title ?author_info ?combined_editor_info ?publisher_info ?type ?issue ?volume ?pub_date ?page ?venueName ?venueMetaid
-    }
-    BIND(CONCAT(?ids, IF(STR(?ids) != "", " ", ""), "omid:br/", STRAFTER(STR(?res), "/br/")) AS ?id)
+    OPTIONAL { ?res dcterm:title ?title }
+    OPTIONAL { ?res prism:publicationDate ?pub_date }
+    OPTIONAL { ?res datacite:hasIdentifier ?identifier }
+    BIND(COALESCE(?identifier, <urn:none>) AS ?identifier_node)
+    OPTIONAL { ?identifier_node datacite:usesIdentifierScheme ?scheme }
+    OPTIONAL { ?identifier_node literal:hasLiteralValue ?literal_value }
+    BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?literal_value, " ") AS ?external_id)
+}
+GROUP BY ?res ?title ?pub_date
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX fabio: <http://purl.org/spar/fabio/>
+
+SELECT DISTINCT ?res ?type
+WHERE {
+    ?res a ?type.
+    FILTER(?type != fabio:Expression)
+}
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
+
+SELECT DISTINCT ?res ?page
+WHERE {
+    ?res frbr:embodiment ?embodiment.
+    ?embodiment prism:startingPage ?starting_page;
+        prism:endingPage ?ending_page.
+    BIND(IF(STR(?starting_page) = STR(?ending_page), STR(?starting_page), CONCAT(?starting_page, "-", ?ending_page)) AS ?page)
+}
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+
+SELECT DISTINCT ?res ?issue
+WHERE {
+    ?res frbr:partOf ?journal_issue.
+    ?journal_issue a fabio:JournalIssue;
+        fabio:hasSequenceIdentifier ?issue.
+}
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+
+SELECT DISTINCT ?res ?volume
+WHERE {
+    ?res frbr:partOf+ ?journal_volume.
+    ?journal_volume a fabio:JournalVolume;
+        fabio:hasSequenceIdentifier ?volume.
+}
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX dcterm: <http://purl.org/dc/terms/>
+PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+
+SELECT ?res
+(CONCAT(?venue_name, " [", COALESCE(GROUP_CONCAT(DISTINCT ?venue_external_id; SEPARATOR=""), ""), "omid:br/", STRAFTER(STR(?venue_resource), "/br/"), "]") AS ?venue)
+WHERE {
+    ?res frbr:partOf ?direct_container;
+        frbr:partOf+ ?venue_resource.
+    ?venue_resource dcterm:title ?venue_name.
+    FILTER(?venue_resource = ?direct_container || (EXISTS { ?res a fabio:JournalArticle } && EXISTS { ?venue_resource a fabio:Journal }))
+    OPTIONAL { ?venue_resource datacite:hasIdentifier ?venue_identifier }
+    BIND(COALESCE(?venue_identifier, <urn:none>) AS ?venue_identifier_node)
+    OPTIONAL { ?venue_identifier_node datacite:usesIdentifierScheme ?venue_scheme }
+    OPTIONAL { ?venue_identifier_node literal:hasLiteralValue ?venue_literal_value }
+    BIND(CONCAT(STRAFTER(STR(?venue_scheme), "http://purl.org/spar/datacite/"), ":", ?venue_literal_value, " ") AS ?venue_external_id)
+}
+GROUP BY ?res ?venue_resource ?venue_name
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX oco: <https://w3id.org/oc/ontology/>
+PREFIX pro: <http://purl.org/spar/pro/>
+
+SELECT ?res (GROUP_CONCAT(DISTINCT ?agent_info; SEPARATOR="|") AS ?author)
+WHERE {
+    ?res pro:isDocumentContextFor ?agent_role.
+    ?agent_role pro:withRole pro:author;
+        pro:isHeldBy ?agent.
+    OPTIONAL { ?agent_role oco:hasNext ?next_agent_role }
+    OPTIONAL { ?agent foaf:familyName ?family_name }
+    OPTIONAL { ?agent foaf:givenName ?given_name }
+    OPTIONAL { ?agent foaf:name ?name }
+    OPTIONAL { ?agent datacite:hasIdentifier ?agent_identifier }
+    BIND(COALESCE(?agent_identifier, <urn:none>) AS ?agent_identifier_node)
+    OPTIONAL { ?agent_identifier_node datacite:usesIdentifierScheme ?agent_scheme }
+    OPTIONAL { ?agent_identifier_node literal:hasLiteralValue ?agent_literal_value }
+    BIND(CONCAT(STRAFTER(STR(?agent_scheme), "http://purl.org/spar/datacite/"), ":", ?agent_literal_value) AS ?agent_id)
+    BIND(CONCAT("omid:ra/", STRAFTER(STR(?agent), "/ra/")) AS ?agent_omid)
     BIND(
-        IF(BOUND(?venueMetaid),
-           IF(STR(?venue_ids) != "",
-              CONCAT(" [", ?venue_ids, " ", ?venueMetaid, "]"),
-              CONCAT(" [", ?venueMetaid, "]")
-           ),
-           ""
+        IF(
+            BOUND(?family_name) && BOUND(?given_name),
+            CONCAT(?family_name, ", ", ?given_name),
+            IF(
+                BOUND(?family_name),
+                CONCAT(?family_name, ","),
+                ?name
+            )
         )
-    AS ?venueIdentifiers)
-    BIND(CONCAT(?venueName, ?venueIdentifiers) AS ?venue)
-} GROUP BY ?id ?title ?type ?issue ?volume ?venue ?pub_date ?page
+    AS ?agent_name)
+    BIND(
+        IF(
+            BOUND(?agent_id),
+            CONCAT(?agent_name, " [", ?agent_id, " ", ?agent_omid, "]"),
+            CONCAT(?agent_name, " [", ?agent_omid, "]")
+        )
+    AS ?agent_label)
+    BIND(CONCAT(?agent_label, ":", STRAFTER(STR(?agent_role), "/ar/"), ":", COALESCE(STRAFTER(STR(?next_agent_role), "/ar/"), "")) AS ?agent_info)
+}
+GROUP BY ?res
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX oco: <https://w3id.org/oc/ontology/>
+PREFIX pro: <http://purl.org/spar/pro/>
+
+SELECT ?res (GROUP_CONCAT(DISTINCT ?agent_info; SEPARATOR="|") AS ?editor)
+WHERE {
+    OPTIONAL { ?res frbr:partOf ?container }
+    VALUES ?of_container { false true }
+    BIND(IF(?of_container, COALESCE(?container, <urn:none>), ?res) AS ?context)
+    ?context pro:isDocumentContextFor ?agent_role.
+    ?agent_role pro:withRole pro:editor;
+        pro:isHeldBy ?agent.
+    OPTIONAL { ?agent_role oco:hasNext ?next_agent_role }
+    OPTIONAL { ?agent foaf:familyName ?family_name }
+    OPTIONAL { ?agent foaf:givenName ?given_name }
+    OPTIONAL { ?agent foaf:name ?name }
+    OPTIONAL { ?agent datacite:hasIdentifier ?agent_identifier }
+    BIND(COALESCE(?agent_identifier, <urn:none>) AS ?agent_identifier_node)
+    OPTIONAL { ?agent_identifier_node datacite:usesIdentifierScheme ?agent_scheme }
+    OPTIONAL { ?agent_identifier_node literal:hasLiteralValue ?agent_literal_value }
+    BIND(CONCAT(STRAFTER(STR(?agent_scheme), "http://purl.org/spar/datacite/"), ":", ?agent_literal_value) AS ?agent_id)
+    BIND(CONCAT("omid:ra/", STRAFTER(STR(?agent), "/ra/")) AS ?agent_omid)
+    BIND(
+        IF(
+            BOUND(?family_name) && BOUND(?given_name),
+            CONCAT(?family_name, ", ", ?given_name),
+            IF(
+                BOUND(?family_name),
+                CONCAT(?family_name, ","),
+                ?name
+            )
+        )
+    AS ?agent_name)
+    BIND(
+        IF(
+            BOUND(?agent_id),
+            CONCAT(?agent_name, " [", ?agent_id, " ", ?agent_omid, "]"),
+            CONCAT(?agent_name, " [", ?agent_omid, "]")
+        )
+    AS ?agent_label)
+    BIND(CONCAT(?agent_label, ":", STRAFTER(STR(?agent_role), "/ar/"), ":", COALESCE(STRAFTER(STR(?next_agent_role), "/ar/"), "")) AS ?agent_info)
+}
+GROUP BY ?res
+
+@@join ?res ?res type=left
+@@values ?res
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX oco: <https://w3id.org/oc/ontology/>
+PREFIX pro: <http://purl.org/spar/pro/>
+
+SELECT ?res (GROUP_CONCAT(DISTINCT ?agent_info; SEPARATOR="|") AS ?publisher)
+WHERE {
+    ?res pro:isDocumentContextFor ?agent_role.
+    ?agent_role pro:withRole pro:publisher;
+        pro:isHeldBy ?agent.
+    OPTIONAL { ?agent_role oco:hasNext ?next_agent_role }
+    OPTIONAL { ?agent foaf:familyName ?family_name }
+    OPTIONAL { ?agent foaf:givenName ?given_name }
+    OPTIONAL { ?agent foaf:name ?name }
+    OPTIONAL { ?agent datacite:hasIdentifier ?agent_identifier }
+    BIND(COALESCE(?agent_identifier, <urn:none>) AS ?agent_identifier_node)
+    OPTIONAL { ?agent_identifier_node datacite:usesIdentifierScheme ?agent_scheme }
+    OPTIONAL { ?agent_identifier_node literal:hasLiteralValue ?agent_literal_value }
+    BIND(CONCAT(STRAFTER(STR(?agent_scheme), "http://purl.org/spar/datacite/"), ":", ?agent_literal_value) AS ?agent_id)
+    BIND(CONCAT("omid:ra/", STRAFTER(STR(?agent), "/ra/")) AS ?agent_omid)
+    BIND(
+        IF(
+            BOUND(?family_name) && BOUND(?given_name),
+            CONCAT(?family_name, ", ", ?given_name),
+            IF(
+                BOUND(?family_name),
+                CONCAT(?family_name, ","),
+                ?name
+            )
+        )
+    AS ?agent_name)
+    BIND(
+        IF(
+            BOUND(?agent_id),
+            CONCAT(?agent_name, " [", ?agent_id, " ", ?agent_omid, "]"),
+            CONCAT(?agent_name, " [", ?agent_omid, "]")
+        )
+    AS ?agent_label)
+    BIND(CONCAT(?agent_label, ":", STRAFTER(STR(?agent_role), "/ar/"), ":", COALESCE(STRAFTER(STR(?next_agent_role), "/ar/"), "")) AS ?agent_info)
+}
+GROUP BY ?res

@@ -1,27 +1,24 @@
 import json
-from unittest.mock import patch
 
 import pytest
-from requests import RequestException
 
 from conftest import create_api_manager, execute_operation, normalize_citations
 from ramose import APIManager
 
 
 @pytest.fixture(scope="session")
-def api_manager(qlever_endpoint: str, virtuoso_endpoint: str) -> APIManager:
-    return create_api_manager(
+def api_manager(qlever_endpoint: str) -> APIManager:
+    manager = create_api_manager(
         "src/api/index_v1.hf",
         {
             "#base https://api.opencitations.net/index": f"#base {qlever_endpoint}",
             "#endpoint http://qlever-service.default.svc.cluster.local:7011": f"#endpoint {qlever_endpoint}",
             "#addon indexapi_v1": "#addon ../src/api/indexapi_v1",
         },
-        env_vars={
-            "SPARQL_ENDPOINT_INDEX": qlever_endpoint,
-            "SPARQL_ENDPOINT_META": virtuoso_endpoint,
-        },
     )
+    for config in manager.all_conf.values():
+        config["sources_map"] = {"meta": qlever_endpoint, "index": qlever_endpoint}
+    return manager
 
 
 DOI_ERRORS_DOI = "10.1007/s11192-022-04367-w"
@@ -78,7 +75,7 @@ EXPECTED_ZENODO_DMP_CITATIONS = [
         "cited": ZENODO_DMP_DOI,
         "creation": "2021-06-08",
         "timespan": "-P0Y0M1D",
-        "journal_sc": "yes",
+        "journal_sc": "no",
         "author_sc": "yes",
     },
     {
@@ -183,27 +180,3 @@ def test_reference_count_zero(api_manager: APIManager) -> None:
         execute_operation(api_manager, "/index/v1/reference-count/10.3233/sw-210434")
     )
     assert result == [{"count": "0"}]
-
-
-def test_citation_count_meta_sparql_failure(api_manager: APIManager) -> None:
-    with (
-        patch("indexapi_v1.post", side_effect=RequestException),
-        patch("indexapi_common.post", side_effect=RequestException),
-    ):
-        result = json.loads(
-            execute_operation(
-                api_manager, f"/index/v1/citation-count/{QSS_ARTICLE_DOI}"
-            )
-        )
-    assert result == [{"count": "0"}]
-
-
-def test_citations_meta_sparql_failure(api_manager: APIManager) -> None:
-    with (
-        patch("indexapi_v1.post", side_effect=RequestException),
-        patch("indexapi_common.post", side_effect=RequestException),
-    ):
-        result = json.loads(
-            execute_operation(api_manager, f"/index/v1/citations/{QSS_ARTICLE_DOI}")
-        )
-    assert result == []

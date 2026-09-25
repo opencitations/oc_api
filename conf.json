@@ -4,7 +4,7 @@
   "oc_services_templates": "https://github.com/opencitations/oc_services_templates",
   "base_url": " api.opencitations.net",
   "sparql_endpoint_index": "http://qlever-service.default.svc.cluster.local:7011",
-  "sparql_endpoint_meta": "http://virtuoso-service.default.svc.cluster.local:8890/sparql",
+  "sparql_endpoint_meta": "http://meta-qlever-service.default.svc.cluster.local:7011",
   "api_index": [ "src/api/index_v1.hf" ],
   "api_index_v2": [ "src/api/index_v2.hf" ],
   "api_meta": ["src/api/meta_v1.hf"],

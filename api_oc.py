@@ -108,11 +108,12 @@ index_openapi_manager_v2 = OpenAPIDocumentationHandler(index_api_manager_v2)
 skgif_api_manager = APIManager(
     c["api_skgif"], endpoint_override=env_config["sparql_endpoint_meta"]
 )
-for config in skgif_api_manager.all_conf.values():
-    config["sources_map"] = {
-        "meta": env_config["sparql_endpoint_meta"],
-        "index": env_config["sparql_endpoint_index"],
-    }
+for manager in (index_api_manager, index_api_manager_v2, skgif_api_manager):
+    for config in manager.all_conf.values():
+        config["sources_map"] = {
+            "meta": env_config["sparql_endpoint_meta"],
+            "index": env_config["sparql_endpoint_index"],
+        }
 skgif_doc_manager = HTMLDocumentationHandler(skgif_api_manager)
 skgif_openapi_manager = OpenAPIDocumentationHandler(skgif_api_manager)
 

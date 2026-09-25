@@ -1,5 +1,4 @@
 import os
-import shutil
 import subprocess
 import tempfile
 import time
@@ -9,23 +8,15 @@ import requests
 
 from ramose import APIManager, Operation
 
-# v0.5.45
-QLEVER_IMAGE = "adfreiburg/qlever@sha256:4672a53f0ff4e55ac921d25832a21ec0bb3ca08f54d7c1950d04ebf6af7b8c21"
+# v0.6.0
+QLEVER_IMAGE = "adfreiburg/qlever@sha256:37d5ede193f1bffb6aebf734d15d2a4c2a3228ee102858b0c6c2e65c149a78ec"
 QLEVER_CONTAINER = "oc-api-test-qlever"
 QLEVER_PORT = 7011
-INDEX_NAME = "oc-index-test"
+INDEX_NAME = "oc-test"
 DOCKER_USER = f"{os.getuid()}:{os.getgid()}"
 
-# v7.2.16
-VIRTUOSO_IMAGE = "openlink/virtuoso-opensource-7@sha256:e7a5cd1915569d70d8363503dc62f6bf818b485f1501b230c7608cde8528c72d"
-VIRTUOSO_CONTAINER = "oc-api-test-virtuoso"
-VIRTUOSO_HTTP_PORT = 8893
-VIRTUOSO_ISQL_PORT = 1112
-
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
-QLEVER_DATA_DIR = os.path.join(TEST_DIR, "qlever-index-data")
-VIRTUOSO_DATA_DIR = os.path.join(TEST_DIR, "virtuoso-meta-data")
-VIRTUOSO_DB_DIR = os.path.join(VIRTUOSO_DATA_DIR, "database")
+QLEVER_DATA_DIR = os.path.join(TEST_DIR, "qlever-data")
 
 
 def _wait_for_http(port: int, timeout: int = 60) -> None:
@@ -39,41 +30,6 @@ def _wait_for_http(port: int, timeout: int = 60) -> None:
             pass
         time.sleep(1)
     raise TimeoutError(f"Service did not become ready on port {port} within {timeout}s")
-
-
-def _wait_for_virtuoso(container: str, timeout: int = 60) -> None:
-    deadline = time.monotonic() + timeout
-    while time.monotonic() < deadline:
-        result = subprocess.run(
-            [
-                "docker",
-                "exec",
-                container,
-                "isql",
-                "1111",
-                "dba",
-                "dba",
-                "exec=SELECT 1;",
-            ],
-            capture_output=True,
-        )
-        if result.returncode == 0:
-            return
-        time.sleep(1)
-    raise TimeoutError(f"Virtuoso did not become ready within {timeout}s")
-
-
-def _enable_virtuoso_rdf_freetext(container: str) -> None:
-    commands = (
-        "DB.DBA.RDF_OBJ_FT_RULE_ADD(null, null, 'All');"
-        "DB.DBA.VT_INC_INDEX_DB_DBA_RDF_OBJ();"
-        "checkpoint;"
-    )
-    subprocess.run(
-        ["docker", "exec", container, "isql", "1111", "dba", "dba", f"exec={commands}"],
-        check=True,
-        capture_output=True,
-    )
 
 
 @pytest.fixture(scope="session")
@@ -99,7 +55,7 @@ def qlever_endpoint():
             "--init",
             QLEVER_IMAGE,
             "-c",
-            f"qlever-server -i {INDEX_NAME} -j 4 -p {QLEVER_PORT} -m 1G -c 500M -e 500M -k 50 -s 30s",
+            f"qlever-server -i {INDEX_NAME} -j 4 -p {QLEVER_PORT} -m 1G -c 500M -e 500M -k 50 -s 30s --no-metrics-log --no-resource-usage-log",
         ],
         check=True,
         capture_output=True,
@@ -111,50 +67,13 @@ def qlever_endpoint():
 
 
 @pytest.fixture(scope="session")
-def virtuoso_endpoint():
-    with tempfile.TemporaryDirectory() as temp_dir:
-        database_dir = os.path.join(temp_dir, "database")
-        os.mkdir(database_dir)
-        for entry in os.scandir(VIRTUOSO_DB_DIR):
-            if entry.is_file() and entry.name != "virtuoso.log":
-                shutil.copy2(entry.path, database_dir)
-
-        subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)
-        subprocess.run(
-            [
-                "docker",
-                "run",
-                "-d",
-                "--name",
-                VIRTUOSO_CONTAINER,
-                "-p",
-                f"{VIRTUOSO_HTTP_PORT}:8890",
-                "-p",
-                f"{VIRTUOSO_ISQL_PORT}:1111",
-                "-e",
-                "DBA_PASSWORD=dba",
-                "-v",
-                f"{database_dir}:/opt/virtuoso-opensource/database",
-                VIRTUOSO_IMAGE,
-            ],
-            check=True,
-            capture_output=True,
-        )
-        _wait_for_virtuoso(VIRTUOSO_CONTAINER)
-        _enable_virtuoso_rdf_freetext(VIRTUOSO_CONTAINER)
-        yield f"http://127.0.0.1:{VIRTUOSO_HTTP_PORT}/sparql"
-        subprocess.run(["docker", "stop", VIRTUOSO_CONTAINER], capture_output=True)
-        subprocess.run(["docker", "rm", "-f", VIRTUOSO_CONTAINER], capture_output=True)
-
-
-@pytest.fixture(scope="session")
-def skgif_api_manager(virtuoso_endpoint, qlever_endpoint):
+def skgif_api_manager(qlever_endpoint):
     manager = APIManager(
         [os.path.join(TEST_DIR, "..", "src", "api", "skgif_v1.hf")],
-        endpoint_override=virtuoso_endpoint,
+        endpoint_override=qlever_endpoint,
     )
     for config in manager.all_conf.values():
-        config["sources_map"] = {"meta": virtuoso_endpoint, "index": qlever_endpoint}
+        config["sources_map"] = {"meta": qlever_endpoint, "index": qlever_endpoint}
     return manager
 
 
@@ -181,11 +100,7 @@ def execute_operation(api_manager: APIManager, operation_url: str) -> str:
     return response.body
 
 
-def create_api_manager(
-    config_path: str,
-    replacements: dict[str, str],
-    env_vars: dict[str, str] | None = None,
-) -> APIManager:
+def create_api_manager(config_path: str, replacements: dict[str, str]) -> APIManager:
     full_config_path = os.path.join(TEST_DIR, "..", config_path)
 
     with open(full_config_path, "r", encoding="utf8") as f:
@@ -193,10 +108,6 @@ def create_api_manager(
 
     for old, new in replacements.items():
         config_content = config_content.replace(old, new)
-
-    if env_vars:
-        for key, value in env_vars.items():
-            os.environ[key] = value
 
     tmp_file = tempfile.NamedTemporaryFile(
         mode="w", suffix=".hf", delete=False, dir=TEST_DIR
