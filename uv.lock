@@ -156,14 +156,11 @@ wheels = [
 
 [[package]]
 name = "click"
-version = "8.3.1"
+version = "8.5.0"
 source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/3d/fa/656b739db8587d7b5dfa22e22ed02566950fbfbcdc20311993483657a5c0/click-8.3.1.tar.gz", hash = "sha256:12ff4785d337a1bb490bb7e9c2b1ee5da3112e94a8622f26a6c77f5d2fc6842a", size = 295065, upload-time = "2025-11-15T20:45:42.706Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c7/0e/7fa0ef50764b67090eca4114772a2abf8b6148198475e54c660b97caeee6/click-8.5.0.tar.gz", hash = "sha256:ba0d2089de75ea0310e2dde03160e6ca10009947fb95a182f9b54021bb272e34", size = 382235, upload-time = "2026-08-26T13:33:14.56Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/98/78/01c019cdb5d6498122777c1a43056ebb3ebfeef2076d9d026bfe15583b2b/click-8.3.1-py3-none-any.whl", hash = "sha256:981153a64e25f12d547d3426c367a4857371575ee7ad18df2a6183ab0545b2a6", size = 108274, upload-time = "2025-11-15T20:45:41.139Z" },
+    { url = "https://files.pythonhosted.org/packages/58/50/6c0d534c5f134586a8e1ba4e330569e32f057e33372ae556463212fb4cd3/click-8.5.0-py3-none-any.whl", hash = "sha256:255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360", size = 125251, upload-time = "2026-08-26T13:33:12.928Z" },
 ]
 
 [[package]]
@@ -720,7 +717,7 @@ requires-dist = [
     { name = "gunicorn", specifier = ">=22.0.0" },
     { name = "idna", specifier = ">=3.15" },
     { name = "python-dateutil", specifier = ">=2.9.0.post0" },
-    { name = "ramose", specifier = ">=2.10.0" },
+    { name = "ramose", specifier = ">=2.10.1" },
     { name = "rdflib", specifier = ">=6.1.1" },
     { name = "redis", specifier = ">=7.0.1" },
     { name = "requests", specifier = ">=2.32.4" },
@@ -980,7 +977,7 @@ wheels = [
 
 [[package]]
 name = "ramose"
-version = "2.10.0"
+version = "2.10.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "flask" },
@@ -989,9 +986,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/82/58/ec5bab8167694396d6fa4bf70ca13a9a995744627fd82c45a331a2937ff2/ramose-2.10.0.tar.gz", hash = "sha256:395aa602948d3cd1e235a1f0c520a7cd603d567dbda95d91db224752a906df5c", size = 1369717, upload-time = "2026-09-18T17:19:29.847Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/cf/77/2bacb8c996bec68057ebb197eade2cfd115ab913b225b5897fbf6e549c4b/ramose-2.10.1.tar.gz", hash = "sha256:8a1b3aa384594298554f69683685161bdb817837875ea2d62b7945e4a25aefdf", size = 1370934, upload-time = "2026-09-24T21:59:58.02Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/30/e2/a4638d6cd0780ff4728a6c58dc5f86c5e4feefc95c9e896f3e9c5766038c/ramose-2.10.0-py3-none-any.whl", hash = "sha256:a0908e5efa82d378c3011df756c26c0bb84d312e9f543543550f3a7686d5a9f8", size = 70227, upload-time = "2026-09-18T17:19:28.9Z" },
+    { url = "https://files.pythonhosted.org/packages/5b/ed/61f973b673c47139bc01554f103d7b582d3c02efd4df0b3dfeabd5a1d5de/ramose-2.10.1-py3-none-any.whl", hash = "sha256:c3fda73f6c3adca93e3a9acc7859f8de02494d6613b1dcaaff9804fe91cfc799", size = 70432, upload-time = "2026-09-24T21:59:56.983Z" },
 ]
 
 [[package]]

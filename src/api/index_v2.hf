@@ -24,13 +24,15 @@ get(API_CALL, headers=HTTP_HEADERS)
 #contacts [contact@opencitations.net](mailto:contact@opencitations.net)
 #license This document is licensed with a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/legalcode), while the REST API itself has been created using [RAMOSE](https://github.com/opencitations/ramose), the *Restful API Manager Over SPARQL Endpoints* created by [Silvio Peroni](https://orcid.org/0000-0003-0530-4305), which is licensed with an [ISC license](https://opensource.org/licenses/ISC).
 #endpoint http://qlever-service.default.svc.cluster.local:7011
+#sources meta=http://virtuoso-service.default.svc.cluster.local:8890/sparql;index=http://qlever-service.default.svc.cluster.local:7011
 #method post
 #addon indexapi_v2
 
 #url /citation/{oci}
 #type operation
 #oci str([0-9]+-[0-9]+)
-#postprocess citations_info(oci,citing,cited)
+#preprocess oci_search(oci)
+#postprocess citations_info()
 #method get
 #description This operation retrieves the citation metadata for the citation identified by the input Open Citation Identifier (OCI).
 
@@ -61,21 +63,89 @@ The values of all the fields are prefixed with `[index name] => `, so as to clea
         "author_sc": "no"
     }
 ]
-#field_type str(oci) str(citing) str(cited)
+#field_type str(oci) str(citing) str(cited) datetime(creation) duration(timespan) str(journal_sc) str(author_sc)
 #sparql PREFIX cito: <http://purl.org/spar/cito/>
-SELECT ?oci ?citing ?cited
-WHERE {
-      VALUES ?oci {<https://w3id.org/oc/index/ci/[[oci]]>} .
-      ?oci cito:hasCitingEntity ?citing .
-      ?oci cito:hasCitedEntity ?cited .
+SELECT ?oci ?citing_br ?cited_br WHERE {
+  [[oci]]
+  ?citation cito:hasCitingEntity ?citing_br ;
+      cito:hasCitedEntity ?cited_br .
+  BIND(STRAFTER(STR(?citation), "https://w3id.org/oc/index/ci/") AS ?oci)
 }
-LIMIT 50000
+@@with meta
+@@join ?citing_br ?citing_br
+@@values ?citing_br batch_size=10000 workers=8
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
+SELECT ?citing_br (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=" __ ") AS ?citing_ids) (MIN(STR(?date)) AS ?citing_date) WHERE {
+  ?citing_br datacite:hasIdentifier ?identifier .
+  ?identifier datacite:usesIdentifierScheme ?scheme ;
+      literal:hasLiteralValue ?value .
+  BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?value) AS ?id)
+  OPTIONAL { ?citing_br prism:publicationDate ?date }
+}
+GROUP BY ?citing_br
+@@with meta
+@@join ?cited_br ?cited_br
+@@values ?cited_br
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
+SELECT ?cited_br (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=" __ ") AS ?cited_ids) (MIN(STR(?date)) AS ?cited_date) WHERE {
+  ?cited_br datacite:hasIdentifier ?identifier .
+  ?identifier datacite:usesIdentifierScheme ?scheme ;
+      literal:hasLiteralValue ?value .
+  BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?value) AS ?id)
+  OPTIONAL { ?cited_br prism:publicationDate ?date }
+}
+GROUP BY ?cited_br
+@@join ?oci ?oci type=left
+@@values ?citing_br batch_size=10000 workers=8
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX pro: <http://purl.org/spar/pro/>
+SELECT DISTINCT ?oci ("yes" AS ?same_journal) WHERE {
+  {
+    SELECT ?cited_br ?journal WHERE {
+      [[oci]]
+      ?cited_br a fabio:JournalArticle ;
+          frbr:partOf+ ?journal .
+      ?journal a fabio:Journal .
+    }
+  }
+  ?citing_br a fabio:JournalArticle ;
+      frbr:partOf+ ?journal .
+  BIND(CONCAT(STRAFTER(STR(?citing_br), "https://w3id.org/oc/meta/br/"), "-", STRAFTER(STR(?cited_br), "https://w3id.org/oc/meta/br/")) AS ?oci)
+}
+@@join ?oci ?oci type=left
+@@values ?citing_br batch_size=10000 workers=8
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX pro: <http://purl.org/spar/pro/>
+SELECT DISTINCT ?oci ("yes" AS ?same_author) WHERE {
+  {
+    SELECT ?cited_br ?author WHERE {
+      [[oci]]
+      ?cited_br pro:isDocumentContextFor ?cited_role .
+      ?cited_role pro:withRole pro:author ;
+          pro:isHeldBy ?author .
+    }
+  }
+  ?citing_role pro:isHeldBy ?author ;
+      pro:withRole pro:author .
+  ?citing_br pro:isDocumentContextFor ?citing_role .
+  BIND(CONCAT(STRAFTER(STR(?citing_br), "https://w3id.org/oc/meta/br/"), "-", STRAFTER(STR(?cited_br), "https://w3id.org/oc/meta/br/")) AS ?oci)
+}
 
 #url /citation-count/{id}
 #type operation
 #id str((omid|doi|pmid):(.+))
-#preprocess lower(id) --> id2omids(id)
-#postprocess count_unique_cits(oci,citing,cited)
+#preprocess lower(id) --> cited_search(id)
+#postprocess count_groups(citing)
 #method get
 #description This operation retrieves the number of incoming citations to the bibliographic entity identified by the input PID (DOI, PMID, OMID)..
 
@@ -89,20 +159,41 @@ The field returned by this operation is:
         "count": "34"
     }
 ]
-#sparql PREFIX cito: <http://purl.org/spar/cito/>
-SELECT ?oci ?citing ?cited
-WHERE {
-    VALUES ?cited {[[id]]}
-    ?oci cito:hasCitedEntity ?cited .
-    ?oci cito:hasCitingEntity ?citing .
+#sparql @@with meta
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX fabio: <http://purl.org/spar/fabio/>
+SELECT DISTINCT ?cited_br WHERE {
+  [[id]]
+}
+@@with index
+@@join ?cited_br ?cited_br
+@@values ?cited_br
+PREFIX cito: <http://purl.org/spar/cito/>
+SELECT DISTINCT ?citing_br ?cited_br WHERE {
+  ?citation cito:hasCitedEntity ?cited_br ;
+      cito:hasCitingEntity ?citing_br .
 }
 LIMIT 200000
+@@with meta
+@@join ?citing_br ?citing_br
+@@values ?citing_br batch_size=10000 workers=8
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+SELECT ?citing_br (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=" __ ") AS ?citing_ids) WHERE {
+  ?citing_br datacite:hasIdentifier ?identifier .
+  ?identifier datacite:usesIdentifierScheme ?scheme ;
+      literal:hasLiteralValue ?value .
+  BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?value) AS ?id)
+}
+GROUP BY ?citing_br
 
 #url /venue-citation-count/{id}
 #type operation
 #id str((issn):(.+))
-#preprocess lower(id) --> id2omids(id)
-#postprocess sum_all(count)
+#preprocess lower(id) --> issn_value(id)
+#postprocess venue_count()
 #method get
 #description This operation retrieves the number of incoming citations to all the bibliographic entities published into aspecific journal identified by the input ISSN.
 
@@ -116,19 +207,34 @@ The field returned by this operation is:
         "count": "64352"
     }
 ]
-#sparql PREFIX cito: <http://purl.org/spar/cito/>
-SELECT (count(DISTINCT(?citing)) as ?count)
-WHERE {
-    VALUES ?cited {[[id]]}
-    ?oci cito:hasCitedEntity ?cited .
-    ?oci cito:hasCitingEntity ?citing .
+#sparql @@with meta
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX fabio: <http://purl.org/spar/fabio/>
+SELECT DISTINCT ?issn ?cited_br WHERE {
+  VALUES ?issn { "[[id]]" }
+  ?venue_identifier literal:hasLiteralValue ?issn .
+  ?venue datacite:hasIdentifier ?venue_identifier .
+  ?cited_br frbr:partOf+ ?venue ;
+      a fabio:JournalArticle .
 }
+@@with index
+@@join ?issn ?issn
+@@values ?cited_br
+PREFIX cito: <http://purl.org/spar/cito/>
+SELECT ?issn (COUNT(DISTINCT ?citing_br) AS ?count) WHERE {
+  ?citation cito:hasCitedEntity ?cited_br ;
+      cito:hasCitingEntity ?citing_br .
+  BIND("[[id]]" AS ?issn)
+}
+GROUP BY ?issn
 
 #url /reference-count/{id}
 #type operation
 #id str((omid|doi|pmid|issn):(.+))
-#preprocess lower(id) --> id2omids(id)
-#postprocess count_unique_cits(oci,citing,cited)
+#preprocess lower(id) --> citing_search(id)
+#postprocess count_unique_cits()
 #method get
 #description This operation retrieves the number of outgoing citations from the bibliographic entity identified by the input PID (DOI, PMID, OMID).
 
@@ -142,20 +248,53 @@ The field returned by this operation is:
         "count": "35"
     }
 ]
-#sparql PREFIX cito: <http://purl.org/spar/cito/>
-SELECT ?oci ?citing ?cited
-WHERE {
-    VALUES ?citing {[[id]]}
-    ?oci cito:hasCitingEntity ?citing .
-    ?oci cito:hasCitedEntity ?cited .
+#sparql @@with meta
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX fabio: <http://purl.org/spar/fabio/>
+SELECT DISTINCT ?citing_br WHERE {
+  [[id]]
+}
+@@with index
+@@join ?citing_br ?citing_br
+@@values ?citing_br
+PREFIX cito: <http://purl.org/spar/cito/>
+SELECT DISTINCT ?citing_br ?cited_br WHERE {
+  ?citation cito:hasCitingEntity ?citing_br ;
+      cito:hasCitedEntity ?cited_br .
 }
 LIMIT 200000
+@@with meta
+@@join ?citing_br ?citing_br
+@@values ?citing_br
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+SELECT ?citing_br (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=" __ ") AS ?citing_ids) WHERE {
+  ?citing_br datacite:hasIdentifier ?identifier .
+  ?identifier datacite:usesIdentifierScheme ?scheme ;
+      literal:hasLiteralValue ?value .
+  BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?value) AS ?id)
+}
+GROUP BY ?citing_br
+@@with meta
+@@join ?cited_br ?cited_br
+@@values ?cited_br batch_size=10000 workers=8
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+SELECT ?cited_br (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=" __ ") AS ?cited_ids) WHERE {
+  ?cited_br datacite:hasIdentifier ?identifier .
+  ?identifier datacite:usesIdentifierScheme ?scheme ;
+      literal:hasLiteralValue ?value .
+  BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?value) AS ?id)
+}
+GROUP BY ?cited_br
 
 #url /citations/{id}
 #type operation
 #id str((omid|doi|pmid):(.+))
-#preprocess lower(id) --> id2omids(id)
-#postprocess citations_info(oci,citing,cited)
+#preprocess lower(id) --> cited_search(id)
+#postprocess citations_info()
 #method get
 #description This operation retrieves the citation data for all the references appearing in the reference lists of other citing works to the bibliographic entity identified by the input PID (DOI, PMID, OMID), that constitute the incoming citations of that identified bibliographic entity.
 
@@ -201,21 +340,100 @@ The values of all the fields are prefixed with `[index name] => `, so as to clea
     },
     ...
 ]
-#field_type str(oci) str(citing) str(cited) datetime(creation) duration(timespan) str(?journal_sc) str(?author_sc)
-#sparql PREFIX cito: <http://purl.org/spar/cito/>
-SELECT ?oci ?citing ?cited
-WHERE {
-    VALUES ?cited {[[id]]}
-    ?oci cito:hasCitedEntity ?cited .
-    ?oci cito:hasCitingEntity ?citing .
+#field_type str(oci) str(citing) str(cited) datetime(creation) duration(timespan) str(journal_sc) str(author_sc)
+#sparql @@with meta
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX fabio: <http://purl.org/spar/fabio/>
+SELECT DISTINCT ?cited_br WHERE {
+  [[id]]
+}
+@@with index
+@@join ?cited_br ?cited_br
+@@values ?cited_br
+PREFIX cito: <http://purl.org/spar/cito/>
+SELECT ?oci ?citing_br ?cited_br WHERE {
+  ?citation cito:hasCitedEntity ?cited_br ;
+      cito:hasCitingEntity ?citing_br .
+  BIND(STRAFTER(STR(?citation), "https://w3id.org/oc/index/ci/") AS ?oci)
 }
 LIMIT 200000
+@@with meta
+@@join ?citing_br ?citing_br
+@@values ?citing_br batch_size=10000 workers=8
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
+SELECT ?citing_br (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=" __ ") AS ?citing_ids) (MIN(STR(?date)) AS ?citing_date) WHERE {
+  ?citing_br datacite:hasIdentifier ?identifier .
+  ?identifier datacite:usesIdentifierScheme ?scheme ;
+      literal:hasLiteralValue ?value .
+  BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?value) AS ?id)
+  OPTIONAL { ?citing_br prism:publicationDate ?date }
+}
+GROUP BY ?citing_br
+@@with meta
+@@join ?cited_br ?cited_br
+@@values ?cited_br
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
+SELECT ?cited_br (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=" __ ") AS ?cited_ids) (MIN(STR(?date)) AS ?cited_date) WHERE {
+  ?cited_br datacite:hasIdentifier ?identifier .
+  ?identifier datacite:usesIdentifierScheme ?scheme ;
+      literal:hasLiteralValue ?value .
+  BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?value) AS ?id)
+  OPTIONAL { ?cited_br prism:publicationDate ?date }
+}
+GROUP BY ?cited_br
+@@join ?oci ?oci type=left
+@@values ?citing_br batch_size=10000 workers=8
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX pro: <http://purl.org/spar/pro/>
+SELECT DISTINCT ?oci ("yes" AS ?same_journal) WHERE {
+  {
+    SELECT ?cited_br ?journal WHERE {
+      [[id]]
+      ?cited_br a fabio:JournalArticle ;
+          frbr:partOf+ ?journal .
+      ?journal a fabio:Journal .
+    }
+  }
+  ?citing_br a fabio:JournalArticle ;
+      frbr:partOf+ ?journal .
+  BIND(CONCAT(STRAFTER(STR(?citing_br), "https://w3id.org/oc/meta/br/"), "-", STRAFTER(STR(?cited_br), "https://w3id.org/oc/meta/br/")) AS ?oci)
+}
+@@join ?oci ?oci type=left
+@@values ?citing_br batch_size=10000 workers=8
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX pro: <http://purl.org/spar/pro/>
+SELECT DISTINCT ?oci ("yes" AS ?same_author) WHERE {
+  {
+    SELECT ?cited_br ?author WHERE {
+      [[id]]
+      ?cited_br pro:isDocumentContextFor ?cited_role .
+      ?cited_role pro:withRole pro:author ;
+          pro:isHeldBy ?author .
+    }
+  }
+  ?citing_role pro:isHeldBy ?author ;
+      pro:withRole pro:author .
+  ?citing_br pro:isDocumentContextFor ?citing_role .
+  BIND(CONCAT(STRAFTER(STR(?citing_br), "https://w3id.org/oc/meta/br/"), "-", STRAFTER(STR(?cited_br), "https://w3id.org/oc/meta/br/")) AS ?oci)
+}
 
 #url /references/{id}
 #type operation
 #id str((omid|doi|pmid):(.+))
-#preprocess lower(id) --> id2omids(id)
-#postprocess citations_info(oci,citing,cited)
+#preprocess lower(id) --> citing_search(id)
+#postprocess citations_info()
 #method get
 #description This operation retrieves the citation data for all the outgoing references to other cited works appearing in the reference list of the bibliographic entity identified by the input PID (DOI, PMID, OMID)..
 
@@ -262,12 +480,91 @@ The values of all the fields are prefixed with `[index name] => `, so as to clea
       },
       ...
 ]
-#field_type str(oci) str(citing) str(cited) datetime(creation) duration(timespan) str(?journal_sc) str(?author_sc)
-#sparql PREFIX cito: <http://purl.org/spar/cito/>
-SELECT ?oci ?citing ?cited
-WHERE {
-      VALUES ?citing {[[id]]}
-      ?oci cito:hasCitingEntity ?citing .
-      ?oci cito:hasCitedEntity ?cited .
+#field_type str(oci) str(citing) str(cited) datetime(creation) duration(timespan) str(journal_sc) str(author_sc)
+#sparql @@with meta
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX fabio: <http://purl.org/spar/fabio/>
+SELECT DISTINCT ?citing_br WHERE {
+  [[id]]
+}
+@@with index
+@@join ?citing_br ?citing_br
+@@values ?citing_br
+PREFIX cito: <http://purl.org/spar/cito/>
+SELECT ?oci ?citing_br ?cited_br WHERE {
+  ?citation cito:hasCitingEntity ?citing_br ;
+      cito:hasCitedEntity ?cited_br .
+  BIND(STRAFTER(STR(?citation), "https://w3id.org/oc/index/ci/") AS ?oci)
 }
 LIMIT 200000
+@@with meta
+@@join ?citing_br ?citing_br
+@@values ?citing_br
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
+SELECT ?citing_br (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=" __ ") AS ?citing_ids) (MIN(STR(?date)) AS ?citing_date) WHERE {
+  ?citing_br datacite:hasIdentifier ?identifier .
+  ?identifier datacite:usesIdentifierScheme ?scheme ;
+      literal:hasLiteralValue ?value .
+  BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?value) AS ?id)
+  OPTIONAL { ?citing_br prism:publicationDate ?date }
+}
+GROUP BY ?citing_br
+@@with meta
+@@join ?cited_br ?cited_br
+@@values ?cited_br batch_size=10000 workers=8
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>
+SELECT ?cited_br (GROUP_CONCAT(DISTINCT ?id; SEPARATOR=" __ ") AS ?cited_ids) (MIN(STR(?date)) AS ?cited_date) WHERE {
+  ?cited_br datacite:hasIdentifier ?identifier .
+  ?identifier datacite:usesIdentifierScheme ?scheme ;
+      literal:hasLiteralValue ?value .
+  BIND(CONCAT(STRAFTER(STR(?scheme), "http://purl.org/spar/datacite/"), ":", ?value) AS ?id)
+  OPTIONAL { ?cited_br prism:publicationDate ?date }
+}
+GROUP BY ?cited_br
+@@join ?oci ?oci type=left
+@@values ?cited_br batch_size=10000 workers=8
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX pro: <http://purl.org/spar/pro/>
+SELECT DISTINCT ?oci ("yes" AS ?same_journal) WHERE {
+  {
+    SELECT ?citing_br ?journal WHERE {
+      [[id]]
+      ?citing_br a fabio:JournalArticle ;
+          frbr:partOf+ ?journal .
+      ?journal a fabio:Journal .
+    }
+  }
+  ?cited_br a fabio:JournalArticle ;
+      frbr:partOf+ ?journal .
+  BIND(CONCAT(STRAFTER(STR(?citing_br), "https://w3id.org/oc/meta/br/"), "-", STRAFTER(STR(?cited_br), "https://w3id.org/oc/meta/br/")) AS ?oci)
+}
+@@join ?oci ?oci type=left
+@@values ?cited_br batch_size=10000 workers=8
+PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX fabio: <http://purl.org/spar/fabio/>
+PREFIX pro: <http://purl.org/spar/pro/>
+SELECT DISTINCT ?oci ("yes" AS ?same_author) WHERE {
+  {
+    SELECT ?citing_br ?author WHERE {
+      [[id]]
+      ?citing_br pro:isDocumentContextFor ?citing_role .
+      ?citing_role pro:withRole pro:author ;
+          pro:isHeldBy ?author .
+    }
+  }
+  ?cited_role pro:isHeldBy ?author ;
+      pro:withRole pro:author .
+  ?cited_br pro:isDocumentContextFor ?cited_role .
+  BIND(CONCAT(STRAFTER(STR(?citing_br), "https://w3id.org/oc/meta/br/"), "-", STRAFTER(STR(?cited_br), "https://w3id.org/oc/meta/br/")) AS ?oci)
+}

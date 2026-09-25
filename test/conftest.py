@@ -100,11 +100,7 @@ def execute_operation(api_manager: APIManager, operation_url: str) -> str:
     return response.body
 
 
-def create_api_manager(
-    config_path: str,
-    replacements: dict[str, str],
-    env_vars: dict[str, str] | None = None,
-) -> APIManager:
+def create_api_manager(config_path: str, replacements: dict[str, str]) -> APIManager:
     full_config_path = os.path.join(TEST_DIR, "..", config_path)
 
     with open(full_config_path, "r", encoding="utf8") as f:
@@ -112,10 +108,6 @@ def create_api_manager(
 
     for old, new in replacements.items():
         config_content = config_content.replace(old, new)
-
-    if env_vars:
-        for key, value in env_vars.items():
-            os.environ[key] = value
 
     tmp_file = tempfile.NamedTemporaryFile(
         mode="w", suffix=".hf", delete=False, dir=TEST_DIR

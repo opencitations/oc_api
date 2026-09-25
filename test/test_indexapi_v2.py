@@ -1,8 +1,6 @@
 import json
-from unittest.mock import patch
 
 import pytest
-from requests import RequestException
 
 from conftest import create_api_manager, execute_operation, normalize_citations
 from ramose import APIManager
@@ -10,18 +8,17 @@ from ramose import APIManager
 
 @pytest.fixture(scope="session")
 def api_manager(qlever_endpoint: str) -> APIManager:
-    return create_api_manager(
+    manager = create_api_manager(
         "src/api/index_v2.hf",
         {
             "#base https://api.opencitations.net/index": f"#base {qlever_endpoint}",
             "#endpoint http://qlever-service.default.svc.cluster.local:7011": f"#endpoint {qlever_endpoint}",
             "#addon indexapi_v2": "#addon ../src/api/indexapi_v2",
         },
-        env_vars={
-            "SPARQL_ENDPOINT_INDEX": qlever_endpoint,
-            "SPARQL_ENDPOINT_META": qlever_endpoint,
-        },
     )
+    for config in manager.all_conf.values():
+        config["sources_map"] = {"meta": qlever_endpoint, "index": qlever_endpoint}
+    return manager
 
 
 MAIN_PAPER_OMID = "omid:br/062104388184"
@@ -513,7 +510,7 @@ EXPECTED_ZENODO_DMP_CITATIONS = [
         "cited": ZENODO_DMP_PIDS,
         "creation": "2021-06-08",
         "timespan": "-P0Y0M1D",
-        "journal_sc": "yes",
+        "journal_sc": "no",
         "author_sc": "yes",
     },
 ]
@@ -659,6 +656,13 @@ def test_venue_citation_count(api_manager: APIManager) -> None:
     assert result == [{"count": "6"}]
 
 
+def test_reference_count_by_issn(api_manager: APIManager) -> None:
+    result = json.loads(
+        execute_operation(api_manager, "/index/v2/reference-count/issn:2641-3337")
+    )
+    assert result == [{"count": "45"}]
+
+
 def test_citations_negative_timespan(api_manager: APIManager) -> None:
     result = json.loads(
         execute_operation(api_manager, f"/index/v2/citations/{ZENODO_DMP_OMID}")
@@ -691,35 +695,3 @@ def test_citations_with_author_sc(api_manager: APIManager) -> None:
     assert normalize_citations(result) == normalize_citations(
         EXPECTED_QSS_ARTICLE_CITATIONS
     )
-
-
-def test_citation_count_meta_anyids_failure(api_manager: APIManager) -> None:
-    with patch("indexapi_common.post", side_effect=RequestException):
-        result = json.loads(
-            execute_operation(
-                api_manager, f"/index/v2/citation-count/{MAIN_PAPER_OMID}"
-            )
-        )
-    assert result == [{"count": "0"}]
-
-
-def test_citation_count_meta_sparql_failure(api_manager: APIManager) -> None:
-    with (
-        patch("indexapi_v2.post", side_effect=RequestException),
-        patch("indexapi_common.post", side_effect=RequestException),
-    ):
-        result = json.loads(
-            execute_operation(api_manager, f"/index/v2/citation-count/{MAIN_PAPER_DOI}")
-        )
-    assert result == [{"count": "0"}]
-
-
-def test_citations_meta_sparql_failure(api_manager: APIManager) -> None:
-    with (
-        patch("indexapi_v2.post", side_effect=RequestException),
-        patch("indexapi_common.post", side_effect=RequestException),
-    ):
-        result = json.loads(
-            execute_operation(api_manager, f"/index/v2/citations/{MAIN_PAPER_OMID}")
-        )
-    assert result == []
