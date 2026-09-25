@@ -4,7 +4,7 @@
 
 [project]
 name = "oc-api"
-version = "4.1.1"
+version = "4.1.2"
 description = "OpenCitations API"
 authors = [
     {name = "Mario Petrella", email = "mario.petrella@unibo.it"},
