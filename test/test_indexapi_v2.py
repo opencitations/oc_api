@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 import pytest
 
@@ -24,6 +25,9 @@ def api_manager(qlever_endpoint: str) -> APIManager:
 MAIN_PAPER_OMID = "omid:br/062104388184"
 MAIN_PAPER_DOI = "doi:10.1162/qss_a_00292"
 MAIN_PAPER_PIDS = f"{MAIN_PAPER_OMID} {MAIN_PAPER_DOI}"
+ISBN_EXAMPLES = json.loads(
+    (Path(__file__).parent / "data" / "index_isbn.json").read_text(encoding="utf-8")
+)
 
 EXPECTED_CITATIONS = [
     {
@@ -633,6 +637,57 @@ def test_reference_count_by_doi(api_manager: APIManager) -> None:
         execute_operation(api_manager, f"/index/v2/reference-count/{MAIN_PAPER_DOI}")
     )
     assert result == [{"count": "45"}]
+
+
+@pytest.mark.parametrize("isbn", ["9789048127108", "9781402096327"])
+@pytest.mark.parametrize(
+    ("operation", "expected"),
+    [
+        ("citation-count", [{"count": "0"}]),
+        ("reference-count", [{"count": "0"}]),
+        ("citations", []),
+        ("references", []),
+    ],
+)
+def test_operations_by_isbn(api_manager, isbn, operation, expected):
+    result = json.loads(
+        execute_operation(api_manager, f"/index/v2/{operation}/isbn:{isbn}")
+    )
+    result_by_omid = json.loads(
+        execute_operation(api_manager, f"/index/v2/{operation}/omid:br/0612058700")
+    )
+    assert result == result_by_omid == expected
+
+
+@pytest.mark.parametrize(
+    ("operation", "expected"),
+    [
+        ("citation-count", [{"count": "1"}]),
+        ("reference-count", [{"count": "2"}]),
+    ],
+)
+def test_nonzero_counts_by_isbn(api_manager, operation, expected):
+    result = json.loads(
+        execute_operation(api_manager, f"/index/v2/{operation}/isbn:9789663601922")
+    )
+    result_by_omid = json.loads(
+        execute_operation(api_manager, f"/index/v2/{operation}/omid:br/06101786021")
+    )
+    assert result == result_by_omid == expected
+
+
+@pytest.mark.parametrize("operation", ["citations", "references"])
+def test_citation_data_by_isbn(api_manager, operation):
+    result = json.loads(
+        execute_operation(api_manager, f"/index/v2/{operation}/isbn:9789663601922")
+    )
+    result_by_omid = json.loads(
+        execute_operation(api_manager, f"/index/v2/{operation}/omid:br/06101786021")
+    )
+    expected = normalize_citations(ISBN_EXAMPLES[operation]["selected_results"])
+    assert (
+        normalize_citations(result) == normalize_citations(result_by_omid) == expected
+    )
 
 
 def test_citation_count_by_pmid(api_manager: APIManager) -> None:
