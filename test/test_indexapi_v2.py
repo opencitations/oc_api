@@ -28,6 +28,10 @@ MAIN_PAPER_PIDS = f"{MAIN_PAPER_OMID} {MAIN_PAPER_DOI}"
 ISBN_EXAMPLES = json.loads(
     (Path(__file__).parent / "data" / "index_isbn.json").read_text(encoding="utf-8")
 )
+ISSN_EXAMPLES = json.loads(
+    (Path(__file__).parent / "data" / "index_issn.json").read_text(encoding="utf-8")
+)
+
 
 EXPECTED_CITATIONS = [
     {
@@ -666,9 +670,10 @@ def test_operations_by_isbn(api_manager, isbn, operation, expected):
         ("reference-count", [{"count": "2"}]),
     ],
 )
-def test_nonzero_counts_by_isbn(api_manager, operation, expected):
+@pytest.mark.parametrize("isbn", ["9789663601922", "978-966-360-192-2"])
+def test_nonzero_counts_by_isbn(api_manager, operation, expected, isbn):
     result = json.loads(
-        execute_operation(api_manager, f"/index/v2/{operation}/isbn:9789663601922")
+        execute_operation(api_manager, f"/index/v2/{operation}/isbn:{isbn}")
     )
     result_by_omid = json.loads(
         execute_operation(api_manager, f"/index/v2/{operation}/omid:br/06101786021")
@@ -677,9 +682,10 @@ def test_nonzero_counts_by_isbn(api_manager, operation, expected):
 
 
 @pytest.mark.parametrize("operation", ["citations", "references"])
-def test_citation_data_by_isbn(api_manager, operation):
+@pytest.mark.parametrize("isbn", ["9789663601922", "978-966-360-192-2"])
+def test_citation_data_by_isbn(api_manager, operation, isbn):
     result = json.loads(
-        execute_operation(api_manager, f"/index/v2/{operation}/isbn:9789663601922")
+        execute_operation(api_manager, f"/index/v2/{operation}/isbn:{isbn}")
     )
     result_by_omid = json.loads(
         execute_operation(api_manager, f"/index/v2/{operation}/omid:br/06101786021")
@@ -704,18 +710,61 @@ def test_reference_count_by_pmid(api_manager: APIManager) -> None:
     assert result == [{"count": "0"}]
 
 
-def test_venue_citation_count(api_manager: APIManager) -> None:
+@pytest.mark.parametrize("issn", ["2641-3337", "26413337"])
+def test_venue_citation_count(api_manager: APIManager, issn: str) -> None:
     result = json.loads(
-        execute_operation(api_manager, "/index/v2/venue-citation-count/issn:2641-3337")
+        execute_operation(api_manager, f"/index/v2/venue-citation-count/issn:{issn}")
     )
     assert result == [{"count": "6"}]
 
 
-def test_reference_count_by_issn(api_manager: APIManager) -> None:
+@pytest.mark.parametrize(
+    ("operation", "expected"),
+    [
+        ("citation-count", [{"count": "0"}]),
+        ("reference-count", [{"count": "0"}]),
+        ("citations", []),
+        ("references", []),
+    ],
+)
+def test_operations_by_issn(api_manager, operation, expected):
     result = json.loads(
-        execute_operation(api_manager, "/index/v2/reference-count/issn:2641-3337")
+        execute_operation(api_manager, f"/index/v2/{operation}/issn:2641-3337")
     )
-    assert result == [{"count": "45"}]
+    result_by_omid = json.loads(
+        execute_operation(api_manager, f"/index/v2/{operation}/omid:br/062501778099")
+    )
+    assert result == result_by_omid == expected
+
+
+@pytest.mark.parametrize(
+    ("issn", "omid", "operation"),
+    [
+        ("0192-8651", "0615019585", "citations"),
+        ("1096-987X", "0615019585", "citations"),
+        ("1096987x", "0615019585", "citations"),
+        ("2295-9254", "06101680950", "references"),
+        ("2295-9262", "06101680950", "references"),
+    ],
+)
+@pytest.mark.parametrize("count", [False, True])
+def test_nonzero_citations_by_issn(api_manager, issn, omid, operation, count):
+    endpoint = f"{operation[:-1]}-count" if count else operation
+    result = json.loads(
+        execute_operation(api_manager, f"/index/v2/{endpoint}/issn:{issn}")
+    )
+    result_by_omid = json.loads(
+        execute_operation(api_manager, f"/index/v2/{endpoint}/omid:br/{omid}")
+    )
+    if count:
+        assert result == result_by_omid == [{"count": "2"}]
+    else:
+        expected = normalize_citations(ISSN_EXAMPLES[operation]["selected_results"])
+        assert (
+            normalize_citations(result)
+            == normalize_citations(result_by_omid)
+            == expected
+        )
 
 
 def test_citations_negative_timespan(api_manager: APIManager) -> None:

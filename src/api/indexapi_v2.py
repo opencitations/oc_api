@@ -16,6 +16,8 @@
 
 __author__ = "Arcangelo Massari & Ivan Heibi"
 
+import re
+
 from indexapi_common import (
     lower,  # noqa: F401 - used by ramose via getattr
     count_unique_cits,  # noqa: F401 - used by ramose via getattr
@@ -37,7 +39,13 @@ def citing_search(s):
 
 
 def issn_value(s):
-    return (s.removeprefix("issn:"),)
+    value = re.sub("[^X0-9]", "", s.removeprefix("issn:").upper())
+    return (f"{value[:4]}-{value[4:8]}",)
+
+
+def isbn_value(s):
+    value = re.sub("[^X0-9]", "", s.removeprefix("isbn:").upper())
+    return (value,)
 
 
 def citations_info(res):
@@ -66,10 +74,13 @@ def __br_search(s, variable):
     if scheme == "omid":
         return f"VALUES ?{variable} {{ <https://w3id.org/oc/meta/{value}> }}"
     if scheme == "issn":
+        value = issn_value(s)[0]
+    elif scheme == "isbn":
+        value = isbn_value(s)[0]
+    if scheme in {"issn", "isbn"}:
         return (
-            f'?resolved_identifier literal:hasLiteralValue "{value}" . '
-            "?resolved_venue datacite:hasIdentifier ?resolved_identifier . "
-            f"?{variable} frbr:partOf+ ?resolved_venue ; a fabio:JournalArticle ."
+            literal_search(value, variable)
+            + f" ?resolved_identifier datacite:usesIdentifierScheme datacite:{scheme} ."
         )
     return literal_search(value, variable)
 
