@@ -182,6 +182,14 @@ def _canonical_entities(entities: list[dict]) -> list[dict]:
     return sorted(canonical, key=lambda entity: entity["local_identifier"])
 
 
+def _has_word_clause(variable: str, word: str) -> str:
+    return (
+        f"{{ SELECT DISTINCT ?{variable} WHERE {{ ?{variable} "
+        "<http://qlever.cs.uni-freiburg.de/builtin-functions/has-word> ?_word . "
+        f'FILTER STRSTARTS(?_word, "{word}") }} }}'
+    )
+
+
 def _filter_param_description(spec: dict, entity: str) -> str:
     op_spec = spec["paths"][f"/{entity}"]["get"]
     inline_params = [
@@ -208,9 +216,7 @@ class TestNoFilter:
 
 
 class TestTitleFilter:
-    def test_title_search_uses_virtuoso_text_index(
-        self, skgif_api_manager: APIManager
-    ) -> None:
+    def test_title_search_uses_text_index(self, skgif_api_manager: APIManager) -> None:
         op = skgif_api_manager.get_op(
             "/skg-if/v1/products?filter=cf.search.title:Covid-19"
         )
@@ -218,11 +224,12 @@ class TestTitleFilter:
         params = op._prepare_params()
         filter_param = params["filter"]
         assert isinstance(filter_param, str)
-        assert (
-            filter_param
-            == "?local_identifier dcterm:title ?title .\n?title bif:contains \"'Covid-19'\" ."
+        assert filter_param == (
+            "?local_identifier dcterm:title ?title .\n"
+            f"{_has_word_clause('title', 'covid')}\n"
+            "?local_identifier dcterm:title ?title .\n"
+            f"{_has_word_clause('title', '19')}"
         )
-        assert "CONTAINS" not in filter_param
 
     def test_title_search_matches_content(self, skgif_api_manager: APIManager) -> None:
         results = _exec(
@@ -586,21 +593,21 @@ class TestCustomParamsInDocumentation:
 
 
 class TestPersonsEndpoint:
-    def test_text_search_uses_virtuoso_index(
-        self, skgif_api_manager: APIManager
-    ) -> None:
+    def test_text_search_uses_text_index(self, skgif_api_manager: APIManager) -> None:
         expected_filters = {
             "cf.search.family_name:Peroni": (
                 "?local_identifier foaf:familyName ?familyName .\n"
-                "?familyName bif:contains \"'Peroni'\" ."
+                f"{_has_word_clause('familyName', 'peroni')}"
             ),
             "cf.search.given_name:Silvio": (
                 "?local_identifier foaf:givenName ?givenName .\n"
-                "?givenName bif:contains \"'Silvio'\" ."
+                f"{_has_word_clause('givenName', 'silvio')}"
             ),
             "cf.search.name:Peroni Silvio": (
                 "?local_identifier foaf:name ?name .\n"
-                "?name bif:contains \"'Peroni Silvio'\" ."
+                f"{_has_word_clause('name', 'peroni')}\n"
+                "?local_identifier foaf:name ?name .\n"
+                f"{_has_word_clause('name', 'silvio')}"
             ),
         }
         for filter_value, expected_filter in expected_filters.items():
@@ -609,7 +616,6 @@ class TestPersonsEndpoint:
             filter_param = op._prepare_params()["filter"]
             assert isinstance(filter_param, str)
             assert filter_param == expected_filter
-            assert "FILTER(CONTAINS" not in filter_param
 
     def test_returns_person_by_identifier(self, skgif_api_manager: APIManager) -> None:
         results = _exec(
@@ -651,9 +657,7 @@ class TestPersonsEndpoint:
 
 
 class TestOrganisationsEndpoint:
-    def test_text_search_uses_virtuoso_index(
-        self, skgif_api_manager: APIManager
-    ) -> None:
+    def test_text_search_uses_text_index(self, skgif_api_manager: APIManager) -> None:
         op = skgif_api_manager.get_op(
             "/skg-if/v1/organisations?filter=cf.search.name:Mit Press"
         )
@@ -661,9 +665,8 @@ class TestOrganisationsEndpoint:
         filter_param = op._prepare_params()["filter"]
         assert isinstance(filter_param, str)
         assert filter_param == (
-            "?local_identifier foaf:name ?name .\n?name bif:contains \"'Mit Press'\" ."
+            f"{_has_word_clause('name', 'mit')}\n{_has_word_clause('name', 'press')}"
         )
-        assert "FILTER(CONTAINS" not in filter_param
 
     def test_returns_organisation_by_identifier(
         self, skgif_api_manager: APIManager
@@ -701,9 +704,7 @@ class TestOrganisationsEndpoint:
 
 
 class TestVenuesEndpoint:
-    def test_text_search_uses_virtuoso_index(
-        self, skgif_api_manager: APIManager
-    ) -> None:
+    def test_text_search_uses_text_index(self, skgif_api_manager: APIManager) -> None:
         op = skgif_api_manager.get_op(
             "/skg-if/v1/venues?filter=cf.search.name:Digital Libraries"
         )
@@ -712,9 +713,10 @@ class TestVenuesEndpoint:
         assert isinstance(filter_param, str)
         assert filter_param == (
             "?local_identifier dcterms:title ?name .\n"
-            "?name bif:contains \"'Digital Libraries'\" ."
+            f"{_has_word_clause('name', 'digital')}\n"
+            "?local_identifier dcterms:title ?name .\n"
+            f"{_has_word_clause('name', 'libraries')}"
         )
-        assert "FILTER(CONTAINS" not in filter_param
 
     def test_returns_venue_by_identifier(self, skgif_api_manager: APIManager) -> None:
         results = _exec(

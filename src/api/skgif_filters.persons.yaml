@@ -15,12 +15,12 @@ name:
 cf.search.family_name:
   filter: |-
     ?local_identifier foaf:familyName ?familyName .
-    ?familyName bif:contains "'{{value}}'" .
+    { SELECT DISTINCT ?familyName WHERE { ?familyName <http://qlever.cs.uni-freiburg.de/builtin-functions/has-word> ?_word . FILTER STRSTARTS(?_word, "{{value}}") } }
 cf.search.given_name:
   filter: |-
     ?local_identifier foaf:givenName ?givenName .
-    ?givenName bif:contains "'{{value}}'" .
+    { SELECT DISTINCT ?givenName WHERE { ?givenName <http://qlever.cs.uni-freiburg.de/builtin-functions/has-word> ?_word . FILTER STRSTARTS(?_word, "{{value}}") } }
 cf.search.name:
   filter: |-
     ?local_identifier foaf:name ?name .
-    ?name bif:contains "'{{value}}'" .
+    { SELECT DISTINCT ?name WHERE { ?name <http://qlever.cs.uni-freiburg.de/builtin-functions/has-word> ?_word . FILTER STRSTARTS(?_word, "{{value}}") } }

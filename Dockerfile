@@ -6,7 +6,7 @@ FROM python:3.11-slim
 ENV BASE_URL="api.opencitations.net" \
     LOG_DIR="/mnt/log_dir/oc_api"  \
     SPARQL_ENDPOINT_INDEX="http://qlever-service.default.svc.cluster.local:7011" \
-    SPARQL_ENDPOINT_META="http://virtuoso-service.default.svc.cluster.local:8890/sparql" \
+    SPARQL_ENDPOINT_META="http://meta-qlever-service.default.svc.cluster.local:7011" \
     SYNC_ENABLED="true" 
 
 # Ensure Python output is unbuffered

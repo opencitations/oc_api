@@ -1,0 +1,114 @@
+{
+  "retrieved_at": "2026-09-29T13:38:24.769502+00:00",
+  "metadata": [
+    {
+      "url": "https://api.opencitations.net/meta/v1/metadata/isbn:9789663601922",
+      "results": [
+        {
+          "id": "doi:10.15407/akademperiodyka.192.304 isbn:9789663601922 openalex:W2790273689 omid:br/06101786021",
+          "title": "Coastal Zone Resources Management",
+          "author": "Ivanov, V.A. [omid:ra/06105318565]; Igumnova, E.M. [omid:ra/06105318566]; Timchenko, I.E. [omid:ra/06105318567]",
+          "pub_date": "2012-05-19",
+          "issue": "",
+          "volume": "",
+          "venue": "",
+          "type": "book",
+          "page": "",
+          "publisher": "National Academy Of Sciences Of Ukraine (Co. Ltd Ukrinformnauka) [crossref:6225 omid:ra/0610116288]",
+          "editor": ""
+        }
+      ]
+    },
+    {
+      "url": "https://api.opencitations.net/meta/v1/metadata/omid:br/061202333124",
+      "results": [
+        {
+          "id": "doi:10.31519/conferencearticle_5b1b9384252a73.81999055 openalex:W2593131457 omid:br/061202333124",
+          "title": "Mapping Biochemical Fields In The Upper Layer Of The Black Sea By The Adaptive Balance Of Causes Method",
+          "author": "Lazarchuk, Inga [omid:ra/061206986868]; Lazarchuk, Inga [omid:ra/061206986869]; Timchenko, Igor [omid:ra/061206986870]; Timchenko, Igor [omid:ra/061206986871]",
+          "pub_date": "2017-10-11",
+          "issue": "",
+          "volume": "",
+          "venue": "Proceedings Of International Conference \"Managinag Risks To Coastal Regions And Communities In A Changinag World\" (EMECS'11 - SeaCoasts XXVI) [omid:br/061202334121]",
+          "type": "proceedings article",
+          "page": "",
+          "publisher": "Academus Publishing [crossref:15171 omid:ra/0670114706]",
+          "editor": ""
+        }
+      ]
+    },
+    {
+      "url": "https://api.opencitations.net/meta/v1/metadata/omid:br/06603737264",
+      "results": [
+        {
+          "id": "doi:10.1357/002224090784984678 openalex:W2077769416 omid:br/06603737264",
+          "title": "A Nitrogen-Based Model Of Plankton Dynamics In The Oceanic Mixed Layer",
+          "author": "Fasham, M. J. R. [omid:ra/066010366029]; Ducklow, H. W. [omid:ra/066010366030]; McKelvie, S. M. [omid:ra/066010366031]",
+          "pub_date": "1990-08-01",
+          "issue": "3",
+          "volume": "48",
+          "venue": "Journal Of Marine Research [issn:0022-2402 issn:1543-9542 openalex:S166958622 omid:br/064064740]",
+          "type": "journal article",
+          "page": "591-639",
+          "publisher": "Journal Of Marine Research/Yale [crossref:270 omid:ra/0680114484]",
+          "editor": ""
+        }
+      ]
+    },
+    {
+      "url": "https://api.opencitations.net/meta/v1/metadata/omid:br/061502169014",
+      "results": [
+        {
+          "id": "doi:10.1016/j.ecolecon.2008.01.017 openalex:W2079791368 omid:br/061502169014",
+          "title": "How To Be An Ecological Economist",
+          "author": "Faber, Malte [omid:ra/061506480601]",
+          "pub_date": "2008-05",
+          "issue": "1",
+          "volume": "66",
+          "venue": "Ecological Economics [issn:0921-8009 openalex:S136211407 omid:br/069053430]",
+          "type": "journal article",
+          "page": "1-7",
+          "publisher": "Elsevier Bv [crossref:78 omid:ra/0610116009]",
+          "editor": ""
+        }
+      ]
+    }
+  ],
+  "references": {
+    "url": "https://api.opencitations.net/index/v2/references/omid:br/06101786021",
+    "selected_results": [
+      {
+        "oci": "06101786021-06603737264",
+        "citing": "omid:br/06101786021 doi:10.15407/akademperiodyka.192.304 isbn:9789663601922 openalex:W2790273689",
+        "cited": "omid:br/06603737264 doi:10.1357/002224090784984678 openalex:W2077769416",
+        "creation": "2012-05-19",
+        "timespan": "P21Y9M18D",
+        "journal_sc": "no",
+        "author_sc": "no"
+      },
+      {
+        "oci": "06101786021-061502169014",
+        "citing": "omid:br/06101786021 doi:10.15407/akademperiodyka.192.304 isbn:9789663601922 openalex:W2790273689",
+        "cited": "omid:br/061502169014 doi:10.1016/j.ecolecon.2008.01.017 openalex:W2079791368",
+        "creation": "2012-05-19",
+        "timespan": "P4Y0M",
+        "journal_sc": "no",
+        "author_sc": "no"
+      }
+    ]
+  },
+  "citations": {
+    "url": "https://api.opencitations.net/index/v2/citations/omid:br/06101786021",
+    "selected_results": [
+      {
+        "oci": "061202333124-06101786021",
+        "citing": "omid:br/061202333124 doi:10.31519/conferencearticle_5b1b9384252a73.81999055 openalex:W2593131457",
+        "cited": "omid:br/06101786021 doi:10.15407/akademperiodyka.192.304 isbn:9789663601922 openalex:W2790273689",
+        "creation": "2017-10-11",
+        "timespan": "P5Y4M22D",
+        "journal_sc": "no",
+        "author_sc": "no"
+      }
+    ]
+  }
+}

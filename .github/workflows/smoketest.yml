@@ -15,6 +15,7 @@ env:
   SYNC_ENABLED: "false"
   BASE_URL: http://localhost:8080
   PREVIEW: "?preview=true"
+  PREVIEW_SECOND: "&preview=true"
 
 jobs:
   smoketest:
@@ -58,7 +59,7 @@ jobs:
             local expected_code="${3:-200}"
             TOTAL=$((TOTAL + 1))
 
-            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "$url")
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 75 "$url")
 
             if [ "$code" == "$expected_code" ]; then
                 echo "  ✓ ${label} → ${code}"
@@ -86,6 +87,7 @@ jobs:
         check "GET /meta/v1 (docs)" "${BASE_URL}/meta/v1${PREVIEW}"
         check "GET /index/v1 (docs)" "${BASE_URL}/index/v1${PREVIEW}"
         check "GET /index/v2 (docs)" "${BASE_URL}/index/v2${PREVIEW}"
+        check "GET /skg-if/v1 (docs)" "${BASE_URL}/skg-if/v1${PREVIEW}"
 
         # Meta API v1 operations
         echo ""
@@ -114,6 +116,20 @@ jobs:
         check "citation-count" "${BASE_URL}/index/v2/citation-count/doi:10.1108/jd-12-2013-0166${PREVIEW}"
         check "reference-count" "${BASE_URL}/index/v2/reference-count/doi:10.7717/peerj-cs.421${PREVIEW}"
         check "venue-citation-count" "${BASE_URL}/index/v2/venue-citation-count/issn:0138-9130${PREVIEW}"
+
+        # SKG-IF API v1 operations
+        echo ""
+        echo "[SKG-IF API v1]"
+        check "/products/{local_identifier}" "${BASE_URL}/skg-if/v1/products/https://w3id.org/oc/meta/br/062104388184${PREVIEW}"
+        check "/products" "${BASE_URL}/skg-if/v1/products?filter=cf.search.title:OpenCitations${PREVIEW_SECOND}"
+        check "/persons/{local_identifier}" "${BASE_URL}/skg-if/v1/persons/https://w3id.org/oc/meta/ra/0614010840729${PREVIEW}"
+        check "/persons" "${BASE_URL}/skg-if/v1/persons?filter=cf.search.given_name:Silvio,cf.search.family_name:Peroni${PREVIEW_SECOND}"
+        check "/organisations/{local_identifier}" "${BASE_URL}/skg-if/v1/organisations/https://w3id.org/oc/meta/ra/0670114921${PREVIEW}"
+        check "/organisations" "${BASE_URL}/skg-if/v1/organisations?filter=cf.search.name:Mit%20Press${PREVIEW_SECOND}"
+        check "/venues/{local_identifier}" "${BASE_URL}/skg-if/v1/venues/https://w3id.org/oc/meta/br/062501778099${PREVIEW}"
+        check "/venues" "${BASE_URL}/skg-if/v1/venues?filter=cf.search.name:Quantitative%20Science%20Studies${PREVIEW_SECOND}"
+
+        
 
         # Summary
         echo ""

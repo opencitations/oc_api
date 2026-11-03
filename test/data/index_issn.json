@@ -1,0 +1,159 @@
+{
+  "retrieved_at": "2026-09-29T15:23:49.872614+00:00",
+  "metadata": [
+    {
+      "url": "https://api.opencitations.net/meta/v1/metadata/issn:1096-987X",
+      "results": [
+        {
+          "id": "doi:10.1002/(issn)1096-987x issn:0192-8651 issn:1096-987X openalex:S21117631 omid:br/0615019585",
+          "title": "Journal Of Computational Chemistry",
+          "author": "",
+          "pub_date": "",
+          "issue": "",
+          "volume": "",
+          "venue": "",
+          "type": "journal",
+          "page": "",
+          "publisher": "Wiley [crossref:311 omid:ra/0610116001]",
+          "editor": ""
+        }
+      ]
+    },
+    {
+      "url": "https://api.opencitations.net/meta/v1/metadata/omid:br/06190415414",
+      "results": [
+        {
+          "id": "doi:10.1080/07391102.2017.1386592 openalex:W2761138796 pmid:28978251 omid:br/06190415414",
+          "title": "Intermolecular Interactions Between DNA And Methamphetamine, Amphetamine, Ecstasy And Their Major Metabolites",
+          "author": "Reis, Arthur F.V.F. [omid:ra/061901185326]; Pereira, Igor L. G. [orcid:0000-0002-8022-3612 omid:ra/06160113859]; Neto, Abel F.G. [omid:ra/061901185327]; Santos, Alberdan S. [omid:ra/061901185328]; Kuca, Kamil [omid:ra/061901185329]; Nepovimova, Eugenie [orcid:0000-0003-0281-246X omid:ra/068012488831]; Neto, Antonio M.J.C. [omid:ra/061901185330]",
+          "pub_date": "2017-10-23",
+          "issue": "12",
+          "volume": "36",
+          "venue": "Journal Of Biomolecular Structure And Dynamics [issn:0739-1102 issn:1538-0254 openalex:S178711970 omid:br/061708427]",
+          "type": "journal article",
+          "page": "3047-3057",
+          "publisher": "Informa Uk Limited [crossref:301 omid:ra/0610116005]",
+          "editor": ""
+        }
+      ]
+    },
+    {
+      "url": "https://api.opencitations.net/meta/v1/metadata/omid:br/061701295110",
+      "results": [
+        {
+          "id": "doi:10.1088/0953-4075/47/14/143001 openalex:W2042280112 omid:br/061701295110",
+          "title": "Understanding The Structure And Dynamic Of Odorants In The Gas Phase Using A Combination Of Microwave Spectroscopy And Quantum Chemical Calculations",
+          "author": "Mouhib, Halima [orcid:0000-0001-5031-3468 omid:ra/069014588]",
+          "pub_date": "2014-07-04",
+          "issue": "14",
+          "volume": "47",
+          "venue": "Journal Of Physics B: Atomic, Molecular And Optical Physics [issn:0953-4075 issn:1361-6455 openalex:S108417319 omid:br/0616036311]",
+          "type": "journal article",
+          "page": "143001",
+          "publisher": "Iop Publishing [crossref:266 omid:ra/0610116040]",
+          "editor": ""
+        }
+      ]
+    },
+    {
+      "url": "https://api.opencitations.net/meta/v1/metadata/omid:br/06101680950",
+      "results": [
+        {
+          "id": "doi:10.1484/eer-eb issn:2295-9254 issn:2295-9262 openalex:S4210239944 omid:br/06101680950",
+          "title": "",
+          "author": "Essary, Kirk [omid:ra/06035094624]; Van Gent, Jacqueline [omid:ra/06035094625]; Adams, Tracy [omid:ra/06035094626]; Jamroziak, Emilia [omid:ra/06035094627]; Meyer, Matthias [omid:ra/06035094628]; Ricciardelli, Fabrizio [omid:ra/06035094629]; Ruys, Juanita Feros [omid:ra/06035094630]; Sigurðsson, Jón Viðar [omid:ra/06035094631]; Terpstra, Nicholas [omid:ra/06035094632]",
+          "pub_date": "",
+          "issue": "",
+          "volume": "",
+          "venue": "",
+          "type": "",
+          "page": "",
+          "publisher": "Brepols Publishers Nv [crossref:7597 omid:ra/0610116091]",
+          "editor": ""
+        }
+      ]
+    },
+    {
+      "url": "https://api.opencitations.net/meta/v1/metadata/omid:br/061602440477",
+      "results": [
+        {
+          "id": "doi:10.1057/9780230298125_8 openalex:W2339586113 omid:br/061602440477",
+          "title": "Francis Bacon’s Bi-literal Cipher And The Materiality Of Early Modern Diplomatic Writing",
+          "author": "Stewart, Alan [omid:ra/061607098301]",
+          "pub_date": "2011",
+          "issue": "",
+          "volume": "",
+          "venue": "Diplomacy And Early Modern Culture [doi:10.1057/9780230298125 isbn:9780230298125 isbn:9781349316267 openalex:W599936931 omid:br/061602440482]",
+          "type": "book chapter",
+          "page": "120-137",
+          "publisher": "Springer Science And Business Media Llc [crossref:297 omid:ra/0610116006]",
+          "editor": "Adams, Robyn [omid:ra/061607098305]; Cox, Rosanna [omid:ra/061607098306]"
+        }
+      ]
+    },
+    {
+      "url": "https://api.opencitations.net/meta/v1/metadata/omid:br/06130803068",
+      "results": [
+        {
+          "id": "doi:10.1080/0268117x.2021.1926651 openalex:W3180010455 omid:br/06130803068",
+          "title": "Addressing Audiences Abroad: Cultural And Public Diplomacy In Seventeenth-Century Europe",
+          "author": "Lamal, Nina [orcid:0000-0002-7460-5163 omid:ra/0613061148]; Van Gelder, Klaas [orcid:0000-0002-9250-629X omid:ra/061302457354]",
+          "pub_date": "2021-05-04",
+          "issue": "3",
+          "volume": "36",
+          "venue": "The Seventeenth Century [issn:0268-117X issn:2050-4616 openalex:S4210210779 omid:br/06130803749]",
+          "type": "journal article",
+          "page": "367-387",
+          "publisher": "Informa Uk Limited [crossref:301 omid:ra/0610116005]",
+          "editor": ""
+        }
+      ]
+    }
+  ],
+  "citations": {
+    "url": "https://api.opencitations.net/index/v2/citations/omid:br/0615019585?limit=2",
+    "selected_results": [
+      {
+        "oci": "06190415414-0615019585",
+        "citing": "omid:br/06190415414 doi:10.1080/07391102.2017.1386592 openalex:W2761138796 pmid:28978251",
+        "cited": "omid:br/0615019585 doi:10.1002/(issn)1096-987x issn:0192-8651 issn:1096-987X openalex:S21117631",
+        "creation": "2017-10-23",
+        "timespan": "",
+        "journal_sc": "no",
+        "author_sc": "no"
+      },
+      {
+        "oci": "061701295110-0615019585",
+        "citing": "omid:br/061701295110 doi:10.1088/0953-4075/47/14/143001 openalex:W2042280112",
+        "cited": "omid:br/0615019585 doi:10.1002/(issn)1096-987x issn:0192-8651 issn:1096-987X openalex:S21117631",
+        "creation": "2014-07-04",
+        "timespan": "",
+        "journal_sc": "no",
+        "author_sc": "no"
+      }
+    ]
+  },
+  "references": {
+    "url": "https://api.opencitations.net/index/v2/references/omid:br/06101680950",
+    "selected_results": [
+      {
+        "oci": "06101680950-061602440477",
+        "citing": "omid:br/06101680950 doi:10.1484/eer-eb issn:2295-9254 issn:2295-9262 openalex:S4210239944",
+        "cited": "omid:br/061602440477 doi:10.1057/9780230298125_8 openalex:W2339586113",
+        "creation": "",
+        "timespan": "",
+        "journal_sc": "no",
+        "author_sc": "no"
+      },
+      {
+        "oci": "06101680950-06130803068",
+        "citing": "omid:br/06101680950 doi:10.1484/eer-eb issn:2295-9254 issn:2295-9262 openalex:S4210239944",
+        "cited": "omid:br/06130803068 doi:10.1080/0268117x.2021.1926651 openalex:W3180010455",
+        "creation": "",
+        "timespan": "",
+        "journal_sc": "no",
+        "author_sc": "no"
+      }
+    ]
+  }
+}
