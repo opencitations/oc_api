@@ -190,6 +190,10 @@ def _has_word_clause(variable: str, word: str) -> str:
     )
 
 
+def _prefix_regex(variable: str, word: str) -> str:
+    return f'FILTER REGEX(?{variable}, "(^|[^\\\\p{{L}}\\\\p{{N}}]){word}", "i")'
+
+
 def _filter_param_description(spec: dict, entity: str) -> str:
     op_spec = spec["paths"][f"/{entity}"]["get"]
     inline_params = [
@@ -227,8 +231,7 @@ class TestTitleFilter:
         assert filter_param == (
             "?local_identifier dcterm:title ?title .\n"
             f"{_has_word_clause('title', 'covid')}\n"
-            "?local_identifier dcterm:title ?title .\n"
-            f"{_has_word_clause('title', '19')}"
+            f"{_prefix_regex('title', '19')}"
         )
 
     def test_title_search_matches_content(self, skgif_api_manager: APIManager) -> None:
@@ -606,8 +609,7 @@ class TestPersonsEndpoint:
             "cf.search.name:Peroni Silvio": (
                 "?local_identifier foaf:name ?name .\n"
                 f"{_has_word_clause('name', 'peroni')}\n"
-                "?local_identifier foaf:name ?name .\n"
-                f"{_has_word_clause('name', 'silvio')}"
+                f"{_prefix_regex('name', 'silvio')}"
             ),
         }
         for filter_value, expected_filter in expected_filters.items():
@@ -665,7 +667,7 @@ class TestOrganisationsEndpoint:
         filter_param = op._prepare_params()["filter"]
         assert isinstance(filter_param, str)
         assert filter_param == (
-            f"{_has_word_clause('name', 'mit')}\n{_has_word_clause('name', 'press')}"
+            f"{_has_word_clause('name', 'press')}\n{_prefix_regex('name', 'mit')}"
         )
 
     def test_returns_organisation_by_identifier(
@@ -713,9 +715,8 @@ class TestVenuesEndpoint:
         assert isinstance(filter_param, str)
         assert filter_param == (
             "?local_identifier dcterms:title ?name .\n"
-            f"{_has_word_clause('name', 'digital')}\n"
-            "?local_identifier dcterms:title ?name .\n"
-            f"{_has_word_clause('name', 'libraries')}"
+            f"{_has_word_clause('name', 'libraries')}\n"
+            f"{_prefix_regex('name', 'digital')}"
         )
 
     def test_returns_venue_by_identifier(self, skgif_api_manager: APIManager) -> None:
